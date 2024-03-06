@@ -1,1 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Clase global para el rectángulo rosa en la parte superior */
+.cabecera {
+    background-color: #FC97A9;
+    height: auto; /* Ajusta la altura según tus necesidades */
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2; /* Asegura que esté encima de otros elementos */
+}
+
+/* Clase global para el rectángulo negro a la izquierda */
+.menu {
+    background-color: #343a40;
+    height: 100%; /* Cambiado a altura en viewport (100% del alto de la ventana) */
+    width: 10%; /* Ancho del menú, ajusta según tus necesidades */
+    position: fixed;
+    left: 0;
+    z-index: 1; /* Asegura que esté encima de otros elementos */
+}
+
