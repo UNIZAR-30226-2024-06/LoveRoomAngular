@@ -1,0 +1,8 @@
+
+.contenido-adicional {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: top; /* Centra verticalmente */
+    height: 100vh; /* Establece la altura al 100% del viewport height */
+    padding-top: 60px; /* Ajusta el padding según tus necesidades */
+}
