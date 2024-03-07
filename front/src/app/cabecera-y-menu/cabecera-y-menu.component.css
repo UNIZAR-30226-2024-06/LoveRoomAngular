@@ -9,14 +9,38 @@
     z-index: 2; /* Asegura que esté encima de otros elementos */
 }
 
+.cabecera img{
+  margin: 15px;
+}
+
 /* Clase global para el rectángulo negro a la izquierda */
 .menu {
     background-color: #343a40;
     height: 100%; /* Cambiado a altura en viewport (100% del alto de la ventana) */
-    width: 10%; /* Ancho del menú, ajusta según tus necesidades */
+    width: auto; /* Ancho del menú, ajusta según tus necesidades */
     position: fixed;
     left: 0;
     z-index: 1  ; /* Asegura que esté encima de otros elementos */
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-button {
+  margin-left: 10px;
+  margin-top: 20px;
+  margin-right: 10px;
+  color: white;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Estilo para simular la apariencia de los h1 */
+.h1-like {
+  font-size: 1.5rem; /* Tamaño de fuente similar al de los h1 */
+  margin: 10px; /* Elimina cualquier margen predeterminado */
 }
 
 .logo-container {
@@ -40,5 +64,6 @@
   .logo-derecho{
     height: 50px; /* Ajusta el tamaño según tus necesidades */
     margin-right: 10px; /* Añade un margen entre los logos y el texto */
-    margin-left: 325%;
+    padding-right: 20px;
   }
+
