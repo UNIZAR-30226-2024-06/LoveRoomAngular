@@ -2,7 +2,7 @@
 <header class="cabecera">
   <div class="logo-container">
     <div class="logo">
-      <a [routerLink]="[' ']">
+      <a [routerLink]="['']">
         <img src="assets/Logo.png" alt="Logo Izquierdo" class="logo-izquierdo">
         <img src="assets/Logo_titulo.png" alt="Logo Titulo" class="logo-titulo">
       </a>
@@ -12,7 +12,12 @@
     </a>
   </div>
   <nav class="menu">
-    <button [routerLink]="['/ruta-de-menu']" class="menu-button h1-like">Menu</button>
-    <button [routerLink]="['/mis-salas']" class="menu-button h1-like">Mis salas</button>
+    <a [routerLink]="['/ruta-de-menu']">
+      <button class="menu-button h1-like">Menu</button>
+    </a>
+
+    <a [routerLink]="['/mis-salas']">
+      <button class="menu-button h1-like">Mis salas</button>
+    </a>
   </nav>
 </header>

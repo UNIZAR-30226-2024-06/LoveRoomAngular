@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { CabeceraYMenuComponent } from './cabecera-y-menu/cabecera-y-menu.component';
+import { RouterOutlet, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CabeceraYMenuComponent],
+  imports: [RouterOutlet, RouterModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
