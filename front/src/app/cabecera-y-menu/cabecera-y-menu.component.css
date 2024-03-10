@@ -1,7 +1,7 @@
 /* Clase global para el rectángulo rosa en la parte superior */
 .cabecera {
     background-color: #FC97A9;
-    height: auto; /* Ajusta la altura según tus necesidades */
+    height: auto;
     width: 100%;
     position: fixed;
     top: 0;
@@ -57,12 +57,12 @@
   
   .logo-izquierdo,
   .logo-titulo{
-    height: 50px; /* Ajusta el tamaño según tus necesidades */
+    height: 50px;
     margin-right: 10px; /* Añade un margen entre los logos y el texto */
   }
 
   .logo-derecho{
-    height: 50px; /* Ajusta el tamaño según tus necesidades */
+    height: 50px;
     margin-right: 10px; /* Añade un margen entre los logos y el texto */
     padding-right: 20px;
   }

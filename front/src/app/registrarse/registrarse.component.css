@@ -30,7 +30,7 @@ label {
     display: block;
 }
 
-input[type=text], input[type=password], button {
+input[type=text], input[type=password], input[type=password_secure], button {
    width: 100%;
    padding: 10px;
    margin-bottom: 20px; 
