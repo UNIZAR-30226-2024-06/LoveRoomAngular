@@ -1,0 +1,43 @@
+.contenido-adicional {
+
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-left: 150px;
+    padding-top: 20px;
+    width: 100%;
+}
+
+.cuerpo {
+    display: flex; 
+    flex-wrap: wrap; 
+    margin-top: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+.contenido-adicional h1 {
+    font-size: 1.8rem;
+    margin: 10px;
+    text-decoration: underline;
+    width: 100%;
+}
+
+
+.miSala {
+    width: 70%;
+    height: 100px;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding: 14px; /* Espacio interior */
+    border: 2px solid #fc0202; /* Borde sólido de 2px */
+    border-radius: 10px; /* Borde redondeado */
+    background-color: #f9f9f9; /* Color de fondo */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra */
+  }
+  
+  .item-image {
+    width: 180px;
+    height: 110px;
+    margin-right: 20px;
+  }
