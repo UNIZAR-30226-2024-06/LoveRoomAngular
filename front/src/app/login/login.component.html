@@ -1,5 +1,9 @@
 <div class="login-container">
-    <h1>LoveRoom</h1>
+    <div>
+        <a [routerLink]="['']">
+            <img src="assets/Logo_titulo.png" alt="Logo" class="logo">
+        </a>
+    </div>
     <form>
         <label for="username">Nombre de usuario</label>
         <input type="text" id="username" placeholder="Introduzca su nombre de usuario">
@@ -9,11 +13,6 @@
         
         <button type="submit">Iniciar sesión</button>
     </form>
-    <div>
-        <a [routerLink]="['']">He olvidado mi contraseña</a><br/>
-        ¿No tienes una cuenta? <a [routerLink]="['/registrarse']">Regístrate</a>
-    </div>
-    <a [routerLink]="['']">
-        <img src="assets/Home.png" alt="Home" class="home">
-    </a>
+    <a [routerLink]="['']">He olvidado mi contraseña</a><br/>
+    ¿No tienes una cuenta? <a [routerLink]="['/registrarse']">Regístrate</a>
 </div>

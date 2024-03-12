@@ -1,5 +1,9 @@
 <div class="login-container">
-    <h1>LoveRoom</h1>
+    <div>
+        <a [routerLink]="['']">
+            <img src="assets/Logo_titulo.png" alt="Logo" class="logo">
+        </a>
+    </div>
     <form>
         <label for="email">Correo electrónico</label>
         <input type="text" id="email" placeholder="Introduzca su correo electrónico">
@@ -16,7 +20,4 @@
         <button type="submit">Registrarse</button>
     </form>
     ¿Ya tienes una cuenta? <a [routerLink]="['/login']">Inicia sesión</a>
-    <a [routerLink]="['']">
-        <img src="assets/Home.png" alt="Home" class="home">
-    </a>
 </div>
