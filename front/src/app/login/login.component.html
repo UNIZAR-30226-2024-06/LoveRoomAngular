@@ -4,12 +4,12 @@
             <img src="assets/Logo_titulo.png" alt="Logo" class="logo">
         </a>
     </div>
-    <form (submit)="login(username.value, password.value)">
+    <form (submit)="login(correo.value, contrasena.value)">
         <label for="username">Nombre de usuario</label>
-        <input type="text" id="username" #username placeholder="Introduzca su nombre de usuario">
+        <input type="text" id="username" #correo placeholder="Introduzca su nombre de usuario">
         
         <label for="password">Contraseña</label>
-        <input type="password" id="password" #password placeholder="Introduzca su contraseña">
+        <input type="password" id="password" #contrasena placeholder="Introduzca su contraseña">
         
         <button type="submit">Iniciar sesión</button>
     </form>
