@@ -7,12 +7,18 @@
         <img src="assets/Logo_titulo.png" alt="Logo Titulo" class="logo-titulo">
       </a>
     </div>
-    <a [routerLink]="['/login']">
-      <img src="assets/Login.png" alt="Logo Derecho" class="logo-derecho">
-    </a>
+    <ng-container *ngIf="token">
+      <img src="assets/Logout.png" alt="Logo Derecho" class="logo-derecho" (click)="logout()">
+    </ng-container>
+    <!-- Si no hay token, mostrar la imagen de login -->
+    <ng-container *ngIf="!token">
+      <a [routerLink]="['/login']">
+        <img src="assets/Login.png" alt="Logo Derecho" class="logo-derecho">
+      </a>
+    </ng-container>
   </div>
   <nav class="menu">
-    <a [routerLink]="['/ruta-de-menu']">
+    <a [routerLink]="['']">
       <button class="menu-button h1-like">Menu</button>
     </a>
 

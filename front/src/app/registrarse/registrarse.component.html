@@ -4,15 +4,15 @@
             <img src="assets/Logo_titulo.png" alt="Logo" class="logo">
         </a>
     </div>
-    <form>
-        <label for="email">Correo electrónico</label>
-        <input type="text" id="email" placeholder="Introduzca su correo electrónico">
+    <form (ngSubmit)="registrarse()">
+        <label for="correo">Correo electrónico</label>
+        <input type="text" id="correo" [(ngModel)]="correo" name="correo" placeholder="Introduzca su correo electrónico">
 
         <label for="username">Nombre de usuario</label>
-        <input type="text" id="username" placeholder="Introduzca su nombre de usuario">
+        <input type="text" id="username" [(ngModel)]="nombre" name="nombre" placeholder="Introduzca su nombre de usuario">
         
         <label for="password">Contraseña</label>
-        <input type="password" id="password" placeholder="Introduzca su contraseña">
+        <input type="password" id="password" [(ngModel)]="contrasena" name="contrasena" placeholder="Introduzca su contraseña">
 
         <label for="password_secure">Confirmar contraseña</label>
         <input type="password" id="password_secure" placeholder="Introduzca de nuevo su contraseña">
