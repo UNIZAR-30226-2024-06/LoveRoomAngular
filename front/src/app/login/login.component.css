@@ -1,14 +1,3 @@
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 .login-container {
     max-width: 400px;
     padding: 20px;
@@ -16,6 +5,8 @@ body {
     border-radius: 10px;
     box-sizing: border-box;
     margin: auto;
+    margin-top: 5%;
+    
 }
 
 h1 {
@@ -35,10 +26,30 @@ input[type=text], input[type=password], button {
    padding: 10px;
    margin-bottom: 20px; 
    box-sizing: border-box;
+   border: 1px solid #ccc;
+   border-radius: 5px;
+   background-color: white;
+   color: grey; /* Color del texto */
+   font-size: 16px; /* Tamaño del texto */
+   position: relative;
+}
+
+.input-password {
+    position: relative;
+}
+
+.eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 35%;
+    transform: translateY(-50%);
+    width: 30px; /* Ajusta esto según tus necesidades */
+    height: 30px; /* Ajusta esto según tus necesidades */
+    cursor: pointer;
 }
 
 button {
-   background-color: red; 
+   background-color: #F89F9F; 
    color:white; 
    border:none; 
    border-radius: 5px;
@@ -50,3 +61,7 @@ button {
     margin: auto;
     height: 50px;
   }
+
+.linkLetter{
+    color : #F89F9F;
+}

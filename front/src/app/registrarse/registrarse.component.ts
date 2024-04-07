@@ -2,25 +2,33 @@ import { Component } from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-registrarse',
   standalone: true,
-  imports: [RouterOutlet, RouterModule, FormsModule],
+  imports: [RouterOutlet, RouterModule, FormsModule, CommonModule],
   providers: [HttpClient],
   templateUrl: './registrarse.component.html',
-  styleUrl: './registrarse.component.css'
+  styleUrl: './registrarse.component.css',
 })
 export class RegistrarseComponent {
   correo: string = '';
   nombre: string = '';
   contrasena: string = '';
+  contrasenaConfirm: string = '';
+  errorMsg: string = '';
 
   constructor(private http: HttpClient, private router: Router) { }
 
   registrarse(): void {
+    if (this.contrasena !== this.contrasenaConfirm) {
+      this.errorMsg = 'Las contraseñas no coinciden';
+      return;
+    }
+
     const credentials = {
       correo: this.correo,
       nombre: this.nombre,
@@ -41,15 +49,10 @@ export class RegistrarseComponent {
             localStorage.setItem('token', response.token);
             alert('¡Creación de cuenta exitosa! Token: ' + response.token);
             this.router.navigate(['/']);
-          } else {
-            alert('Error: No se recibió token en la respuesta.');
           }
         },
         error => {
-          // Si hubo un error durante la autenticación, muestra una alerta con el mensaje de error.
-          console.error('Error al crear cuenta', error);
-          alert('Error al crear cuenta: ' + error.message);
-          this.router.navigate(['/mis-salas']);
+          console.error('Error al crear la cuenta', error);
         }
       );
   }

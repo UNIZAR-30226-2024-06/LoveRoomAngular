@@ -19,6 +19,8 @@ export class LoginComponent {
   correo: string = '';
   contrasena: string = '';
 
+  mostrarContrasena = false;
+
   constructor(private http: HttpClient, private router: Router) { }
 
   login(): void {
@@ -52,5 +54,9 @@ export class LoginComponent {
           this.router.navigate(['/mis-salas']);
         }
       );
+  }
+
+  toggleMostrarContrasena() {
+    this.mostrarContrasena = !this.mostrarContrasena;
   }
 }

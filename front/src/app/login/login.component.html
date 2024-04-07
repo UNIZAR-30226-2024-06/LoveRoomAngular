@@ -9,10 +9,16 @@
         <input type="text" id="correo" [(ngModel)]="correo" name="correo" placeholder="Introduzca su correo electrónico">
         
         <label for="password">Contraseña</label>
-        <input type="password" id="password" [(ngModel)]="contrasena" name="contrasena" placeholder="Introduzca su contraseña">
+        <div class="input-password">
+            <input [type]="mostrarContrasena ? 'text' : 'password'" id="password" [(ngModel)]="contrasena" name="contrasena" placeholder="Introduzca su contraseña">
+            <img id="toggleImage" [src]="mostrarContrasena ? 'assets/hidePass.png' : 'assets/showPass.png'" (click)="toggleMostrarContrasena()" class="eye-icon">
+        </div>
         
         <button type="submit">Iniciar sesión</button>
     </form>
-    <a [routerLink]="['']">He olvidado mi contraseña</a><br/>
-    ¿No tienes una cuenta? <a [routerLink]="['/registrarse']">Regístrate</a>
+    <a class="linkLetter" [routerLink]="['']">He olvidado mi contraseña</a><br/>
+    <br/>
+    ¿No tienes una cuenta? <a class="linkLetter" [routerLink]="['/registrarse']"><strong>Regístrate</strong></a>
 </div>
+
+

@@ -1,0 +1,33 @@
+<div class="perfil-container">
+    <div class="head-perfil">
+        <h1>Editar perfil</h1>
+        <img src="assets/Logo_titulo.png" alt="Imagen Perfil" class="ImgPerfil">
+    </div>
+    <button>Cambiar imagen de perfil</button>
+    <form>  <!--<form (ngSubmit)="update()">-->
+        <div class="data">
+            <label for="Nombre Completo">Nombre completo</label>
+            <input type="text" id="nombre" name="nombre"> <!--[(ngModel)]="nombre"-->
+
+            <label for="Correo">Correo electrónico</label>
+            <input type="text" id="correo"  name="correo"> <!--[(ngModel)]="correo"-->
+
+            <label for="password">Contraseña</label>
+            <div class="input-password">
+                <input [type]="mostrarContrasena ? 'text' : 'password'" id="password"  name="contrasena"> <!--[(ngModel)]="contrasena"-->
+                <img id="toggleImage" [src]="mostrarContrasena ? 'assets/hidePass.png' : 'assets/showPass.png'" (click)="toggleMostrarContrasena()" class="eye-icon">
+            </div>   
+
+            <label for="age">Edad</label>
+            <select id="edad" name="edad">
+                <option value="">Seleccione su edad</option>
+                <option *ngFor="let edad of edades" [value]="edad">{{edad}}</option>
+            </select>
+            
+            
+        </div>
+        <div class="data">
+
+        </div>
+    </form>
+</div>
