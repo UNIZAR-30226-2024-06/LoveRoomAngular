@@ -1,33 +1,66 @@
 <div class="perfil-container">
     <div class="head-perfil">
         <h1>Editar perfil</h1>
-        <img src="assets/Logo_titulo.png" alt="Imagen Perfil" class="ImgPerfil">
+        <img [src]="imagenPerfil" alt="Imagen Perfil" class="ImgPerfil">
     </div>
-    <button>Cambiar imagen de perfil</button>
+    <button class="button" (click)="fileInput.click()">Cambiar imagen de perfil</button>
+    <input type="file" #fileInput style="display: none" (change)="cambiarImagen($event)">
     <form>  <!--<form (ngSubmit)="update()">-->
         <div class="data">
             <label for="Nombre Completo">Nombre completo</label>
-            <input type="text" id="nombre" name="nombre"> <!--[(ngModel)]="nombre"-->
+            <input type="text" id="nombre" name="nombre"> <!--[(ngModel)]="nombre"--> <!--Quiza aqui traer la de la BD-->
 
-            <label for="Correo">Correo electrónico</label>
-            <input type="text" id="correo"  name="correo"> <!--[(ngModel)]="correo"-->
+            <label for="Correo">Correo Electrónico</label>
+            <input type="text" id="correo"  name="correo"> <!--[(ngModel)]="correo"--> <!--Quiza aqui traer la de la BD-->
 
             <label for="password">Contraseña</label>
-            <div class="input-password">
+            <div class="input-password"> <!--Quiza aqui traer la de la BD-->
                 <input [type]="mostrarContrasena ? 'text' : 'password'" id="password"  name="contrasena"> <!--[(ngModel)]="contrasena"-->
                 <img id="toggleImage" [src]="mostrarContrasena ? 'assets/hidePass.png' : 'assets/showPass.png'" (click)="toggleMostrarContrasena()" class="eye-icon">
             </div>   
 
             <label for="age">Edad</label>
             <select id="edad" name="edad">
-                <option value="">Seleccione su edad</option>
+                <option value="">Seleccione su edad</option> <!--Quiza aqui traer la de la BD-->
                 <option *ngFor="let edad of edades" [value]="edad">{{edad}}</option>
             </select>
-            
-            
+
+            <label for="sexo">Sexo</label>
+            <select id="sexo" name="sexo"> <!--Quiza aqui traer la de la BD-->
+                <option value="Hombre">Hombre</option>
+                <option value="Mujer">Mujer</option>
+                <option value="Otro">Otro</option>
+            </select>              
         </div>
         <div class="data">
+            <label for="buscaedadmin">Edad mínima</label>
+            <select id="buscaedadmin" name="buscaedadmin">
+                <option value="">Seleccione la edad mínima</option> <!--Quiza aqui traer la de la BD-->
+                <option *ngFor="let edad of edades" [value]="edad">{{edad}}</option>
+            </select>
 
+            <label for="buscaedadmax">Edad máxima</label>
+            <select id="buscaedadmax" name="buscaedadmax">
+                <option value="">Seleccione la edad máxima</option> <!--Quiza aqui traer la de la BD-->
+                <option *ngFor="let edad of edades" [value]="edad">{{edad}}</option>
+            </select>
+
+            <label for="buscasexo">Preferencia Sexual</label>
+            <select id="buscasexo" name="buscasexo"> <!--Quiza aqui traer la de la BD-->
+                <option value="Hombre">Hombre</option>
+                <option value="Mujer">Mujer</option>
+                <option value="Todos">Todos</option>
+            </select>  
+
+            <label for="localidad">Localidad</label>
+            <select id="localidad" name="localidad"> <!--Quiza aqui traer la de la BD-->
+                <option value="Zaragoza">Zaragoza</option>
+                <option value="Huesca">Huesca</option>
+                <option value="Teruel">Teruel</option>
+            </select>
+
+            <label for="descripcion">Descripción</label>
+            <input class="desc" type="text" id="descripcion" name="descripcion"> <!--[(ngModel)]="descripcion"--> <!--Quiza aqui traer la de la BD-->
         </div>
     </form>
 </div>
