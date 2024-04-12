@@ -41,6 +41,7 @@ export class LoginComponent {
           if (response.token) {
             // Guardar el token en localStorage
             localStorage.setItem('token', response.token);
+            localStorage.setItem('correo', this.correo);
             alert('¡Inicio de sesión exitoso! Token: ' + response.token);
             this.router.navigate(['/']);
           } else {

@@ -5,63 +5,63 @@
     </div>
     <button class="button" (click)="fileInput.click()">Cambiar imagen de perfil</button>
     <input type="file" #fileInput style="display: none" (change)="cambiarImagen($event)">
-    <form>  <!--<form (ngSubmit)="update()">-->
+    <form  (ngSubmit)="guardarCambios()">
         <div class="data">
-            <label for="Nombre Completo">Nombre completo</label>
-            <input type="text" id="nombre" name="nombre"> <!--[(ngModel)]="nombre"--> <!--Quiza aqui traer la de la BD-->
+            <label for="nombre">Nombre completo</label>
+            <input type="text" id="nombre" name="nombre" placeholder="{{ usuario.nombre }}" [(ngModel)]="usuario.nombre">
 
-            <label for="Correo">Correo Electrónico</label>
-            <input type="text" id="correo"  name="correo"> <!--[(ngModel)]="correo"--> <!--Quiza aqui traer la de la BD-->
+            <label for="correo">Correo Electrónico</label>
+            <input type="text" id="correo" name="correo" placeholder="{{ usuario.correo }}" [(ngModel)]="usuario.correo">
 
             <label for="password">Contraseña</label>
-            <div class="input-password"> <!--Quiza aqui traer la de la BD-->
-                <input [type]="mostrarContrasena ? 'text' : 'password'" id="password"  name="contrasena"> <!--[(ngModel)]="contrasena"-->
+            <div class="input-password">
+                <input type="password" id="password" name="contrasena">
                 <img id="toggleImage" [src]="mostrarContrasena ? 'assets/hidePass.png' : 'assets/showPass.png'" (click)="toggleMostrarContrasena()" class="eye-icon">
             </div>   
 
-            <label for="age">Edad</label>
-            <select id="edad" name="edad">
-                <option value="">Seleccione su edad</option> <!--Quiza aqui traer la de la BD-->
-                <option *ngFor="let edad of edades" [value]="edad">{{edad}}</option>
+            <label for="edad">Edad</label>
+            <select id="edad" name="edad" [(ngModel)]="usuario.edad">
+                <option value="" disabled selected>Seleccione su edad</option>
+                <option *ngFor="let edad of edades" [value]="edad" [selected]="edad === usuario.edad">{{edad}}</option>
             </select>
 
             <label for="sexo">Sexo</label>
-            <select id="sexo" name="sexo"> <!--Quiza aqui traer la de la BD-->
-                <option value="Hombre">Hombre</option>
-                <option value="Mujer">Mujer</option>
-                <option value="Otro">Otro</option>
+            <select id="sexo" name="sexo" [(ngModel)]="usuario.sexo">
+                <option value="H" [selected]="'H' === usuario.sexo">Hombre</option>
+                <option value="M" [selected]="'M' === usuario.sexo">Mujer</option>
+                <option value="O" [selected]="'O' === usuario.sexo">Otro</option>
             </select>              
         </div>
         <div class="data">
             <label for="buscaedadmin">Edad mínima</label>
-            <select id="buscaedadmin" name="buscaedadmin">
-                <option value="">Seleccione la edad mínima</option> <!--Quiza aqui traer la de la BD-->
-                <option *ngFor="let edad of edades" [value]="edad">{{edad}}</option>
+            <select id="buscaedadmin" name="buscaedadmin" [(ngModel)]="usuario.buscaedadmin">
+                <option value="" disabled selected>Seleccione la edad mínima</option>
+                <option *ngFor="let edad of edades" [value]="edad" [selected]="edad === usuario.buscaedadmin">{{edad}}</option>
             </select>
 
             <label for="buscaedadmax">Edad máxima</label>
-            <select id="buscaedadmax" name="buscaedadmax">
-                <option value="">Seleccione la edad máxima</option> <!--Quiza aqui traer la de la BD-->
-                <option *ngFor="let edad of edades" [value]="edad">{{edad}}</option>
+            <select id="buscaedadmax" name="buscaedadmax" [(ngModel)]="usuario.buscaedadmax">
+                <option value="" disabled selected>Seleccione la edad máxima</option>
+                <option *ngFor="let edad of edades" [value]="edad" [selected]="edad === usuario.buscaedadmax">{{edad}}</option>
             </select>
 
             <label for="buscasexo">Preferencia Sexual</label>
-            <select id="buscasexo" name="buscasexo"> <!--Quiza aqui traer la de la BD-->
-                <option value="Hombre">Hombre</option>
-                <option value="Mujer">Mujer</option>
-                <option value="Todos">Todos</option>
+            <select id="buscasexo" name="buscasexo" [(ngModel)]="usuario.buscasexo">
+                <option value="H" [selected]="'H' === usuario.buscasexo">Hombre</option>
+                <option value="M" [selected]="'M' === usuario.buscasexo">Mujer</option>
+                <option value="T" [selected]="'T' === usuario.buscasexo">Todos</option>
             </select>  
 
             <label for="localidad">Localidad</label>
-            <select id="localidad" name="localidad"> <!--Quiza aqui traer la de la BD-->
-                <option value="Zaragoza">Zaragoza</option>
-                <option value="Huesca">Huesca</option>
-                <option value="Teruel">Teruel</option>
+            <select id="localidad" name="localidad" [(ngModel)]="usuario.idlocalidad">
+                <option value="0" [selected]="'0' === usuario.idlocalidad">Zaragoza</option>
+                <option value="1" [selected]="'1' === usuario.idlocalidad">Huesca</option>
+                <option value="2" [selected]="'2' === usuario.idlocalidad">Teruel</option>
             </select>
 
             <label for="descripcion">Descripción</label>
-            <input class="desc" type="text" id="descripcion" name="descripcion"> <!--[(ngModel)]="descripcion"--> <!--Quiza aqui traer la de la BD-->
+            <input class="desc" type="text" id="descripcion" name="descripcion" placeholder="{{ usuario.descripcion }}" [(ngModel)]="usuario.descripcion">
         </div>
+        <button type="submit" class="button"><strong>Guardar cambios</strong></button>
     </form>
-    <button class="button"><strong>Guardar cambios</strong></button> <!--Con este hace el post de lo que haya en los inputs y redirigir al home-->
 </div>
