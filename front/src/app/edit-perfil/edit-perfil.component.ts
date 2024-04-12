@@ -2,11 +2,12 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { RouterOutlet, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-edit-perfil',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterOutlet, RouterModule],
   templateUrl: './edit-perfil.component.html',
   styleUrl: './edit-perfil.component.css'
 })

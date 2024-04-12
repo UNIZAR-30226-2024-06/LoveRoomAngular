@@ -1,4 +1,4 @@
-<div class="perfil-container">
+<div class="edit-perfil-container">
     <div class="head-perfil">
         <h1>Editar perfil</h1>
         <img [src]="imagenPerfil" alt="Imagen Perfil" class="ImgPerfil">
@@ -14,10 +14,7 @@
             <input type="text" id="correo" name="correo" placeholder="{{ usuario.correo }}" [(ngModel)]="usuario.correo">
 
             <label for="password">Contraseña</label>
-            <div class="input-password">
-                <input type="password" id="password" name="contrasena">
-                <img id="toggleImage" [src]="mostrarContrasena ? 'assets/hidePass.png' : 'assets/showPass.png'" (click)="toggleMostrarContrasena()" class="eye-icon">
-            </div>   
+            <button [routerLink]="['']">Presione este botón para cambiar su contraseña</button> 
 
             <label for="edad">Edad</label>
             <select id="edad" name="edad" [(ngModel)]="usuario.edad">

@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CabeceraYMenuComponent } from '../cabecera-y-menu/cabecera-y-menu.component';
+import { RouterOutlet, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [ CabeceraYMenuComponent],
+  imports: [ CabeceraYMenuComponent, RouterOutlet, RouterModule, FormsModule],
   templateUrl: './perfil.component.html',
   styleUrl: './perfil.component.css'
 })
