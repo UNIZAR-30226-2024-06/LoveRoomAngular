@@ -8,7 +8,9 @@
       </a>
     </div>
     <ng-container *ngIf="token">
-      <img src="assets/Logout.png" alt="Logo Derecho" class="logo-derecho" (click)="logout()">
+      <a [routerLink]="['/perfil']">
+        <img src="assets/Logout.png" alt="Logo Derecho" class="logo-derecho">
+      </a>
     </ng-container>
     <!-- Si no hay token, mostrar la imagen de login -->
     <ng-container *ngIf="!token">

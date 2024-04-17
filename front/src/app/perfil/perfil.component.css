@@ -10,16 +10,17 @@
     display: flex;
     flex-direction: column;
     height: 100vh; /* Asegura que el contenedor ocupe toda la altura de la vista */
-    align-items: left;
+    align-items: flex-start;
     font-family: Arial, Helvetica, sans-serif;
     margin-left: 110px;
+    width: 50%;
 }
 
 .head-perfil {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 50%;
+    width: 100%;
     height: 20%;
     background: #F89F9F;
     margin-bottom: 2%;
@@ -44,7 +45,7 @@
     color: black;
     border:none;
     font-weight: bold;
-    width: 50%;
+    width: 100%;
     padding-top: 3px;
    padding-bottom: 3px;
  }
@@ -53,7 +54,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    width: 50%;
+    width: 100%;
     position: relative; /* Establece posición relativa para permitir el posicionamiento de la línea */
 }
 
@@ -88,6 +89,49 @@
       width: 100%;
       margin-top: 70px;
       margin-left: 10px;
+}
+
+.answers-container {
+   display: flex;
+   flex-direction: column;
+   padding-top: 20%;
+   height: 100vh; /* Asegura que el contenedor ocupe toda la altura de la vista */
+   align-items: flex-start;
+   font-family: Arial, Helvetica, sans-serif;
+   width: 50%;
+}
+
+.answer {
+   display: flex;
+   justify-content: space-around;
+   width: 100%;
+   position: relative; /* Establece posición relativa para permitir el posicionamiento de la línea */
+}
+
+.answerEspecial {
+   padding-left: 10%;
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+   width: 100%;
+   position: relative; /* Establece posición relativa para permitir el posicionamiento de la línea */
+}
+
+.general-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      height: 100vh; /* Asegura que el contenedor ocupe toda la altura de la vista */
+}
+
+.closeSession {
+   margin-top: 10px;
+   background-color: red; 
+   color:white; 
+   border:none; 
+   cursor: pointer;
+   width: 50%;
+   height: 10%;
 }
 
 @media (max-height: 1200px) {

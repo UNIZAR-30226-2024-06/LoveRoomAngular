@@ -11,6 +11,7 @@
     <p>Localidad: {{ usuario.idlocalidad }}</p>
 </div> -->
 <app-cabecera-y-menu></app-cabecera-y-menu>
+<div class="general-container">
 <div class="perfil-container">
     <div class="head-perfil">
         <h1>Perfil</h1>
@@ -21,42 +22,68 @@
         <label class="SectionTitle">Mi plan</label>
         <div class="option">
             <img class="icono" src="assets/Logo.png" alt="icono">
-            <button class="button">¡Hazte premium!</button> 
+            <button class="button" (click)="toggleAnswer(0)">¡Hazte premium!</button> 
             <img class="icono" src="assets/flechaDerecha.png" alt="icono">
         </div>
         <label class="SectionTitle">Acerca de</label>
         <div class="option">
             <img class="icono" src="assets/Logo.png" alt="icono">
-            <button class="button">Preguntas frecuentes</button> 
+            <button class="button" (click)="toggleAnswer(1)">Preguntas frecuentes</button> 
             <img class="icono" src="assets/flechaDerecha.png" alt="icono">
         </div>
         <div class="option">
             <img class="icono" src="assets/Logo.png" alt="icono">
-            <button class="button">Consejos de seguridad</button> 
+            <button class="button" (click)="toggleAnswer(2)">Consejos de seguridad</button> 
             <img class="icono" src="assets/flechaDerecha.png" alt="icono">
         </div>
         <div class="option">
             <img class="icono" src="assets/Logo.png" alt="icono">
-            <button class="button">Contáctanos</button>
+            <button class="button" (click)="toggleAnswer(3)">Contáctanos</button>
             <img class="icono" src="assets/flechaDerecha.png" alt="icono">
         </div>
         <div class="option">
             <img class="icono" src="assets/Logo.png" alt="icono">
-            <button class="button">Sobre nosotros</button>
+            <button class="button" (click)="toggleAnswer(4)">Sobre nosotros</button>
             <img class="icono" src="assets/flechaDerecha.png" alt="icono">
         </div>
         <label class="SectionTitle">Cuenta</label>
         <div class="option">
             <img class="icono" src="assets/Logo.png" alt="icono">
-            <button class="button">Cerrar sesión</button>
+            <button class="button"  (click)="toggleAnswer(5)">Cerrar sesión</button>
             <img class="icono" src="assets/flechaDerecha.png" alt="icono">
         </div>
         <div class="option">
             <img class="icono" src="assets/Logo.png" alt="icono">
-            <button class="button">Borrar cuenta</button>
+            <button class="button" (click)="toggleAnswer(6)">Borrar cuenta</button>
             <img class="icono" src="assets/flechaDerecha.png" alt="icono">
         </div>
     </div>
+</div>
+<div class="answers-container">
+    <div class="answer" *ngIf="showAnswer[0]">
+        <label> HACERME PREMIUM</label>
+    </div>
+    <div class="answer" *ngIf="showAnswer[1]">
+        <label> PREGUNTAS FRECUENTES</label>
+    </div>
+    <div class="answer" *ngIf="showAnswer[2]">
+        <label> CONSEJOS DE SEGURIDAD</label>
+    </div>
+    <div class="answer" *ngIf="showAnswer[3]">
+        <label> CONTÁCTANOS</label>
+    </div>
+    <div class="answer" *ngIf="showAnswer[4]">
+        <label> SOBRE NOSOTROS</label>
+    </div>
+    <div class="answerEspecial" *ngIf="showAnswer[5]">
+        <label> Si desea cerrar sesión pulse el botón</label>
+        <button class="closeSession" (click)="logout()">Cerrar Sesión</button>
+    </div>
+    <div class="answerEspecial" *ngIf="showAnswer[6]">
+        <label> Si desea eliminar su cuenta pulse el siguiente botón</label>
+        <button class="closeSession" (click)="borrar()">Borrar Cuenta</button>
+    </div>
+</div>
 </div>
 
 

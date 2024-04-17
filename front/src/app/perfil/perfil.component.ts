@@ -4,19 +4,21 @@ import { CabeceraYMenuComponent } from '../cabecera-y-menu/cabecera-y-menu.compo
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [ CabeceraYMenuComponent, RouterOutlet, RouterModule, FormsModule],
+  imports: [ CabeceraYMenuComponent, RouterOutlet, RouterModule, FormsModule, CommonModule],
   templateUrl: './perfil.component.html',
   styleUrl: './perfil.component.css'
 })
 export class PerfilComponent {
   usuario: any;
   error: string | undefined;
+  showAnswer: boolean[] = [];
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     const correo = localStorage.getItem('correo');
     if (correo !== null && correo !== undefined) {
     this.obtenerPerfilUsuario(correo);
@@ -40,6 +42,60 @@ export class PerfilComponent {
         error => {
           console.error('Error al obtener el perfil del usuario', error);
           this.error = 'Error al obtener el perfil del usuario';
+        }
+      );
+  }
+
+  toggleAnswer(index: number): void {
+    // Cambiar el estado de la respuesta correspondiente al índice
+    this.showAnswer[index] = !this.showAnswer[index];
+
+    // Ocultar las demás respuestas
+    for (let i = 0; i < this.showAnswer.length; i++) {
+      if (i !== index) {
+        this.showAnswer[i] = false;
+      }
+    }
+  }
+
+  logout(): void {
+    // Verificar si estamos en el navegador antes de intentar acceder a localStorage
+    if (typeof window !== 'undefined') {
+      // Eliminar el token del localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('correo');
+      window.location.reload();
+    }
+  }
+
+  token: string = '';
+
+  borrar(): void {
+
+  const credentials = {
+    token: this.token,
+  };
+
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json'
+  });
+
+  
+    // Verificar si estamos en el navegador antes de intentar acceder a localStorage
+    this.http.post<any>('http://localhost:5000/user/delete', credentials, { headers: headers })
+      .subscribe(
+        response => {
+          // Si la autenticación fue exitosa, muestra una alerta con el token.
+          console.log('Se ha borrado la cuenta', response);
+            localStorage.removeItem('token');
+            localStorage.removeItem('correo');
+            alert('¡Eliminación de cuenta exitosa!');
+            this.router.navigate(['/']);
+          
+        },
+        error => {
+          console.error('Error al borrar la cuenta', error);
+          alert('Error al borrar la cuenta' + error);
         }
       );
   }

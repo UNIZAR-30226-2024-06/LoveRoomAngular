@@ -20,12 +20,4 @@ export class CabeceraYMenuComponent {
     }
   }
 
-  logout(): void {
-    // Verificar si estamos en el navegador antes de intentar acceder a localStorage
-    if (typeof window !== 'undefined') {
-      // Eliminar el token del localStorage
-      localStorage.removeItem('token');
-      window.location.reload();
-    }
-  }
 }
