@@ -71,32 +71,33 @@ export class PerfilComponent {
   token: string = '';
 
   borrar(): void {
-
-  const credentials = {
-    token: this.token,
-  };
-
-  const headers = new HttpHeaders({
-    'Content-Type': 'application/json'
-  });
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró un token en el almacenamiento local.');
+      alert('No se encontró un token en el almacenamiento local.');
+      return;
+    }
   
-    // Verificar si estamos en el navegador antes de intentar acceder a localStorage
-    this.http.post<any>('http://localhost:5000/user/delete', credentials, { headers: headers })
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    });
+    
+    this.http.delete<any>('http://localhost:5000/user/delete', { headers: headers })
       .subscribe(
         response => {
           // Si la autenticación fue exitosa, muestra una alerta con el token.
           console.log('Se ha borrado la cuenta', response);
-            localStorage.removeItem('token');
-            localStorage.removeItem('correo');
-            alert('¡Eliminación de cuenta exitosa!');
-            this.router.navigate(['/']);
-          
+          localStorage.removeItem('token');
+          localStorage.removeItem('correo');
+          alert('¡Eliminación de cuenta exitosa!');
+          this.router.navigate(['/']);
         },
         error => {
-          console.error('Error al borrar la cuenta', error);
-          alert('Error al borrar la cuenta' + error);
+          console.error('Error al borrar la cuenta', error.message);
+          alert('Error al borrar la cuenta' + error.message);
         }
       );
   }
+  
 }

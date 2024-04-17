@@ -52,7 +52,7 @@ export class LoginComponent {
           // Si hubo un error durante la autenticación, muestra una alerta con el mensaje de error.
           console.error('Error al autenticar', error);
           alert('Error al iniciar sesión: ' + error.message);
-          this.router.navigate(['/mis-salas']);
+          this.router.navigate(['/']);
         }
       );
   }
