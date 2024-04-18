@@ -16,8 +16,32 @@ import { CommonModule } from '@angular/common';
 export class YoutubeComponent {
 
   showResults = false;
+  searchQuery: string = '';
+  videos: any[] = [];
+  errorMessage: string = '';
+
+  constructor(private http: HttpClient, private router: Router) { }
 
   toggleResults() {
     this.showResults = !this.showResults;
+  }
+
+  searchVideos() {
+    if (this.searchQuery.trim() === '') {
+      this.errorMessage = 'No ha escrito nada para su búsqueda';
+      return;
+    }
+    this.errorMessage = '';
+    //Aqui el apikey estaba
+    const apiUrl = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&part=snippet&type=video&q=${this.searchQuery}&maxResults=5`;
+
+    this.http.get(apiUrl).subscribe((data: any) => {
+      this.videos = data.items;
+      this.showResults = true;
+    });
+  }
+
+  watchVideo(videoId: string) {
+    this.router.navigate(['/sala', videoId]);
   }
 }

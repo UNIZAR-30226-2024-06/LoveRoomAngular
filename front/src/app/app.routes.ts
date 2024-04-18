@@ -15,6 +15,6 @@ export const routes: Routes = [
     { path: 'registrarse', title: 'Registrarse', component: RegistrarseComponent, canActivate: [SinCuenta]},
     { path: 'perfil', title: 'Perfil', component: PerfilComponent, canActivate: [ConCuenta]},
     { path: 'edit-perfil', title: 'Editar perfil', component: EditPerfilComponent, canActivate: [ConCuenta]},
-    { path: 'sala', title: 'Sala', component: SalaComponent, canActivate: [ConCuenta]},
+    { path: 'sala/:videoId', title: 'Sala', component: SalaComponent, canActivate: [ConCuenta]},
     { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

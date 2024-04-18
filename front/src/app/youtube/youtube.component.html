@@ -1,18 +1,13 @@
 <div class="youtube-container">
     <div class="name-input-container">
-        <input type="text" placeholder="Introduce un nombre de un video para buscarlo">
-        <img src="assets/lupa.png" alt="Search Icon" class="search-icon" (click)="toggleResults()">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Introduce un nombre de un video para buscarlo">
+        <img src="assets/lupa.png" alt="Search Icon" class="search-icon" (click)="searchVideos()">
     </div>
+    <div class="error-message" *ngIf="errorMessage">{{errorMessage}}</div>
     <div class="results" *ngIf="showResults">
-        <div class="result">
-            <img src="./assets/pruebaPerfil.png" alt="Item Image" class="miniature"> <!-- Aqui traer la miniatura-->
-            <button class="acceptResult" [routerLink]="['/sala']">Opcion 1</button> <!-- Aqui traer el nombre del video-->
-        </div>
-        <div class="result">
-            <img src="./assets/pruebaPerfil.png" alt="Item Image" class="miniature">
-            <button class="acceptResult" [routerLink]="['/sala']">Opcion 2</button>
+        <div class="result" *ngFor="let video of videos">
+            <img [src]="video.snippet.thumbnails.default.url" alt="Item Image" class="miniature">
+            <button class="acceptResult" (click)="watchVideo(video.id.videoId)">{{ video.snippet.title }}</button>
         </div>
     </div>
 </div>
-
-

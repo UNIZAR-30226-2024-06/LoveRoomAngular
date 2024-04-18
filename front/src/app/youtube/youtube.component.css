@@ -28,6 +28,12 @@
     height: 30px;
 }
 
+.error-message {
+    color: red;
+    margin-top: 0px;
+    font-size: 13px;
+}
+
 .results {
     flex-direction: column;
     margin-top: 10px;
