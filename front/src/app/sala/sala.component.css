@@ -7,21 +7,6 @@
     margin-top: 84px;
 }
 
-.name-input-container {
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 20px;
-    margin-top: 20px;
-    width: 80%;
-}
-
-.name-input-container input {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-}
-
 .video-container {
     border: 7px solid #ccc;
     border-radius: 5px;
@@ -32,10 +17,43 @@
 }
 
 .youtube-video {
-    
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+.chat-container {
+    margin-top: 20px;
+    width: 80%;
+    height: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.messages-container {
+    overflow-y: auto;
+    height: 90%;
+}
+
+.input-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 10%;
+}
+
+.input-container input {
+    width: 90%;
+}
+
+.input-container img {
+    cursor: pointer;
+}
+
+.iconosend {
+    cursor: pointer;
+    height: 30px;
 }

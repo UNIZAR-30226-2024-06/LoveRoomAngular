@@ -2,9 +2,18 @@
 <div class="sala-container">
     <app-youtube style="width: 100%"></app-youtube>
     <div class="video-container">
-        <iframe class="youtube-video" [src]="videoUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> <!--Cambiar la src o lo q haya q poner-->
+        <iframe class="youtube-video" [src]="videoUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
     <div class="chat-container">
-
+        <div class="messages-container">
+            <div *ngFor="let message of messages" class="message">
+                {{message}}
+            </div>
+        </div>
+        <div class="input-container">
+            <input [(ngModel)]="newMessage" type="text" placeholder="Escribe un mensaje...">
+            <img class = "iconosend" src="assets/enviar.png" (click)="sendMessage()">
+        </div>
     </div>
 </div>
+

@@ -4,6 +4,7 @@ import { RouterOutlet, RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../environments/environment';
 
 
 @Component({
@@ -32,8 +33,8 @@ export class YoutubeComponent {
       return;
     }
     this.errorMessage = '';
-    //Aqui el apikey estaba
-    const apiUrl = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&part=snippet&type=video&q=${this.searchQuery}&maxResults=5`;
+    const apiKey = environment.apiKey;
+    const apiUrl = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&part=snippet&type=video&q=${this.searchQuery}&maxResults=50`;
 
     this.http.get(apiUrl).subscribe((data: any) => {
       this.videos = data.items;
