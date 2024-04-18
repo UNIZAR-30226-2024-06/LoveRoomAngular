@@ -1,11 +1,12 @@
 <app-cabecera-y-menu></app-cabecera-y-menu>
 
-<div class="contenido-adicional">
-    <div class="cuerpo">
-        <h1>Mis Salas</h1>
-        <div class="miSala" *ngFor="let sala of salas">
-            <h3>{{ sala.id }}</h3> <!-- Puedes mostrar otros detalles de la sala si es necesario -->
-            <img [src]="getVideoThumbnailUrl(sala.idvideo)" alt="Miniatura del video">
+<div class="mis-salas-container">
+    <div class="salas">
+        <div class="sala" *ngFor="let sala of salas">
+            <h3>Sala: {{ sala.id }}</h3> <!-- Puedes mostrar otros detalles de la sala si es necesario -->
+            <img class="miniature" [src]="getVideoThumbnailUrl(sala.idvideo)" alt="Miniatura del video">
+            <button class="acceptResult" (click)="watchVideo(sala.idvideo)">{{ getVideoTitle(sala.idvideo) }}</button>
+            <h3> {{ sala.id }}</h3>
         </div>
     </div>
 </div>
