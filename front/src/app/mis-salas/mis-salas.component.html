@@ -1,11 +1,12 @@
 <app-cabecera-y-menu></app-cabecera-y-menu>
 
 <div class="contenido-adicional">
-    <!-- Aquí puedes colocar el resto de tu contenido -->
     <div class="cuerpo">
-        <h1> Mis Salas</h1>
-        <div class="miSala">
-            <img src="./assets/captura.jpg" alt="Item Image" class="item-image">  <!-- Tendra que ir o captura del momento del video o lo que vayamos a poner-->
+        <h1>Mis Salas</h1>
+        <div class="miSala" *ngFor="let sala of salas">
+            <h3>{{ sala.id }}</h3> <!-- Puedes mostrar otros detalles de la sala si es necesario -->
+            <img [src]="getVideoThumbnailUrl(sala.idvideo)" alt="Miniatura del video">
         </div>
     </div>
 </div>
+

@@ -43,6 +43,23 @@ export class YoutubeComponent {
   }
 
   watchVideo(videoId: string) {
-    this.router.navigate(['/sala', videoId]);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    // Hacer la solicitud HTTP GET al backend
+    this.http.get(`http://localhost:5000/videos/watch/${videoId}`, { headers }).subscribe(
+      (response: any) => {
+        // Manejar la respuesta del backend aquí
+        console.log(response);
+        // Navegar a la sala después de la verificación del backend
+        this.router.navigate(['/sala', videoId]);
+      },
+      (error: any) => {
+        // Manejar errores aquí
+        console.error(error);
+      }
+    );
   }
 }
