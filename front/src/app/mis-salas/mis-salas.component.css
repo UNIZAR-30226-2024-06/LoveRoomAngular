@@ -16,9 +16,18 @@
     margin-bottom: 20px;
     width: 90%;
 }
-.sala h3 {
+.id {
     margin: 20px;
+    width: 10%;
+    text-align: center;
 }
+
+.namePerson {
+  margin: 20px;
+  width: 20%;
+  text-align: center;
+}
+
 
 .sala {
     display: flex;
@@ -41,10 +50,19 @@
   }
 
   .acceptResult {
-    background-color: rgb(230, 229, 229); 
+    background-color: white; 
     color:black; 
     border:none; 
-    cursor: pointer;
     width: 50%;
     height: 100%;
+}
+
+.goToSala{
+  width: 20%;
+  height: 100%;
+  background-color: rgb(4, 207, 4);
+  color: white;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
 }

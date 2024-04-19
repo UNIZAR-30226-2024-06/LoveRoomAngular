@@ -3,69 +3,17 @@
     <app-youtube style="width: 100%"></app-youtube>
     <div class="contenido-adicional">
         <!-- Aquí puedes colocar el resto de tu contenido -->
-        <h1> Salas Disponibles</h1>
-        <div class="cuerpo">
-            <div>
-                <div class="miSala">
-                    <img src="./assets/captura.jpg" alt="Item Image" class="item-image">  <!-- Tendra que ir o captura del momento del video o lo que vayamos a poner-->
+        <h1> Salas Disponibles De Tu Interés</h1>
+        <div class="interestSalas">
+            <!-- Lo siguiente se repite por cada sala de interes para el usuario -->
+            <button class="salaAvailable"> <!--Al pinchar aqui te tiene que llevar a esa sala-->
+                <img class="miSala" alt="Miniatura del video" src="assets/pruebaPerfil.png">
+                <div class="infoSala">
+                    <label>TITUTLO VIDEO</label> <!--{{ getVideoTitle(sala.idvideo) }}-->
+                    <br/>
+                    <label>AUTOR</label>
                 </div>
-                <p style="margin-left: 30px;">
-                    <strong>Nombre video</strong>
-                    <br>
-                    Descripción de la sala
-                </p>
-            </div>
-            <div>
-                <div class="miSala">
-                    <img src="./assets/captura.jpg" alt="Item Image" class="item-image">  <!-- Tendra que ir o captura del momento del video o lo que vayamos a poner-->
-                </div>
-                <p style="margin-left: 30px;">
-                    <strong>Nombre video</strong>
-                    <br>
-                    Descripción de la sala
-                </p>
-            </div>
-            <div>
-                <div class="miSala">
-                    <img src="./assets/captura.jpg" alt="Item Image" class="item-image">  <!-- Tendra que ir o captura del momento del video o lo que vayamos a poner-->
-                </div>
-                <p style="margin-left: 30px;">
-                    <strong>Nombre video</strong>
-                    <br>
-                    Descripción de la sala
-                </p>
-            </div>
-            <div>
-                <div class="miSala">
-                    <img src="./assets/captura.jpg" alt="Item Image" class="item-image">  <!-- Tendra que ir o captura del momento del video o lo que vayamos a poner-->
-                </div>
-                <p style="margin-left: 30px;">
-                    <strong>Nombre video</strong>
-                    <br>
-                    Descripción de la sala
-                </p>
-            </div>
-            <div>
-                <div class="miSala">
-                    <img src="./assets/captura.jpg" alt="Item Image" class="item-image">  <!-- Tendra que ir o captura del momento del video o lo que vayamos a poner-->
-                </div>
-                <p style="margin-left: 30px;">
-                    <strong>Nombre video</strong>
-                    <br>
-                    Descripción de la sala
-                </p>
-            </div>
-            <div>
-                <div class="miSala">
-                    <img src="./assets/captura.jpg" alt="Item Image" class="item-image">  <!-- Tendra que ir o captura del momento del video o lo que vayamos a poner-->
-                </div>
-                <p style="margin-left: 30px;">
-                    <strong>Nombre video</strong>
-                    <br>
-                    Descripción de la sala
-                </p>
-            </div>
-            
+            </button>
         </div>
     </div>
 </div>
