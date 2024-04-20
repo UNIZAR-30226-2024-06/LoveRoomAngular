@@ -4,6 +4,7 @@
     border:none; 
     cursor: pointer;
     width: 100%;
+    font-size: medium;
  }
 
  .perfil-container {
@@ -71,6 +72,7 @@
  .icono {
     width: 30px;
     height: 30px;
+    margin: 5px;
     cursor: pointer;
  }
 

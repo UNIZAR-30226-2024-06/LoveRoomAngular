@@ -7,6 +7,14 @@
     margin-top: 84px;
 }
 
+.titulo {
+    font-size: 1.8rem;
+    margin: 10px;
+    text-decoration: underline;
+    width: 100%;
+    color:#F89F9F
+}
+
 .contenido-adicional {
 
     flex-direction: column;

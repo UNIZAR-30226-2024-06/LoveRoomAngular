@@ -35,4 +35,11 @@ export class SalaComponent implements OnInit {
       this.newMessage = '';
     }
   }
+
+  handleEnterKey(event: Event): void {
+    const keyboardEvent = event as KeyboardEvent;
+    if (keyboardEvent.key === 'Enter') {
+      this.sendMessage();
+    }
+  }
 }
