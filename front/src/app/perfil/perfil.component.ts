@@ -5,6 +5,7 @@ import { RouterOutlet, RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-perfil',
@@ -83,7 +84,7 @@ export class PerfilComponent {
       'Content-Type': 'application/json'
     });
     
-    this.http.delete<any>('http://localhost:5000/user/delete', { headers: headers })
+    this.http.delete<any>('http://'+environment.host_back+'/user/delete', { headers: headers })
       .subscribe(
         response => {
           // Si la autenticación fue exitosa, muestra una alerta con el token.

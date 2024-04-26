@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterOutlet, RouterModule } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-edit-perfil',
@@ -52,7 +53,7 @@ export class EditPerfilComponent {
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
 
-    this.http.get<any>('http://localhost:5000/user/' + correo, { headers: headers })
+    this.http.get<any>('http://'+environment.host_back+'/user/' + correo, { headers: headers })
       .subscribe(
         response => {
           if (response.error) {

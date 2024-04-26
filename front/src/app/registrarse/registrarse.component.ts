@@ -3,7 +3,7 @@ import { RouterOutlet, RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-
+import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
@@ -39,7 +39,7 @@ export class RegistrarseComponent {
       'Content-Type': 'application/json'
     });
 
-    this.http.post<any>('http://localhost:5000/user/create', credentials, { headers: headers })
+    this.http.post<any>('http://'+environment.host_back+'/user/create', credentials, { headers: headers })
       .subscribe(
         response => {
           // Si la autenticación fue exitosa, muestra una alerta con el token.

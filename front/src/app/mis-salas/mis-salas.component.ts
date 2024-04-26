@@ -32,7 +32,7 @@ export class MisSalasComponent implements OnInit {
     });
 
     // Llamada HTTP GET al backend para obtener las salas
-    this.http.get<any[]>('http://localhost:5000/rooms', { headers })
+    this.http.get<any[]>('http://'+environment.host_back+'/rooms', { headers })
       .subscribe(
         (response) => {
           // Éxito: asignamos la respuesta (lista de salas) a nuestra variable 'salas'

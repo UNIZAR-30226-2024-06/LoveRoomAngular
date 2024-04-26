@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
+import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
@@ -28,12 +28,12 @@ export class LoginComponent {
       correo: this.correo,
       contrasena: this.contrasena
     };
-
+    
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
-    this.http.post<any>('http://localhost:5000/user/login', credentials, { headers: headers })
+    this.http.post<any>('http://'+environment.host_back+'/user/login', credentials, { headers: headers })
       .subscribe(
         response => {
           // Si la autenticación fue exitosa, muestra una alerta con el token.
