@@ -2,13 +2,14 @@ import { Component } from '@angular/core';
 import { RouterOutlet, RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterOutlet, RouterModule, FormsModule],
+  imports: [RouterOutlet, RouterModule, FormsModule, CommonModule],
   providers: [HttpClient],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
@@ -18,6 +19,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 export class LoginComponent {
   correo: string = '';
   contrasena: string = '';
+  errorMessage: string = '';
 
   mostrarContrasena = false;
 
@@ -42,17 +44,13 @@ export class LoginComponent {
             // Guardar el token en localStorage
             localStorage.setItem('token', response.token);
             localStorage.setItem('correo', this.correo);
-            alert('¡Inicio de sesión exitoso! Token: ' + response.token);
             this.router.navigate(['/']);
-          } else {
-            alert('Error: No se recibió token en la respuesta.');
           }
         },
         error => {
           // Si hubo un error durante la autenticación, muestra una alerta con el mensaje de error.
           console.error('Error al autenticar', error);
-          alert('Error al iniciar sesión: ' + error.message);
-          this.router.navigate(['/']);
+          this.errorMessage = error.error.error;
         }
       );
   }

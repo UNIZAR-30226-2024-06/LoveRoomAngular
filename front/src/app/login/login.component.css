@@ -66,3 +66,9 @@ button {
 .linkLetter{
     color : #F89F9F;
 }
+
+.errorMsg {
+    color: red;
+    margin-top: 0px;
+    font-size: 15px;
+}

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { Observable } from 'rxjs';
-import { Config } from '../utils';  // Configuración de la URL y otros parámetros.
+import { environment } from '../environments/environment';
+
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,7 @@ import { Config } from '../utils';  // Configuración de la URL y otros parámet
 export class SocketService {
   constructor(private socket: Socket) {
     this.socket = new Socket({
-      url: Config.API_URL,
+      url: 'http://'+environment.host_back,
       options: {
         withCredentials: true,
       },

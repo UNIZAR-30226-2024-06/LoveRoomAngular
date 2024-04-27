@@ -48,7 +48,7 @@ export class YoutubeComponent {
       'Authorization': `Bearer ${token}`
     });
 
-    // Hacer la solicitud HTTP GET al backend
+    // Hacer la solicitud HTTP POST al backend
     this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
       (response: any) => {
         // Manejar la respuesta del backend aquí

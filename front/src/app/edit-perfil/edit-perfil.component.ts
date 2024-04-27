@@ -98,7 +98,7 @@ export class EditPerfilComponent {
 
     const body = this.usuario; // Enviar el objeto usuarioActualizado al backend
 
-    this.http.post<any>('http://localhost:5000/update-user', body, { headers: headers })
+    this.http.post<any>('http://'+environment.host_back+'/update-user', body, { headers: headers })
       .subscribe(
         response => {
           if (response.message) {
