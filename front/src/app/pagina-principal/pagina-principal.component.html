@@ -4,16 +4,18 @@
     <div class="contenido-adicional">
         <!-- Aquí puedes colocar el resto de tu contenido -->
         <h1 class="titulo"> Salas Disponibles De Tu Interés</h1>
-        <div class="interestSalas">
+        <div class="allSalasInterest">
+        <div class="interestSalas" *ngFor="let sala of salasInterest">
             <!-- Lo siguiente se repite por cada sala de interes para el usuario -->
-            <button class="salaAvailable"> <!--Al pinchar aqui te tiene que llevar a esa sala-->
-                <img class="miSala" alt="Miniatura del video" src="assets/pruebaPerfil.png">
+            <button class="salaAvailable" (click)="watchVideo(sala.idvideo)"> <!--Al pinchar aqui te tiene que llevar a esa sala-->
+                <img class="miSala" alt="Miniatura del video" [src]="getVideoThumbnailUrl(sala.idvideo)" alt="Miniatura del video">
                 <div class="infoSala">
-                    <label>TITUTLO VIDEO</label> <!--{{ getVideoTitle(sala.idvideo) }}-->
+                    <label class="acceptResult">{{ getVideoTitle(sala.idvideo) }}</label> <!--{{ getVideoTitle(sala.idvideo) }}-->
                     <br/>
                     <label>AUTOR</label>
                 </div>
             </button>
+        </div>
         </div>
     </div>
 </div>

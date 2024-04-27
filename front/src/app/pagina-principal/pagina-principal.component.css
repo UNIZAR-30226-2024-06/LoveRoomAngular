@@ -25,11 +25,17 @@
     padding-top: 0px;
 }
 
+.allSalasInterest {
+    display: flex; 
+    flex-wrap: wrap; 
+    width: 100%;
+}
+
 .interestSalas {
     display: flex; 
     flex-wrap: wrap; 
     margin: 20px;
-    width: 100%;
+    width: 20%;
 }
 
 .contenido-adicional h1 {
@@ -41,8 +47,8 @@
 
 .salaAvailable {
     cursor: pointer;
-    width: 20%;
-    height: 50%;
+    width: 100%;
+    height: 100%;
     background-color: white;
     border: solid #F89F9F 3px;
     border-radius: 10px;

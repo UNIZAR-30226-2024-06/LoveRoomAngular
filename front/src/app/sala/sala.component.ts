@@ -17,37 +17,41 @@ import { YouTubePlayer } from '@angular/youtube-player';
   selector: 'app-sala',
   standalone: true,
   imports: [CabeceraYMenuComponent, CommonModule, FormsModule, RouterOutlet, RouterModule],
+  providers: [SocketService],
   templateUrl: './sala.component.html',
   styleUrls: ['./sala.component.css']
 })
 export class SalaComponent implements OnInit {
+  @ViewChild(YouTubePlayer) youtubePlayer!: YouTubePlayer;
   videoId: string | undefined;
   videoUrl!: SafeResourceUrl;
   messages: string[] = [];
   newMessage: string = '';
   subscriptions: Subscription[] = [];
   player: any;
-  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private socketService: SocketService) { }
+  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private socketService: SocketService) { } 
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.videoId = params['videoId'];
       this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
     });
-    /*this.subscriptions.push(
+    this.subscriptions.push(
       this.socketService.onEvent(socketEvents.PAUSE).subscribe(() => {
-        //this.pauseVideo(); // Pausar el video
+        this.youtubePlayer.pauseVideo(); // Pausar el video
       }),
       this.socketService.onEvent(socketEvents.PLAY).subscribe(() => {
-        //this.playVideo(); // Reproducir el video
+        this.youtubePlayer.playVideo(); // Reproducir el video
       }),
+      /*  ESTAS DOS decreaseSpeed() y normalSpeed() NO EXISTEN EN youtube-player.ts
       this.socketService.onEvent(socketEvents.DECREASE_SPEED).subscribe(() => {
-        //this.decreaseSpeed(); // Disminuir la velocidad de reproducción
+        this.youtubePlayer.decreaseSpeed(); // Disminuir la velocidad de reproducción
       }),
       this.socketService.onEvent(socketEvents.NOTHING).subscribe(() => {
-        //this.normalSpeed(); // Restablecer velocidad
+        this.youtubePlayer.normalSpeed(); // Restablecer velocidad
       })
-    );*/
+      */
+    );
   }
 
 

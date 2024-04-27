@@ -64,10 +64,10 @@ export class MisSalasComponent implements OnInit {
     });
 
     // Hacer la solicitud HTTP GET al backend
-    this.http.post(`http://localhost:5000/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
+    this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
       (response: any) => {
         // Manejar la respuesta del backend aquí
-
+        console.log(headers);
         console.log(response);
         // Navegar a la sala después de la verificación del backend
         this.router.navigate(['/sala', videoId]);
