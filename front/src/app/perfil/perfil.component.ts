@@ -90,7 +90,6 @@ export class PerfilComponent {
           // Si la autenticación fue exitosa, muestra una alerta con el token.
           console.log('Se ha borrado la cuenta', response);
           localStorage.removeItem('token');
-          localStorage.removeItem('correo');
           alert('¡Eliminación de cuenta exitosa!');
           this.router.navigate(['/']);
         },

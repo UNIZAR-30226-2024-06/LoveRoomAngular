@@ -2,7 +2,7 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { RouterOutlet, RouterModule } from '@angular/router';
+import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -17,7 +17,6 @@ export class EditPerfilComponent {
   mostrarContrasena = false;
   @ViewChild('fileInput') fileInput!: ElementRef;
   imagenPerfil = 'assets/Logo.png'; //Quiza aqui traer la de la BD
-  router: any;
 
   toggleMostrarContrasena() {
     this.mostrarContrasena = !this.mostrarContrasena;
@@ -39,28 +38,21 @@ export class EditPerfilComponent {
   
   
   usuario: any;
-  error: string | undefined;
+  error: string='';
 
-  constructor(private http: HttpClient) {
-    const correo = localStorage.getItem('correo');
-    if (correo !== null && correo !== undefined) {
-    this.obtenerPerfilUsuario(correo);
-    }
+  constructor(private http: HttpClient, private router: Router) {
+    this.obtenerPerfilUsuario();
   }
 
-  obtenerPerfilUsuario(correo: string): void {
+  obtenerPerfilUsuario(): void {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
-
-    this.http.get<any>('http://'+environment.host_back+'/user/' + correo, { headers: headers })
+  
+    this.http.get<any>('http://'+environment.host_back+'/user/profile', { headers: headers })
       .subscribe(
         response => {
-          if (response.error) {
-            this.error = response.error;
-          } else {
-            this.usuario = response;
-          }
+          this.usuario = response;
         },
         error => {
           console.error('Error al obtener el perfil del usuario', error);
@@ -68,23 +60,23 @@ export class EditPerfilComponent {
         }
       );
   }
+  
 
   usuarioActualizado: any = {}; // Nuevo objeto para almacenar los cambios antes de enviarlos al servidor
 
   actualizarUsuario(): void {
     // Actualizar el objeto usuarioActualizado con los valores del formulario
     this.usuarioActualizado = {
-      nombre: this.usuario.nombre,
-      contrasena: this.usuario.contrasena,
-      edad: this.usuario.edad,
-      sexo: this.usuario.sexo,
-      buscaedadmin: this.usuario.buscaedadmin,
-      buscaedadmax: this.usuario.buscaedadmax,
-      buscasexo: this.usuario.buscasexo,
-      descripcion: this.usuario.descripcion,
-      fotoperfil: this.usuario.fotoperfil,
-      idlocalidad: this.usuario.idlocalidad,
-      correo: this.usuario.correo
+    correo: this.usuario.correo,
+    nombre: this.usuario.nombre,
+    edad: parseInt(this.usuario.edad, 10),
+    sexo: this.usuario.sexo,
+    buscaedadmin: parseInt(this.usuario.buscaedadmin, 10),
+    buscaedadmax: parseInt(this.usuario.buscaedadmax, 10),
+    buscasexo: this.usuario.buscasexo,
+    descripcion: this.usuario.descripcion,
+    fotoperfil: this.usuario.fotoperfil,
+    idlocalidad: parseInt(this.usuario.idlocalidad, 10),
     };
   }
 
@@ -96,21 +88,18 @@ export class EditPerfilComponent {
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
 
-    const body = this.usuario; // Enviar el objeto usuarioActualizado al backend
+    const body = this.usuarioActualizado; // Enviar el objeto usuarioActualizado al backend
+    console.log(body);
 
-    this.http.post<any>('http://'+environment.host_back+'/update-user', body, { headers: headers })
+    this.http.put<any>('http://'+environment.host_back+'/user/update', body, { headers: headers })
       .subscribe(
         response => {
-          if (response.message) {
-            alert('Usuario actualizado correctamente');
-            this.router.navigate(['/']);
-          } else {
-            alert('Error al actualizar el usuario');
-          }
+          console.log('Usuario actualizado', response);
+          this.router.navigate(['/']);
         },
         error => {
-          console.error('Error al actualizar el usuario', error);
-          alert('Error al actualizar el usuario: ' + error.message);
+          console.error('Error al actualizar el usuario', error.message);
+          this.error = error.error.error;
         }
       );
   }

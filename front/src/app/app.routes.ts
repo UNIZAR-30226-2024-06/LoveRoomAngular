@@ -5,6 +5,7 @@ import { LoginComponent } from './login/login.component';
 import { RegistrarseComponent } from './registrarse/registrarse.component';
 import { PerfilComponent } from './perfil/perfil.component';
 import { EditPerfilComponent } from './edit-perfil/edit-perfil.component';
+import { EditPasswordComponent } from './edit-password/edit-password.component';
 import { ConCuenta, SinCuenta } from './auth.guard';
 import { SalaComponent } from './sala/sala.component';
 
@@ -15,6 +16,7 @@ export const routes: Routes = [
     { path: 'registrarse', title: 'Registrarse', component: RegistrarseComponent, canActivate: [SinCuenta]},
     { path: 'perfil', title: 'Perfil', component: PerfilComponent, canActivate: [ConCuenta]},
     { path: 'edit-perfil', title: 'Editar perfil', component: EditPerfilComponent, canActivate: [ConCuenta]},
+    { path: 'edit-password', title: 'Cambiar contraseña', component: EditPasswordComponent, canActivate: [ConCuenta]},
     { path: 'sala/:videoId', title: 'Sala', component: SalaComponent, canActivate: [ConCuenta]},
     { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

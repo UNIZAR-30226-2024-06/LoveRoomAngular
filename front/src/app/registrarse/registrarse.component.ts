@@ -53,7 +53,6 @@ export class RegistrarseComponent {
         },
         error => {
           console.error('Error al crear la cuenta', error);
-          this.errorMsg1 = error.error.error;
         }
       );
   }
