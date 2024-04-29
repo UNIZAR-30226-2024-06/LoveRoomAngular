@@ -60,6 +60,8 @@
             <input class="desc" type="text" id="descripcion" name="descripcion" placeholder="{{ usuario.descripcion }}" [(ngModel)]="usuario.descripcion">
         </div>
         <button type="submit" class="button"><strong>Guardar cambios</strong></button>
-        <p class="errorMsg" *ngIf="error">{{error}}</p>
     </form>
+    <div class="placeErrorMsg">
+        <p class="errorMsg" *ngIf="error">{{error}}</p>
+    </div>
 </div>

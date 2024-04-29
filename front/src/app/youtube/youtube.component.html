@@ -1,10 +1,10 @@
 <div class="youtube-container">
     <div class="name-input-container">
-        <input type="text" [(ngModel)]="searchQuery" placeholder="Introduce un nombre de un video para buscarlo">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Introduce un nombre de un video para buscarlo" (keydown.enter)="searchVideos()">
         <img src="assets/lupa.png" alt="Search Icon" class="search-icon" (click)="searchVideos()">
     </div>
     <div class="error-message" *ngIf="errorMessage">{{errorMessage}}</div>
-    <div class="results" *ngIf="showResults">
+    <div class="results" *ngIf="showResults && searchQuery.trim() !== ''">
         <div class="result" *ngFor="let video of videos">
             <img [src]="video.snippet.thumbnails.default.url" alt="Item Image" class="miniature">
             <button class="acceptResult" (click)="watchVideo(video.id.videoId)">{{ video.snippet.title }}</button>

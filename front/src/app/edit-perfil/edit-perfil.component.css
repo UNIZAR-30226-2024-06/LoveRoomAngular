@@ -76,3 +76,15 @@ input[type=text], input[type=password], button, select {
     margin-bottom: 5px;
     color: white;
 }
+
+.placeErrorMsg {
+    width: 100%;
+    align-self: flex-end; /* Alinea el div al final del contenedor */
+}
+
+.errorMsg {
+    color: red;
+    margin-top: 0px;
+    font-size: 17px;
+    text-align: end; /* Alinea el texto al centro */
+}
