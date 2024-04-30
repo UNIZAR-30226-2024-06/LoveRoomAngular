@@ -31,13 +31,13 @@
         </div>
         <div class="data">
             <label for="buscaedadmin">Edad mínima</label>
-            <select id="buscaedadmin" name="buscaedadmin" [(ngModel)]="usuario.buscaedadmin">
+            <select id="buscaedadmin" name="buscaedadmin" [(ngModel)]="usuario.buscaedadmin" (change)="actualizarEdadMaxima()">
                 <option value="" disabled selected>Seleccione la edad mínima</option>
                 <option *ngFor="let edad of edades" [value]="edad" [selected]="edad === usuario.buscaedadmin">{{edad}}</option>
             </select>
 
             <label for="buscaedadmax">Edad máxima</label>
-            <select id="buscaedadmax" name="buscaedadmax" [(ngModel)]="usuario.buscaedadmax">
+            <select id="buscaedadmax" name="buscaedadmax" [(ngModel)]="usuario.buscaedadmax" (change)="actualizarEdadMinima()">
                 <option value="" disabled selected>Seleccione la edad máxima</option>
                 <option *ngFor="let edad of edades" [value]="edad" [selected]="edad === usuario.buscaedadmax">{{edad}}</option>
             </select>
