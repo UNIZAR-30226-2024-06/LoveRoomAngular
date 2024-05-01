@@ -8,7 +8,7 @@ import { EditPerfilComponent } from './edit-perfil/edit-perfil.component';
 import { EditPasswordComponent } from './edit-password/edit-password.component';
 import { SalaComponent } from './sala/sala.component';
 import { UsuariosAdminComponent } from './usuarios-admin/usuarios-admin.component';
-import { ConCuenta, SinCuenta } from './auth.guard';
+import { ConCuenta, SinCuenta, Admin } from './auth.guard';
 
 
 export const routes: Routes = [
@@ -20,6 +20,6 @@ export const routes: Routes = [
     { path: 'edit-perfil', title: 'Editar perfil', component: EditPerfilComponent, canActivate: [ConCuenta]},
     { path: 'edit-password', title: 'Cambiar contraseña', component: EditPasswordComponent, canActivate: [ConCuenta]},
     { path: 'sala/:videoId', title: 'Sala', component: SalaComponent, canActivate: [ConCuenta]},
-    { path: 'usuarios-admin', title: 'Usuarios admin', component: UsuariosAdminComponent, canActivate: [ConCuenta]},
+    { path: 'usuarios-admin', title: 'Usuarios admin', component: UsuariosAdminComponent, canActivate: [Admin]},
     { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

@@ -27,5 +27,10 @@
     <a [routerLink]="['/mis-salas']">
       <button class="menu-button h1-like">Mis salas</button>
     </a>
+    <ng-container *ngIf="admin">
+      <a [routerLink]="['/usuarios-admin']">
+        <button class="menu-button h1-like">Usuarios</button>
+      </a>
+    </ng-container>
   </nav>
 </header>

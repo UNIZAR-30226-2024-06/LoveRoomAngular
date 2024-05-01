@@ -10,8 +10,12 @@
             <label for="nombre" class="name">{{ usuario.nombre }}</label> <!-- Puedes mostrar otros detalles de la sala si es necesario -->
             <img class="perfil"  [src]="imagenPerfil"  alt="Foto de Perfil">
             <label class="email" for="correo">{{ usuario.correo }}</label>
-            <button class="bann" *ngIf="usuario.baneado" (click)="banearUsuario(usuario)">Banear Usuario</button>
-            <button class="unbann" *ngIf="!usuario.baneado" (click)="desbanearUsuario(usuario)">Desbanear Usuario</button>
+            <button class="ban" *ngIf="!usuario.baneado" (click)="banearUsuario(usuario)">Banear Usuario</button>
+            <button class="unban" *ngIf="usuario.baneado" (click)="desbanearUsuario(usuario)">Desbanear Usuario</button>
+            <button class="unban" *ngIf="usuario.tipousuario==='normal'" (click)="hacerPremium(usuario)">Hacer Premium</button>
+            <button class="ban" *ngIf="usuario.tipousuario==='premium'" (click)="hacerNormal(usuario)">Quitar Premium</button>
+            <button class="unban" *ngIf="usuario.tipousuario!=='administrador'" (click)="hacerAdmin(usuario)">Hacer Admin</button>
+            <button class="ban" *ngIf="usuario.tipousuario==='administrador'" (click)="hacerNormal(usuario)">Quitar Admin</button>
         </div>
     </div>
 </div>

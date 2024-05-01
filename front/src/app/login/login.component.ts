@@ -43,6 +43,9 @@ export class LoginComponent {
           if (response.token) {
             // Guardar el token en localStorage
             localStorage.setItem('token', response.token);
+            if (response.usuario.tipousuario == "administrador"){
+              localStorage.setItem('admin', 'true');
+            }
             this.router.navigate(['/']);
           }
         },

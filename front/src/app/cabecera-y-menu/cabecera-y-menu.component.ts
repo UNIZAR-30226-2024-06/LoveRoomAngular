@@ -12,11 +12,13 @@ import { RouterOutlet, RouterModule } from '@angular/router';
 export class CabeceraYMenuComponent {
 
   token: string | null = null;
+  admin: string | null = null;
 
   constructor() {
     // Verificar si estamos en el navegador antes de intentar acceder a localStorage
     if (typeof window !== 'undefined') {
       this.token = localStorage.getItem('token');
+      this.admin = localStorage.getItem('admin');
     }
   }
 

@@ -21,3 +21,15 @@ export const ConCuenta: CanActivateFn = () =>{
         return false;
     }
 }
+
+export const Admin: CanActivateFn = () =>{
+    const token = localStorage.getItem('token');
+    const admin = localStorage.getItem('admin');
+    
+    if (token && admin){
+        return true;
+    } else {
+        window.location.href = "";
+        return false;
+    }
+}

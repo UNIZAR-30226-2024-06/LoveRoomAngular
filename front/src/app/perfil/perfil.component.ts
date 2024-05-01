@@ -64,7 +64,7 @@ export class PerfilComponent {
     if (typeof window !== 'undefined') {
       // Eliminar el token del localStorage
       localStorage.removeItem('token');
-      localStorage.removeItem('correo');
+      localStorage.removeItem('admin');
       window.location.reload();
     }
   }
@@ -90,6 +90,7 @@ export class PerfilComponent {
           // Si la autenticación fue exitosa, muestra una alerta con el token.
           console.log('Se ha borrado la cuenta', response);
           localStorage.removeItem('token');
+          localStorage.removeItem('admin');
           alert('¡Eliminación de cuenta exitosa!');
           this.router.navigate(['/']);
         },
