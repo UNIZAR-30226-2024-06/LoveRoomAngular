@@ -1,15 +1,3 @@
-<!--<div class="view-perfil-container">
-    <p>Correo: {{ usuario.correo }}</p>
-    <p>Nombre: {{ usuario.nombre }}</p>
-    <p>Edad: {{ usuario.edad }}</p>
-    <p>Sexo: {{ usuario.sexo }}</p>
-    <p>Busca Edad Minima: {{ usuario.buscaedadmin }}</p>
-    <p>Busca Edad Máxima: {{ usuario.buscaedadmax }}</p>
-    <p>Busca Sexo: {{ usuario.buscasexo }}</p>
-    <p>Descripcion: {{ usuario.descripcion }}</p>
-    <p>Foto Perfil: {{ usuario.fotoperfil }}</p>
-    <p>Localidad: {{ usuario.idlocalidad }}</p>
-</div> -->
 <app-cabecera-y-menu></app-cabecera-y-menu>
 <div class="general-container">
 <div class="perfil-container">
@@ -61,19 +49,26 @@
 </div>
 <div class="answers-container">
     <div class="answer" *ngIf="showAnswer[0]">
-        <label> HACERME PREMIUM</label>
+        <label class="text"> ¡Hazte premium y disfruta de todas las ventajas que te ofrecemos! </label>
+        <label class="title"> HACERME PREMIUM</label>
+        <label class="text"> ¿Qué ventajas tiene ser premium? </label>
+        <label class="text"> ¡Siendo premium, puedes disfrutar la posibilidad de poder estar un un número ilimitado de salas!</label>
+        <label class="text"> ¿Cómo puedo hacerme premium? </label>
+        <label class="text"> ¡Es muy sencillo! Solo tienes que introducir su número de tarjeta y pulsar el botón de PAGAR, y se le realizara el cobro de la cuota mensual de 4,99€.</label>
+        <label class="apartado"> Intrudizca aqui su tarjeta:</label>
+        <input class="creditCard" type="text" placeholder="XXXX XXXX XXXX XXXX">
     </div>
     <div class="answer" *ngIf="showAnswer[1]">
-        <label> PREGUNTAS FRECUENTES</label>
+        <label class="title"> PREGUNTAS FRECUENTES</label>
     </div>
     <div class="answer" *ngIf="showAnswer[2]">
-        <label> CONSEJOS DE SEGURIDAD</label>
+        <label class="title"> CONSEJOS DE SEGURIDAD</label>
     </div>
     <div class="answer" *ngIf="showAnswer[3]">
-        <label> CONTÁCTANOS</label>
+        <label class="title"> CONTÁCTANOS</label>
     </div>
     <div class="answer" *ngIf="showAnswer[4]">
-        <label> SOBRE NOSOTROS</label>
+        <label class="title"> SOBRE NOSOTROS</label>
     </div>
     <div class="answerEspecial" *ngIf="showAnswer[5]">
         <label> Si desea cerrar sesión pulse el botón</label>

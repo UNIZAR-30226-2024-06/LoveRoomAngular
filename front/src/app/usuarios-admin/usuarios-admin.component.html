@@ -1,0 +1,17 @@
+<app-cabecera-y-menu></app-cabecera-y-menu>
+
+<div class="mis-salas-container">
+    <div class="name-input-container">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Introduce un nombre de usuario para encontrarlo" (keydown.enter)="filtrarUsuarios()" (input)="filtrarUsuarios()">
+        <img src="assets/lupa.png" alt="Search Icon" class="search-icon" (click)="filtrarUsuarios()">
+    </div>
+    <div class="salas">
+        <div class="sala" *ngFor="let usuario of filteredUsuarios">
+            <label for="nombre" class="name">{{ usuario.nombre }}</label> <!-- Puedes mostrar otros detalles de la sala si es necesario -->
+            <img class="perfil"  [src]="imagenPerfil"  alt="Foto de Perfil">
+            <label class="email" for="correo">{{ usuario.correo }}</label>
+            <button class="bann" *ngIf="usuario.baneado" (click)="banearUsuario(usuario)">Banear Usuario</button>
+            <button class="unbann" *ngIf="!usuario.baneado" (click)="desbanearUsuario(usuario)">Desbanear Usuario</button>
+        </div>
+    </div>
+</div>

@@ -60,6 +60,7 @@ export class YoutubeComponent {
       (error: any) => {
         // Manejar errores aquí
         console.error(error);
+        this.errorMessage = error.error.error;
       }
     );
   }

@@ -31,7 +31,7 @@ export class PerfilComponent {
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
 
-    this.http.get<any>('http://localhost:5000/user/' + correo, { headers: headers })
+    this.http.get<any>('http://'+environment.host_back+'/user/' + correo, { headers: headers })
       .subscribe(
         response => {
           if (response.error) {

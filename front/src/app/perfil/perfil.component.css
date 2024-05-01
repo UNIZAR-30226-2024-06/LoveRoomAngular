@@ -105,7 +105,9 @@
 
 .answer {
    display: flex;
+   flex-direction: column;
    justify-content: space-around;
+   margin-left: 30px;
    width: 100%;
    position: relative; /* Establece posición relativa para permitir el posicionamiento de la línea */
 }
@@ -117,6 +119,12 @@
    height: 100%;
    width: 100%;
    position: relative; /* Establece posición relativa para permitir el posicionamiento de la línea */
+   font-size: x-large;
+   color:#F89F9F
+}
+
+.title {
+   text-decoration: underline;
    font-size: x-large;
    color:#F89F9F
 }
