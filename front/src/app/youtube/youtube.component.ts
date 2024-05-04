@@ -1,16 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { RouterOutlet, RouterModule } from '@angular/router';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet, RouterModule, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
+import { SocketService } from '../../services/socket.service';
 
 
 @Component({
   selector: 'app-youtube',
   standalone: true,
   imports: [RouterOutlet, RouterModule, FormsModule, CommonModule],
+  providers: [SocketService],
   templateUrl: './youtube.component.html',
   styleUrl: './youtube.component.css'
 })
@@ -21,7 +22,22 @@ export class YoutubeComponent {
   videos: any[] = [];
   errorMessage: string = '';
 
-  constructor(private http: HttpClient, private router: Router) { }
+  // En el constructor o en algún método de inicialización
+constructor(private http: HttpClient, private router: Router, private SocketService: SocketService) {
+  // Preparar la suscripción
+  this.setupSocketListeners();
+}
+
+private setupSocketListeners() {
+  this.SocketService.getSocketState().subscribe(state => {
+    if (state.idSala && state.idSala !== '') {
+      // Asegurarse de navegar y unirse solo si se recibe el MATCH
+      this.router.navigate(['/sala', state.idSala]);
+      this.SocketService.send({ type: 'JOIN_ROOM', idSala: state.idSala });
+    }
+  });
+}
+
 
   toggleResults() {
     this.showResults = !this.showResults;
@@ -47,21 +63,36 @@ export class YoutubeComponent {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-
+  
     // Hacer la solicitud HTTP POST al backend
-    this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
-      (response: any) => {
-        // Manejar la respuesta del backend aquí
-        console.log(headers);
-        console.log(response);
-        // Navegar a la sala después de la verificación del backend
-        this.router.navigate(['/sala', videoId]);
+    this.http.post(`http://${environment.host_back}/videos/watch/${videoId}`, {}, { headers: headers }).subscribe({
+      next: (response: any) => {
+        console.log('Response:', response);
+        // Si es una sala unitaria, nos quedamos escuchando
+        if (response.esSalaUnitaria) {
+          this.router.navigate(['/sala', videoId]);  // Ver el video en sala unitaria
+          // Escuchar el evento MATCH
+          this.SocketService.getSocketState().subscribe(state => {
+            if (state.idSala && state.idSala !== '') {
+              this.SocketService.send({ type: 'JOIN_ROOM', idSala: state.idSala });
+            }
+          });
+        } else {
+          // No es una sala unitaria, emitir inmediatamente JOIN_ROOM
+          this.router.navigate(['/sala', response.idSala]);
+          this.SocketService.send({ type: 'JOIN_ROOM', idSala: response.idSala });
+        }
       },
-      (error: any) => {
-        // Manejar errores aquí
-        console.error(error);
-        this.errorMessage = error.error.error;
+      error: (error: any) => {
+        console.error('Error:', error);
+        this.errorMessage = error.error.error || 'Error desconocido al intentar ver el video';
+        if (error.status === 403) {
+          alert("El usuario ha sobrepasado su límite de salas");
+        } else if (error.status === 500) {
+          alert("Error al ver video");
+        }
       }
-    );
+    });
   }
+  
 }

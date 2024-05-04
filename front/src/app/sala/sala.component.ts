@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CabeceraYMenuComponent } from '../cabecera-y-menu/cabecera-y-menu.component';
 import { YoutubeComponent } from '../youtube/youtube.component';
@@ -21,40 +21,22 @@ import { YouTubePlayer } from '@angular/youtube-player';
   templateUrl: './sala.component.html',
   styleUrls: ['./sala.component.css']
 })
-export class SalaComponent implements OnInit {
+export class SalaComponent  {
   @ViewChild(YouTubePlayer) youtubePlayer!: YouTubePlayer;
   videoId: string | undefined;
   videoUrl!: SafeResourceUrl;
   messages: string[] = [];
   newMessage: string = '';
-  subscriptions: Subscription[] = [];
-  player: any;
-  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private socketService: SocketService) { } 
+  videoPlaying: boolean = true;
+  isEnabled: boolean = false;
+  selectedVideoUrl: string = '';
+  
+  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private SocketService: SocketService) { } 
 
-  ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.videoId = params['videoId'];
-      this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
-    });
-    this.subscriptions.push(
-      this.socketService.onEvent(socketEvents.PAUSE).subscribe(() => {
-        this.youtubePlayer.pauseVideo(); // Pausar el video
-      }),
-      this.socketService.onEvent(socketEvents.PLAY).subscribe(() => {
-        this.youtubePlayer.playVideo(); // Reproducir el video
-      }),
-      /*  ESTAS DOS decreaseSpeed() y normalSpeed() NO EXISTEN EN youtube-player.ts
-      this.socketService.onEvent(socketEvents.DECREASE_SPEED).subscribe(() => {
-        this.youtubePlayer.decreaseSpeed(); // Disminuir la velocidad de reproducción
-      }),
-      this.socketService.onEvent(socketEvents.NOTHING).subscribe(() => {
-        this.youtubePlayer.normalSpeed(); // Restablecer velocidad
-      })
-      */
-    );
-  }
+  
 
 
+  //No borrar
   sendMessage(): void {
     if (this.newMessage.trim() !== '') {
       this.messages.push(this.newMessage);
