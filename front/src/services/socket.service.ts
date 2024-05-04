@@ -10,15 +10,13 @@ interface SocketState {
   receiverId: string;
   idSala: string;
   idVideo: string;
+  play?: boolean;  // Opcional, indica si el video está en reproducción
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class SocketService {
-  send(arg0: { type: string; idSala: any; }) {
-    throw new Error('Method not implemented.');
-  }
   private socket: Socket | null = null;
   private socketState = new BehaviorSubject<SocketState>({
     socket: null,
@@ -72,4 +70,27 @@ export class SocketService {
       idSala: ''
     });
   }
+
+  send(message: { type: string; idSala: string }): void {
+    if (!this.socket) {
+      console.error('Socket is not initialized');
+      return;
+    }
+    this.socket.emit(message.type, message.idSala);
+  }
+
+  public listenToEvents() {
+    this.socket?.on('PLAY', () => {
+      this.socketState.next({...this.socketState.value, play: true});
+    });
+    this.socket?.on('PAUSE', () => {
+      this.socketState.next({...this.socketState.value, play: false});
+    });
+  }
+
+  public cleanUpListeners() {
+    this.socket?.off('PLAY');
+    this.socket?.off('PAUSE');
+  }
 }
+

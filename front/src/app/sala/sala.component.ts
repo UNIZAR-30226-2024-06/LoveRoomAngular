@@ -16,13 +16,14 @@ import { YouTubePlayer } from '@angular/youtube-player';
 @Component({
   selector: 'app-sala',
   standalone: true,
-  imports: [CabeceraYMenuComponent, CommonModule, FormsModule, RouterOutlet, RouterModule],
+  imports: [CabeceraYMenuComponent, CommonModule, FormsModule, RouterOutlet, RouterModule, YouTubePlayer],
   providers: [SocketService],
   templateUrl: './sala.component.html',
   styleUrls: ['./sala.component.css']
 })
-export class SalaComponent  {
+export class SalaComponent implements OnInit  {
   @ViewChild(YouTubePlayer) youtubePlayer!: YouTubePlayer;
+  private subscriptions = new Subscription(); // Define la propiedad para manejar las suscripciones
   videoId: string | undefined;
   videoUrl!: SafeResourceUrl;
   messages: string[] = [];
@@ -37,9 +38,63 @@ export class SalaComponent  {
     this.route.params.subscribe(params => {
       this.videoId = params['videoId'];
       this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
+      this.setupPlayerEvents();
+    });
+  // Escuchar eventos del socket
+  this.SocketService.listenToEvents();  // Asegúrate de llamar a esto en algún lugar adecuado
+
+  // Suscribirse a cambios de estado emitidos por el socket
+  const socketSub = this.SocketService.getSocketState().subscribe(state => {
+    if (state.play) {
+      this.playVideo();
+    } else {
+      this.pauseVideo();
+    }
+  });
+
+  this.subscriptions.add(socketSub);
+}
+
+private playVideo() {
+  if (this.youtubePlayer) {
+    this.youtubePlayer.playVideo();  // Método de API de YouTube para reproducir el video
+  }
+}
+
+private pauseVideo() {
+  if (this.youtubePlayer) {
+    this.youtubePlayer.pauseVideo();  // Método de API de YouTube para pausar el video
+  }
+}
+
+ngOnDestroy(): void {
+  // Desuscribirse de todas las suscripciones
+  this.subscriptions.unsubscribe();
+
+  // Limpiar los oyentes de eventos del socket
+  this.SocketService.cleanUpListeners();  // Implementa este método en SocketService si es necesario
+
+  // Desconectar el socket si es necesario
+  this.SocketService.disconnectSocket();
+}
+
+
+  private setupPlayerEvents() {
+    if (!this.youtubePlayer) {
+      console.error('YouTube Player not initialized');
+      return;
+    }
+
+    this.youtubePlayer.stateChange.subscribe(event => {
+      if (event.data === YT.PlayerState.PLAYING && !event.target.getPlayerState()) {
+        console.log('Video is playing');
+        this.SocketService.send({ type: 'PLAY', idSala: 'yourRoomId' });
+      } else if (event.data === YT.PlayerState.PAUSED) {
+        console.log('Video is paused');
+        this.SocketService.send({ type: 'PAUSE', idSala: 'yourRoomId' });
+      }
     });
   }
-
 
   //No borrar
   sendMessage(): void {
