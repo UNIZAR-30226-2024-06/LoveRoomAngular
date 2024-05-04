@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../environments/environment';
+import { socketEvents } from '../environments/socketEvents';
 
 // Define una interfaz para el estado del socket
 interface SocketState {
@@ -38,7 +39,7 @@ export class SocketService {
 
     this.socket.on('connect', () => {
       console.log('Connected to socket');
-      this.socket!.on('MATCH', (senderId: string, receiverId: string, idSala: string, idVideo: string) => {
+      this.socket!.on(socketEvents.MATCH, (senderId: string, receiverId: string, idSala: string, idVideo: string) => {
         console.log('Match event received:', receiverId, senderId, idSala, idVideo);
         const newState: SocketState = {
           socket: this.socket,
@@ -76,7 +77,18 @@ export class SocketService {
       console.error('Socket is not initialized');
       return;
     }
-    this.socket.emit(message.type, message.idSala);
+    if (message.type == 'PLAY'){
+      console.log('Emitiendo PLAY')
+      this.socket.emit(socketEvents.PLAY, message.idSala)
+    }
+    else if (message.type == 'PAUSE'){
+      console.log('Emitiendo PAUSE')
+      this.socket.emit(socketEvents.PAUSE, message.idSala)
+    }
+    else if (message.type == 'JOIN_ROOM'){
+      console.log('Emitiendo JOIN_ROOM')
+      this.socket.emit(socketEvents.JOIN_ROOM, message.idSala)
+    }
   }
 
   public listenToEvents() {
@@ -88,9 +100,16 @@ export class SocketService {
     });
   }
 
+  public leaveRoom(idSala: string): void {
+    if (this.socket && idSala) {
+      this.socket.emit(socketEvents.LEAVE_ROOM, idSala);
+      console.log(`Left room: ${idSala}`);
+    }
+  }
+
   public cleanUpListeners() {
-    this.socket?.off('PLAY');
-    this.socket?.off('PAUSE');
+    this.socket?.off(socketEvents.PLAY);
+    this.socket?.off(socketEvents.PAUSE);
   }
 }
 

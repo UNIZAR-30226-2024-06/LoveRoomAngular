@@ -68,14 +68,15 @@ private pauseVideo() {
 }
 
 ngOnDestroy(): void {
+  // Llamar a leaveRoom antes de desconectar el socket
+  if (this.videoId) { // Asegurarse de que el videoId está disponible
+    this.SocketService.leaveRoom(this.videoId); // Usar el id de la sala
+  }
+  // Limpiar los oyentes de eventos del socket y desconectar
+  this.SocketService.cleanUpListeners();
+  this.SocketService.disconnectSocket();
   // Desuscribirse de todas las suscripciones
   this.subscriptions.unsubscribe();
-
-  // Limpiar los oyentes de eventos del socket
-  this.SocketService.cleanUpListeners();  // Implementa este método en SocketService si es necesario
-
-  // Desconectar el socket si es necesario
-  this.SocketService.disconnectSocket();
 }
 
 
