@@ -33,7 +33,12 @@ export class SalaComponent  {
   
   constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private SocketService: SocketService) { } 
 
-  
+  ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      this.videoId = params['videoId'];
+      this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
+    });
+  }
 
 
   //No borrar
