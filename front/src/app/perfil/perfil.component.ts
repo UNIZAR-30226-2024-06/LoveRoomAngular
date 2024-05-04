@@ -91,7 +91,6 @@ export class PerfilComponent {
           console.log('Se ha borrado la cuenta', response);
           localStorage.removeItem('token');
           localStorage.removeItem('admin');
-          alert('¡Eliminación de cuenta exitosa!');
           this.router.navigate(['/']);
         },
         error => {

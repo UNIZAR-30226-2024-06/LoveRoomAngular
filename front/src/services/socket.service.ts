@@ -1,115 +1,46 @@
 import { Injectable } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
-import { BehaviorSubject } from 'rxjs';
+import { io} from 'socket.io-client';
+import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
-import { socketEvents } from '../environments/socketEvents';
-
-// Define una interfaz para el estado del socket
-interface SocketState {
-  socket: Socket | null;
-  senderId: string;
-  receiverId: string;
-  idSala: string;
-  idVideo: string;
-  play?: boolean;  // Opcional, indica si el video está en reproducción
-}
+import { Socket, SocketIoConfig } from 'ngx-socket-io';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class SocketService {
-  private socket: Socket | null = null;
-  private socketState = new BehaviorSubject<SocketState>({
-    socket: null,
-    senderId: '',
-    receiverId: '',
-    idVideo: '',
-    idSala: ''
-  });
+  private socket: Socket;
 
-  constructor() {}
+  constructor() {
+    const config: SocketIoConfig = { url: 'http://'+environment.host_back, options: { withCredentials: true } };
+    this.socket = new Socket(config);
 
-  // Inicializar el socket con el token del usuario
-  initializeSocket(token: string): void {
-    this.socket = io(environment.host_back, {
-      auth: {
-        token: `Bearer ${token}`
-      }
+    // Este método se usa para registrar un listener que responde a cualquier evento emitido por el servidor, imprimiendo los eventos y sus datos en la consola. Esto es útil para depuración
+    this.socket.onAny((event: string, ...args: any[]) => {
+      console.log(event, args);
     });
+  }
 
-    this.socket.on('connect', () => {
-      console.log('Connected to socket');
-      this.socket!.on(socketEvents.MATCH, (senderId: string, receiverId: string, idSala: string, idVideo: string) => {
-        console.log('Match event received:', receiverId, senderId, idSala, idVideo);
-        const newState: SocketState = {
-          socket: this.socket,
-          senderId: receiverId,
-          receiverId: senderId,
-          idSala: idSala.toString(),
-          idVideo: idVideo
-        };
-        this.socketState.next(newState);
+  // Permite emitir eventos al servidor con un nombre de evento y datos asociados.
+  emitEvent(eventName: string, data: any): void {
+    this.socket.emit(eventName, data);
+  }
+
+  // Devuelve un Observable que permite a los componentes suscribirse a eventos específicos y reaccionar a los datos recibidos
+  onEvent(eventName: string): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on(eventName, (data: any) => {
+        observer.next(data);
       });
+
+      return () => {
+        this.socket.off(eventName);
+      };
     });
   }
 
-  getSocketState() {
-    return this.socketState.asObservable();
-  }
-
-  disconnectSocket(): void {
-    if (this.socket) {
-      this.socket.disconnect();
-      this.socket = null; // Asegúrate de resetear el estado
-    }
-    // Actualiza el BehaviorSubject después de desconectar
-    this.socketState.next({
-      socket: null,
-      senderId: '',
-      receiverId: '',
-      idVideo: '',
-      idSala: ''
-    });
-  }
-
-  send(message: { type: string; idSala: string }): void {
-    if (!this.socket) {
-      console.error('Socket is not initialized');
-      return;
-    }
-    if (message.type == 'PLAY'){
-      console.log('Emitiendo PLAY')
-      this.socket.emit(socketEvents.PLAY, message.idSala)
-    }
-    else if (message.type == 'PAUSE'){
-      console.log('Emitiendo PAUSE')
-      this.socket.emit(socketEvents.PAUSE, message.idSala)
-    }
-    else if (message.type == 'JOIN_ROOM'){
-      console.log('Emitiendo JOIN_ROOM')
-      this.socket.emit(socketEvents.JOIN_ROOM, message.idSala)
-    }
-  }
-
-  public listenToEvents() {
-    this.socket?.on('PLAY', () => {
-      this.socketState.next({...this.socketState.value, play: true});
-    });
-    this.socket?.on('PAUSE', () => {
-      this.socketState.next({...this.socketState.value, play: false});
-    });
-  }
-
-  public leaveRoom(idSala: string): void {
-    if (this.socket && idSala) {
-      this.socket.emit(socketEvents.LEAVE_ROOM, idSala);
-      console.log(`Left room: ${idSala}`);
-    }
-  }
-
-  public cleanUpListeners() {
-    this.socket?.off(socketEvents.PLAY);
-    this.socket?.off(socketEvents.PAUSE);
+  //Desconecta el socket manualmente
+  disconnect(): void {
+    this.socket.disconnect();
   }
 }
 

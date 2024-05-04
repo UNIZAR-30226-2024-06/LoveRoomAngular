@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, ViewChild, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CabeceraYMenuComponent } from '../cabecera-y-menu/cabecera-y-menu.component';
 import { YoutubeComponent } from '../youtube/youtube.component';
@@ -12,92 +12,73 @@ import { socketEvents } from '../../environments/socketEvents';
 import { Subscription } from 'rxjs';
 import { YouTubePlayer } from '@angular/youtube-player';
 
-
 @Component({
   selector: 'app-sala',
   standalone: true,
-  imports: [CabeceraYMenuComponent, CommonModule, FormsModule, RouterOutlet, RouterModule, YouTubePlayer],
+  imports: [CabeceraYMenuComponent, CommonModule, FormsModule, RouterOutlet, RouterModule],
   providers: [SocketService],
   templateUrl: './sala.component.html',
   styleUrls: ['./sala.component.css']
 })
-export class SalaComponent implements OnInit  {
+export class SalaComponent implements OnInit, OnDestroy {
   @ViewChild(YouTubePlayer) youtubePlayer!: YouTubePlayer;
-  private subscriptions = new Subscription(); // Define la propiedad para manejar las suscripciones
+  roomId: string | undefined;
   videoId: string | undefined;
   videoUrl!: SafeResourceUrl;
   messages: string[] = [];
   newMessage: string = '';
-  videoPlaying: boolean = true;
-  isEnabled: boolean = false;
-  selectedVideoUrl: string = '';
-  
-  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private SocketService: SocketService) { } 
+  subscriptions: Subscription[] = [];
+  player: any;
+
+  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private socketService: SocketService) { } 
 
   ngOnInit(): void {
+    // Se suscribe a los cambios en los parámetros de la ruta para obtener el videoId del video a reproducir
     this.route.params.subscribe(params => {
       this.videoId = params['videoId'];
       this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
-      this.setupPlayerEvents();
     });
-  // Escuchar eventos del socket
-  this.SocketService.listenToEvents();  // Asegúrate de llamar a esto en algún lugar adecuado
-
-  // Suscribirse a cambios de estado emitidos por el socket
-  const socketSub = this.SocketService.getSocketState().subscribe(state => {
-    if (state.play) {
-      this.playVideo();
-    } else {
-      this.pauseVideo();
-    }
-  });
-
-  this.subscriptions.add(socketSub);
-}
-
-private playVideo() {
-  if (this.youtubePlayer) {
-    this.youtubePlayer.playVideo();  // Método de API de YouTube para reproducir el video
+    
+     // Configura los listeners de sockets para los eventos de control de video
+    this.setupSocketListeners();
   }
-}
 
-private pauseVideo() {
-  if (this.youtubePlayer) {
-    this.youtubePlayer.pauseVideo();  // Método de API de YouTube para pausar el video
-  }
-}
-
-ngOnDestroy(): void {
-  // Llamar a leaveRoom antes de desconectar el socket
-  if (this.videoId) { // Asegurarse de que el videoId está disponible
-    this.SocketService.leaveRoom(this.videoId); // Usar el id de la sala
-  }
-  // Limpiar los oyentes de eventos del socket y desconectar
-  this.SocketService.cleanUpListeners();
-  this.SocketService.disconnectSocket();
-  // Desuscribirse de todas las suscripciones
-  this.subscriptions.unsubscribe();
-}
-
-
-  private setupPlayerEvents() {
-    if (!this.youtubePlayer) {
-      console.error('YouTube Player not initialized');
-      return;
-    }
-
-    this.youtubePlayer.stateChange.subscribe(event => {
-      if (event.data === YT.PlayerState.PLAYING && !event.target.getPlayerState()) {
-        console.log('Video is playing');
-        this.SocketService.send({ type: 'PLAY', idSala: 'yourRoomId' });
-      } else if (event.data === YT.PlayerState.PAUSED) {
-        console.log('Video is paused');
-        this.SocketService.send({ type: 'PAUSE', idSala: 'yourRoomId' });
-      }
+  setupSocketListeners(): void {
+    // Suscribirse al evento PAUSE para pausar el video cuando se recibe el evento desde otro usuario
+    const pauseSub = this.socketService.onEvent(socketEvents.PAUSE).subscribe(() => {
+      this.youtubePlayer.pauseVideo(); // Pause el video
+      alert('PAUSE event received and video paused');
     });
+    // Suscribirse al evento PLAY para reproducir el video cuando se recibe el evento desde otro usuario
+    const playSub = this.socketService.onEvent(socketEvents.PLAY).subscribe(() => {
+      this.youtubePlayer.playVideo(); // Play el video
+      alert('PLAY event received and video played');
+    });
+
+    // Almacena las suscripciones para poder cancelarlas más tarde, evitando fugas de memoria
+    this.subscriptions.push(pauseSub, playSub);
+  }
+  
+  ngOnDestroy(): void {
+    // Cancela todas las suscripciones cuando el componente se destruye para prevenir fugas de memoria
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    // Asegurarse de desconectar el socket al salir
+    this.socketService.disconnect();
+    alert('Socket desconectado al salir de la sala');
   }
 
-  //No borrar
+  // Emite un evento PAUSE al servidor para informar que el usuario ha pausado el video
+  pauseVideo(): void {
+    this.socketService.emitEvent(socketEvents.PAUSE, { roomId: this.roomId });
+    alert('Evento PAUSE emitido');
+  }
+
+  // Emite un evento PAUSE al servidor para informar que el usuario ha pausado el video
+  playVideo(): void {
+    this.socketService.emitEvent(socketEvents.PLAY, { roomId: this.roomId });
+    console.log('Evento PLAY emitido');
+  }
+
   sendMessage(): void {
     if (this.newMessage.trim() !== '') {
       this.messages.push(this.newMessage);

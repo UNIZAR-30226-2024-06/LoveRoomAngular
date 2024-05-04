@@ -1,10 +1,12 @@
-import { Component, Injectable } from '@angular/core';
+import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Router, RouterOutlet, RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterOutlet, RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { SocketService } from '../../services/socket.service';
+import { socketEvents } from '../../environments/socketEvents';
 
 
 @Component({
@@ -22,22 +24,7 @@ export class YoutubeComponent {
   videos: any[] = [];
   errorMessage: string = '';
 
-  // En el constructor o en algún método de inicialización
-constructor(private http: HttpClient, private router: Router, private SocketService: SocketService) {
-  // Preparar la suscripción
-  this.setupSocketListeners();
-}
-
-private setupSocketListeners() {
-  this.SocketService.getSocketState().subscribe(state => {
-    if (state.idSala && state.idSala !== '') {
-      // Asegurarse de navegar y unirse solo si se recibe el MATCH
-      this.router.navigate(['/sala', state.idSala]);
-      this.SocketService.send({ type: 'JOIN_ROOM', idSala: state.idSala });
-    }
-  });
-}
-
+  constructor(private http: HttpClient, private router: Router, private socketService: SocketService) { }
 
   toggleResults() {
     this.showResults = !this.showResults;
@@ -63,36 +50,50 @@ private setupSocketListeners() {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-  
+
     // Hacer la solicitud HTTP POST al backend
-    this.http.post(`http://${environment.host_back}/videos/watch/${videoId}`, {}, { headers: headers }).subscribe({
-      next: (response: any) => {
-        console.log('Response:', response);
-        // Si es una sala unitaria, nos quedamos escuchando
-        if (response.esSalaUnitaria) {
-          this.router.navigate(['/sala', videoId]);  // Ver el video en sala unitaria
-          // Escuchar el evento MATCH
-          this.SocketService.getSocketState().subscribe(state => {
-            if (state.idSala && state.idSala !== '') {
-              this.SocketService.send({ type: 'JOIN_ROOM', idSala: state.idSala });
-            }
-          });
-        } else {
-          // No es una sala unitaria, emitir inmediatamente JOIN_ROOM
-          this.router.navigate(['/sala', response.idSala]);
-          this.SocketService.send({ type: 'JOIN_ROOM', idSala: response.idSala });
+    this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
+      (response: any) => {
+        // Manejar la respuesta del backend aquí
+        console.log(headers);
+        console.log(response);
+        // Navegar a la sala después de la verificación del backend
+        this.router.navigate(['/sala', videoId]);
+        alert(response.esSalaUnitaria);
+        if(response.esSalaUnitaria == true) {
+          alert('Esperando match...');
+          // Escuchar el evento MATCH. Este evento se espera que sea emitido por el servidor cuando otro usuario
+          // se una a la misma sala, lo cual constituiría un "match".
+        this.socketService.onEvent(socketEvents.MATCH).subscribe({
+          next: (data) => {
+            alert('Evento MATCH recibido, data:'); // Aviso cuando llegue algo en la escucha.
+            // En el momento que se recibe el evento MATCH, este bloque se ejecuta. 'data' debería contener
+            // información relevante enviada por el servidor, como el 'roomId' de la sala donde ambos usuarios
+            // están ahora emparejados.
+            
+            // Emitir el evento JOIN_ROOM hacia el servidor, pasando el 'roomId' recibido.
+            // Esto le indica al servidor que el usuario actual se está uniendo formalmente a la sala
+            // donde ha ocurrido el match.
+            this.socketService.emitEvent(socketEvents.JOIN_ROOM, { roomId: data.roomId });
+            alert('Evento JOIN_ROOM emitido hacia el servidor con roomId:'); // Aviso después de hacer el emit.
+            
+          }
+        });
+      } else {
+        // En el caso que la sala no sea unitaria desde el inicio (lo que implica que hay al menos otro
+        // usuario ya presente en la sala), se emite directamente el evento JOIN_ROOM.
+        alert('Sala no es unitaria, match inicial encontrado.');
+        // Emitir el evento JOIN_ROOM inmediatamente con el 'roomId' proporcionado en la respuesta del servidor.
+        // Esto se hace porque no es necesario esperar a que otro usuario se una; el match ya existe.
+        this.socketService.emitEvent(socketEvents.JOIN_ROOM, { roomId: response.roomId });
+        alert('Evento JOIN_ROOM emitido inmediatamente con roomId');
         }
       },
-      error: (error: any) => {
-        console.error('Error:', error);
-        this.errorMessage = error.error.error || 'Error desconocido al intentar ver el video';
-        if (error.status === 403) {
-          alert("El usuario ha sobrepasado su límite de salas");
-        } else if (error.status === 500) {
-          alert("Error al ver video");
-        }
+      (error: any) => {
+        // Manejar errores aquí
+        console.error(error);
+        this.errorMessage = error.error.error;
       }
-    });
+    );
   }
-  
 }
