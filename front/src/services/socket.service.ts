@@ -25,16 +25,14 @@ export class SocketService {
     this.socket.emit(eventName, data);
   }
 
-  // Devuelve un Observable que permite a los componentes suscribirse a eventos específicos y reaccionar a los datos recibidos
+  // Método para escuchar eventos específicos
   onEvent(eventName: string): Observable<any> {
-    return new Observable((observer) => {
-      this.socket.on(eventName, (data: any) => {
-        observer.next(data);
+    return new Observable(observer => {
+      this.socket.on(eventName, (senderId: string, receiverId: string, idSala: string, idVideo: string) => {
+        observer.next({ senderId, receiverId, idSala, idVideo });
       });
 
-      return () => {
-        this.socket.off(eventName);
-      };
+      return () => this.socket.off(eventName);
     });
   }
 

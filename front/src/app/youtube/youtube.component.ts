@@ -60,25 +60,19 @@ export class YoutubeComponent {
         // Navegar a la sala después de la verificación del backend
         this.router.navigate(['/sala', videoId]);
         alert(response.esSalaUnitaria);
+        // Emitir el evento emitMatch para asegurarnos de iniciar el proceso de matching
+        //this.socketService.emitEvent(socketEvents.MATCH, { videoId: videoId });
         if(response.esSalaUnitaria == true) {
           alert('Esperando match...');
           // Escuchar el evento MATCH. Este evento se espera que sea emitido por el servidor cuando otro usuario
           // se una a la misma sala, lo cual constituiría un "match".
-        this.socketService.onEvent(socketEvents.MATCH).subscribe({
-          next: (data) => {
-            alert('Evento MATCH recibido, data:'); // Aviso cuando llegue algo en la escucha.
-            // En el momento que se recibe el evento MATCH, este bloque se ejecuta. 'data' debería contener
-            // información relevante enviada por el servidor, como el 'roomId' de la sala donde ambos usuarios
-            // están ahora emparejados.
-            
-            // Emitir el evento JOIN_ROOM hacia el servidor, pasando el 'roomId' recibido.
-            // Esto le indica al servidor que el usuario actual se está uniendo formalmente a la sala
-            // donde ha ocurrido el match.
-            this.socketService.emitEvent(socketEvents.JOIN_ROOM, { roomId: data.roomId });
+          this.socketService.onEvent(socketEvents.MATCH).subscribe(data => {
+            console.log('Match event received:', data);
+            console.log(`Match confirmed between senderId: ${data.senderId} and receiverId: ${data.receiverId} in room: ${data.idSala}`);
+              // Additional logic to handle room joining or video control could be placed here
+            this.socketService.emitEvent(socketEvents.JOIN_ROOM, { idSala: data.idSala });
             alert('Evento JOIN_ROOM emitido hacia el servidor con roomId:'); // Aviso después de hacer el emit.
-            
-          }
-        });
+          });
       } else {
         // En el caso que la sala no sea unitaria desde el inicio (lo que implica que hay al menos otro
         // usuario ya presente en la sala), se emite directamente el evento JOIN_ROOM.
