@@ -13,7 +13,7 @@ export class SocketService {
   constructor() {
   }
 
-
+  
   // Conecta el socket al servidor
   public connect(): void {
     const token = localStorage.getItem('token');  // Obtener el token de autenticación guardado
@@ -23,12 +23,13 @@ export class SocketService {
         token: `Bearer ${token}`  // Enviar el token como parte de la autenticación
       }
     });
+    alert(environment.host_back);
     // escuchando el evento connect que se emite cuando el socket se conecta con éxito al servidor. Se muestra la alerta si hay una conexion con exito
     this.socket.on("connect", () => {
     alert(this.socket.id); // Si conectara deberiamos poder ver 
 });
 
-this.socket.on("connect_error", (error) => {
+/*this.socket.on("connect_error", (error) => {
   if (this.socket.active) {
     alert("Socoket supuestamente activo");
   } else {
@@ -37,7 +38,7 @@ this.socket.on("connect_error", (error) => {
     alert("Conexion denegada");
     console.log(error.message);
   }
-});
+});*/
     alert("Intento conectar el socket");
   }
 
