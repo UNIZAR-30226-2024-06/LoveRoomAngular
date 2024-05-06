@@ -1,36 +1,58 @@
 import { Injectable } from '@angular/core';
-import { io} from 'socket.io-client';
+import { io, Socket} from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
-import { Socket, SocketIoConfig } from 'ngx-socket-io';
+import { SocketIoConfig } from 'ngx-socket-io';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
-  private socket: any;
-  readonly uri: string = 'http://'+environment.host_back;
-
+  private socket: Socket = null!;
 
   constructor() {
-    this.socket = io(this.uri, {
-      auth: {
-        token: `Bearer ${localStorage.getItem('token')}`
-      }
-    });
   }
 
-  /*
+
   // Conecta el socket al servidor
-  connect(): void {
-    this.socket.connect();
-  } */
+  public connect(): void {
+    const token = localStorage.getItem('token');  // Obtener el token de autenticación guardado
+    alert(token);
+    this.socket = io(`http://${environment.host_back}`, {
+      auth: {
+        token: `Bearer ${token}`  // Enviar el token como parte de la autenticación
+      }
+    });
+    // escuchando el evento connect que se emite cuando el socket se conecta con éxito al servidor. Se muestra la alerta si hay una conexion con exito
+    this.socket.on("connect", () => {
+    alert(this.socket.id); // Si conectara deberiamos poder ver 
+});
+
+this.socket.on("connect_error", (error) => {
+  if (this.socket.active) {
+    alert("Socoket supuestamente activo");
+  } else {
+    // the connection was denied by the server
+    // in that case, `socket.connect()` must be manually called in order to reconnect
+    alert("Conexion denegada");
+    console.log(error.message);
+  }
+});
+    alert("Intento conectar el socket");
+  }
+
+  public disconnect(): void {
+    this.socket.on("disconnect", () => {
+      alert(this.socket.id); // undefined
+    });
+  }
 
   // Permite emitir eventos al servidor con un nombre de evento y datos asociados.
   emitEvent(eventName: string, data: any): void {
     this.socket.emit(eventName, data);
   }
 
+  /*
   // Escuchar el evento "MATCH"
   onMatch(): Observable<any> {
     return this.socket.fromEvent('MATCH');
@@ -44,11 +66,7 @@ export class SocketService {
         });
       return () => this.socket.off(eventName);
     });
-  }
+  } */
 
-  //Desconecta el socket manualmente
-  disconnect(): void {
-    this.socket.disconnect();
-  }
 }
 

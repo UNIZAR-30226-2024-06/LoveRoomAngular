@@ -75,7 +75,7 @@ export class PaginaPrincipalComponent implements OnInit{
           alert('Esperando match...');
           // Escuchar el evento MATCH. Este evento se espera que sea emitido por el servidor cuando otro usuario
           // se una a la misma sala, lo cual constituiría un "match".
-        this.socketService.listen(socketEvents.MATCH).subscribe({
+        /*this.socketService.listen(socketEvents.MATCH).subscribe({
           next: (data) => {
             alert('Evento MATCH recibido, data:'); // Aviso cuando llegue algo en la escucha.
             // En el momento que se recibe el evento MATCH, este bloque se ejecuta. 'data' debería contener
@@ -89,7 +89,7 @@ export class PaginaPrincipalComponent implements OnInit{
             alert('Evento JOIN_ROOM emitido hacia el servidor con roomId:'); // Aviso después de hacer el emit.
             
           }
-        });
+        });*/
       } else {
         // En el caso que la sala no sea unitaria desde el inicio (lo que implica que hay al menos otro
         // usuario ya presente en la sala), se emite directamente el evento JOIN_ROOM.

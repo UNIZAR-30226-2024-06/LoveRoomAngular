@@ -52,11 +52,11 @@ export class SalaComponent implements OnInit, OnDestroy {
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
     
      // Configura los listeners de sockets para los eventos de control de video
-    this.setupSocketListeners();
+    //this.setupSocketListeners();
     
   }
 
-  setupSocketListeners(): void {
+  /*setupSocketListeners(): void {
     // Suscribirse al evento PAUSE para pausar el video cuando se recibe el evento desde otro usuario
     const pauseSub = this.socketService.listen(socketEvents.PAUSE).subscribe(() => {
       this.youtubePlayer.pauseVideo(); // Pause el video
@@ -70,7 +70,7 @@ export class SalaComponent implements OnInit, OnDestroy {
 
     // Almacena las suscripciones para poder cancelarlas más tarde, evitando fugas de memoria
     this.subscriptions.push(pauseSub, playSub);
-  }
+  }*/
   
   ngOnDestroy(): void {
     // Cancela todas las suscripciones cuando el componente se destruye para prevenir fugas de memoria
