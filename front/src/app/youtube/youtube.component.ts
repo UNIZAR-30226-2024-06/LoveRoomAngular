@@ -50,7 +50,7 @@ export class YoutubeComponent {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-
+    
     // Hacer la solicitud HTTP POST al backend
     this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
       (response: any) => {
@@ -58,15 +58,21 @@ export class YoutubeComponent {
         console.log(headers);
         console.log(response);
         // Navegar a la sala después de la verificación del backend
-        this.router.navigate(['/sala', videoId]);
+
+        // En sala unitaria : redirige /videos/watch/idVideo
+        // En sala no unitaria : /rooms/idSala
+
+         // /sala/idSala
         alert(response.esSalaUnitaria);
         // Emitir el evento emitMatch para asegurarnos de iniciar el proceso de matching
         //this.socketService.emitEvent(socketEvents.MATCH, { videoId: videoId });
         if(response.esSalaUnitaria == true) {
+          this.router.navigate(['/sala', videoId]);
           alert('Esperando match...');
           // Escuchar el evento MATCH. Este evento se espera que sea emitido por el servidor cuando otro usuario
           // se una a la misma sala, lo cual constituiría un "match".
-          this.socketService.onEvent(socketEvents.MATCH).subscribe(data => {
+          this.socketService.listen(socketEvents.MATCH).subscribe(data => {
+            this.router.navigate(['/sala', { idSala: data.idSala }]);
             console.log('Match event received:', data);
             console.log(`Match confirmed between senderId: ${data.senderId} and receiverId: ${data.receiverId} in room: ${data.idSala}`);
               // Additional logic to handle room joining or video control could be placed here
@@ -74,6 +80,7 @@ export class YoutubeComponent {
             alert('Evento JOIN_ROOM emitido hacia el servidor con roomId:'); // Aviso después de hacer el emit.
           });
       } else {
+        this.router.navigate(['/sala', response.idSala]);
         // En el caso que la sala no sea unitaria desde el inicio (lo que implica que hay al menos otro
         // usuario ya presente en la sala), se emite directamente el evento JOIN_ROOM.
         alert('Sala no es unitaria, match inicial encontrado.');

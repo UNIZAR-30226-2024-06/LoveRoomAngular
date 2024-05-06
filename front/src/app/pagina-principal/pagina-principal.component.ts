@@ -75,7 +75,7 @@ export class PaginaPrincipalComponent implements OnInit{
           alert('Esperando match...');
           // Escuchar el evento MATCH. Este evento se espera que sea emitido por el servidor cuando otro usuario
           // se una a la misma sala, lo cual constituiría un "match".
-        this.socketService.onEvent(socketEvents.MATCH).subscribe({
+        this.socketService.listen(socketEvents.MATCH).subscribe({
           next: (data) => {
             alert('Evento MATCH recibido, data:'); // Aviso cuando llegue algo en la escucha.
             // En el momento que se recibe el evento MATCH, este bloque se ejecuta. 'data' debería contener

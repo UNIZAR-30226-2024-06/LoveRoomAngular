@@ -7,7 +7,7 @@
             <img class="miniature" [src]="getVideoThumbnailUrl(sala.idvideo)" alt="Miniatura del video">
             <label class="acceptResult">{{ getVideoTitle(sala.idvideo) }}</label>
             <h3 class="namePerson"> {{ sala.id }}</h3>
-            <button class="goToSala" (click)="watchVideo(sala.idvideo)">IR A LA SALA</button>
+            <button class="goToSala" (click)="watchVideo(sala.idsala, sala.idvideo)">IR A LA SALA</button>
         </div>
     </div>
 </div>

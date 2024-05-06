@@ -9,8 +9,9 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
 import { SocketService } from '../../services/socket.service';
 import { socketEvents } from '../../environments/socketEvents';
-import { Subscription } from 'rxjs';
+import { Subscription, first } from 'rxjs';
 import { YouTubePlayer } from '@angular/youtube-player';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sala',
@@ -23,34 +24,46 @@ import { YouTubePlayer } from '@angular/youtube-player';
 export class SalaComponent implements OnInit, OnDestroy {
   @ViewChild(YouTubePlayer) youtubePlayer!: YouTubePlayer;
   roomId: string | undefined;
-  videoId: string | undefined;
   videoUrl!: SafeResourceUrl;
+  videoId: string | undefined;
   messages: string[] = [];
   newMessage: string = '';
   subscriptions: Subscription[] = [];
   player: any;
 
-  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private socketService: SocketService) { } 
+  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private socketService: SocketService, private router: Router) { } 
 
   ngOnInit(): void {
-    // Se suscribe a los cambios en los parámetros de la ruta para obtener el videoId del video a reproducir
-    this.route.params.subscribe(params => {
-      this.videoId = params['videoId'];
-      this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
-    });
+    const videoIdAux = localStorage.getItem('videoId');
+    if (videoIdAux) {
+      this.videoId = videoIdAux;
+      localStorage.removeItem('videoId');
+    }
+    else{
+      this.route.params
+        .pipe(first())
+        .subscribe(params => {
+          const videoIdAux = params['videoId'];
+          if (videoIdAux) {
+            this.videoId = videoIdAux;
+          }
+        });
+    }
+    this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
     
      // Configura los listeners de sockets para los eventos de control de video
     this.setupSocketListeners();
+    
   }
 
   setupSocketListeners(): void {
     // Suscribirse al evento PAUSE para pausar el video cuando se recibe el evento desde otro usuario
-    const pauseSub = this.socketService.onEvent(socketEvents.PAUSE).subscribe(() => {
+    const pauseSub = this.socketService.listen(socketEvents.PAUSE).subscribe(() => {
       this.youtubePlayer.pauseVideo(); // Pause el video
       alert('PAUSE event received and video paused');
     });
     // Suscribirse al evento PLAY para reproducir el video cuando se recibe el evento desde otro usuario
-    const playSub = this.socketService.onEvent(socketEvents.PLAY).subscribe(() => {
+    const playSub = this.socketService.listen(socketEvents.PLAY).subscribe(() => {
       this.youtubePlayer.playVideo(); // Play el video
       alert('PLAY event received and video played');
     });

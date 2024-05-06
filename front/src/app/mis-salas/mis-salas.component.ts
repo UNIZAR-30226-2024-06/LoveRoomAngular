@@ -57,24 +57,8 @@ export class MisSalasComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
-  watchVideo(videoId: string) {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    // Hacer la solicitud HTTP GET al backend
-    this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
-      (response: any) => {
-        // Manejar la respuesta del backend aquí
-        console.log(response);
-        // Navegar a la sala después de la verificación del backend
-        this.router.navigate(['/sala', videoId]);
-      },
-      (error: any) => {
-        // Manejar errores aquí
-        console.error(error);
-      }
-    );
+  watchVideo(salaId: string, videoId: string) {
+    localStorage.setItem('videoId', videoId);
+    this.router.navigate(['/sala', salaId]);
   }
 }
