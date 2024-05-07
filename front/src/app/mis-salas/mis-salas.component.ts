@@ -48,6 +48,15 @@ export class MisSalasComponent implements OnInit {
                 console.error('Error al obtener el título del video:', error);
               }
             );
+
+            this.getAuthor(sala.idvideo).subscribe(
+              (autor: string) => {
+                sala.autor = autor;
+              },
+              (error) => {
+                console.error('Error al obtener el autor del video:', error);
+              }
+            );
           });
         },
         (error) => {
@@ -63,6 +72,16 @@ export class MisSalasComponent implements OnInit {
     return this.http.get(url).pipe(
       map((data: any) => {
         return data.items[0].snippet.title;
+      })
+    );
+  }
+
+  getAuthor(videoId: string) {
+    const apiKey = environment.apiKey;
+    const url = `https://www.googleapis.com/youtube/v3/videos?key=${apiKey}&part=snippet&id=${videoId}`;
+    return this.http.get(url).pipe(
+      map((data: any) => {
+        return data.items[0].snippet.channelTitle;
       })
     );
   }
