@@ -1,0 +1,19 @@
+<app-cabecera-y-menu></app-cabecera-y-menu>
+
+<div class="mis-salas-container">
+    <div class="name-input-container">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Introduce un correo para encontrar sus reportes" (keydown.enter)="filtrarReportes()" (input)="filtrarReportes()">
+        <img src="assets/lupa.png" alt="Search Icon" class="search-icon" (click)="filtrarReportes()">
+    </div>
+    <div class="salas">
+        <div class="sala" *ngFor="let reporte of filteredReportes">
+            <label for="correo" class="correo">{{ reporte.correo }}</label> <!-- Puedes mostrar otros detalles de la sala si es necesario -->
+            <label class="texto" for="correo">{{ reporte.texto }}</label>
+            <label class="motivo" for="correo">{{ reporte.motivo }}</label>
+            <button class="unban" *ngIf="!reporte.resuelto" (click)="resolverReporte(reporte.id)">Resolver Reporte</button>
+            <label class="resuelto" *ngIf="reporte.resuelto">Reporte Resuelto </label>
+            <button class="ban" (click)="eliminarReporte(reporte.id)">Eliminar Reporte</button>
+        </div>
+    </div>
+</div>
+
