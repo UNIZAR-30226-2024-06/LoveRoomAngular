@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-mis-salas',
@@ -37,6 +38,17 @@ export class MisSalasComponent implements OnInit {
         (response) => {
           // Éxito: asignamos la respuesta (lista de salas) a nuestra variable 'salas'
           this.salas = response;
+          this.salas.forEach(sala => {
+            // Obtenemos el título del video de YouTube
+            this.getVideoTitle(sala.idvideo).subscribe(
+              (title: string) => {
+                sala.videoTitle = title;
+              },
+              (error) => {
+                console.error('Error al obtener el título del video:', error);
+              }
+            );
+          });
         },
         (error) => {
           // Manejo de errores
@@ -48,7 +60,11 @@ export class MisSalasComponent implements OnInit {
   getVideoTitle(videoId: string) {
     const apiKey = environment.apiKey;
     const url = `https://www.googleapis.com/youtube/v3/videos?key=${apiKey}&part=snippet&id=${videoId}`;
-    return this.http.get(url);
+    return this.http.get(url).pipe(
+      map((data: any) => {
+        return data.items[0].snippet.title;
+      })
+    );
   }
   
   getVideoThumbnailUrl(videoId: string): SafeResourceUrl {

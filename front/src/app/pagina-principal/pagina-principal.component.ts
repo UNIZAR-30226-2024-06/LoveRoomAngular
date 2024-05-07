@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 import { SocketService } from '../../services/socket.service';
 import { socketEvents } from '../../environments/socketEvents';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-pagina-principal',
@@ -37,6 +38,17 @@ export class PaginaPrincipalComponent implements OnInit{
       .subscribe(
         (response) => {
           this.salasInterest = response;
+          this.salasInterest.forEach(sala => {
+            // Obtenemos el título del video de YouTube
+            this.getVideoTitle(sala.idvideo).subscribe(
+              (title: string) => {
+                sala.videoTitle = title;
+              },
+              (error) => {
+                console.error('Error al obtener el título del video:', error);
+              }
+            );
+          });
         },
         (error) => {
           console.error('Error al obtener los videos de interés:', error);
@@ -47,7 +59,11 @@ export class PaginaPrincipalComponent implements OnInit{
   getVideoTitle(videoId: string) {
     const apiKey = environment.apiKey;
     const url = `https://www.googleapis.com/youtube/v3/videos?key=${apiKey}&part=snippet&id=${videoId}`;
-    return this.http.get(url);
+    return this.http.get(url).pipe(
+      map((data: any) => {
+        return data.items[0].snippet.title;
+      })
+    );
   }
   
   getVideoThumbnailUrl(videoId: string): SafeResourceUrl {

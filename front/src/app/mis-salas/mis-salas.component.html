@@ -5,7 +5,7 @@
         <div class="sala" *ngFor="let sala of salas">
             <h3 class="id">Sala: {{ sala.id }}</h3> <!-- Puedes mostrar otros detalles de la sala si es necesario -->
             <img class="miniature" [src]="getVideoThumbnailUrl(sala.idvideo)" alt="Miniatura del video">
-            <label class="acceptResult">{{ getVideoTitle(sala.idvideo) }}</label>
+            <label class="acceptResult">{{ sala.videoTitle }}</label>
             <h3 class="namePerson"> {{ sala.id }}</h3>
             <button class="goToSala" (click)="watchVideo(sala.idsala, sala.idvideo)">IR A LA SALA</button>
         </div>
