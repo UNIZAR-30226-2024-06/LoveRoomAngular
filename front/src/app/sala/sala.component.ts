@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnDestroy, OnInit } from '@angular/core';
+import { Component, ViewChild, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CabeceraYMenuComponent } from '../cabecera-y-menu/cabecera-y-menu.component';
 import { YoutubeComponent } from '../youtube/youtube.component';
@@ -21,7 +21,7 @@ import { Router } from '@angular/router';
   templateUrl: './sala.component.html',
   styleUrls: ['./sala.component.css']
 })
-export class SalaComponent implements OnInit, OnDestroy {
+export class SalaComponent implements OnInit {
   @ViewChild(YouTubePlayer) youtubePlayer!: YouTubePlayer;
   roomId: string | undefined;
   videoUrl!: SafeResourceUrl;
@@ -30,10 +30,12 @@ export class SalaComponent implements OnInit, OnDestroy {
   newMessage: string = '';
   subscriptions: Subscription[] = [];
   player: any;
+  private socketService: SocketService = inject(SocketService);
 
-  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private socketService: SocketService, private router: Router) { } 
+  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private router: Router) { } 
 
   ngOnInit(): void {
+    
     const videoIdAux = localStorage.getItem('videoId');
     if (videoIdAux) {
       this.videoId = videoIdAux;
@@ -50,7 +52,6 @@ export class SalaComponent implements OnInit, OnDestroy {
         });
     }
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
-    
      // Configura los listeners de sockets para los eventos de control de video
     //this.setupSocketListeners();
     
@@ -72,7 +73,7 @@ export class SalaComponent implements OnInit, OnDestroy {
     this.subscriptions.push(pauseSub, playSub);
   }*/
   
-  ngOnDestroy(): void {
+  /*ngOnDestroy(): void {
     // Cancela todas las suscripciones cuando el componente se destruye para prevenir fugas de memoria
     this.subscriptions.forEach(sub => sub.unsubscribe());
     // Asegurarse de desconectar el socket al salir
@@ -104,5 +105,5 @@ export class SalaComponent implements OnInit, OnDestroy {
     if (keyboardEvent.key === 'Enter') {
       this.sendMessage();
     }
-  }
+  }*/
 }

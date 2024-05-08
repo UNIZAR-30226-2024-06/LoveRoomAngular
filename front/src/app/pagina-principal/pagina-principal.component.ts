@@ -131,7 +131,7 @@ export class PaginaPrincipalComponent implements OnInit{
         alert('Sala no es unitaria, match inicial encontrado.');
         // Emitir el evento JOIN_ROOM inmediatamente con el 'roomId' proporcionado en la respuesta del servidor.
         // Esto se hace porque no es necesario esperar a que otro usuario se una; el match ya existe.
-        this.socketService.emitEvent(socketEvents.JOIN_ROOM, { roomId: response.roomId });
+        //this.socketService.emitEvent(socketEvents.JOIN_ROOM, { roomId: response.roomId });
         alert('Evento JOIN_ROOM emitido inmediatamente con roomId');
         }
       },

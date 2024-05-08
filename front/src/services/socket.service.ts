@@ -1,57 +1,62 @@
 import { Injectable } from '@angular/core';
-import { io, Socket} from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
-import { SocketIoConfig } from 'ngx-socket-io';
+import io from "socket.io-client";
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
-  private socket: Socket = null!;
-
-  constructor() {
-  }
-
+  private socket = io(`http://${environment.host_back}`, {
+    auth: {
+      token: `Bearer ${localStorage.getItem('token')}`
+    }
+  });
   
-  // Conecta el socket al servidor
-  public connect(): void {
-    const token = localStorage.getItem('token');  // Obtener el token de autenticación guardado
-    alert(token);
-    this.socket = io(`http://${environment.host_back}`, {
-      auth: {
-        token: `Bearer ${token}`  // Enviar el token como parte de la autenticación
-      }
-    });
-    alert(environment.host_back);
-    // escuchando el evento connect que se emite cuando el socket se conecta con éxito al servidor. Se muestra la alerta si hay una conexion con exito
-    this.socket.on("connect", () => {
-    alert(this.socket.id); // Si conectara deberiamos poder ver 
-});
+  constructor() {}
 
-/*this.socket.on("connect_error", (error) => {
-  if (this.socket.active) {
-    alert("Socoket supuestamente activo");
-  } else {
-    // the connection was denied by the server
-    // in that case, `socket.connect()` must be manually called in order to reconnect
-    alert("Conexion denegada");
-    console.log(error.message);
-  }
-});*/
-    alert("Intento conectar el socket");
+  /*getDatosPacientes(): Observable<any> {
+    return new Observable<any>((observer) => {
+      // Escuchar el evento 'datos' del servidor
+      this.socket.on("datos", (data: any) => {
+        observer.next(data); // Enviar los datos recibidos a los suscriptores
+      });
+
+      // Manejar la desconexión
+      return () => {
+        this.socket.disconnect();
+      };
+    });
   }
 
-  public disconnect(): void {
-    this.socket.on("disconnect", () => {
-      alert(this.socket.id); // undefined
+  getPacientesPorGenero(): Observable<any> {
+    return new Observable<any>((observer) => {
+      // Escuchar el evento 'pacientesPorGenero' del servidor
+      this.socket.on("pacientesPorGenero", (data: any) => {
+        observer.next(data); // Enviar los datos recibidos a los suscriptores
+      });
+
+      // Manejar la desconexión
+      return () => {
+        this.socket.disconnect();
+      };
     });
+  }*/
+
+  /*public disconnect(): void {
+    if(this.socket){
+      this.socket.on("disconnect", () => {
+        alert(this.socket); // undefined
+      });
+    }
   }
 
   // Permite emitir eventos al servidor con un nombre de evento y datos asociados.
   emitEvent(eventName: string, data: any): void {
-    this.socket.emit(eventName, data);
-  }
+    if(this.socket){
+      this.socket.emit(eventName, data);
+    }
+  }*/
 
   /*
   // Escuchar el evento "MATCH"

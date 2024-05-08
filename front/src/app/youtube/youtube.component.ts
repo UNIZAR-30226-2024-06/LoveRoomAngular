@@ -50,7 +50,7 @@ export class YoutubeComponent {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    this.socketService.connect();
+    //this.socketService.connect();
     // Hacer la solicitud HTTP POST al backend
     this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
       (response: any) => {
@@ -68,7 +68,7 @@ export class YoutubeComponent {
         //this.socketService.emitEvent(socketEvents.MATCH, { videoId: videoId });
         if(response.esSalaUnitaria == true) {
           this.router.navigate(['/sala', videoId]);
-          alert('Esperando match...');
+          //alert('Esperando match...');
           // Escuchar el evento MATCH. Este evento se espera que sea emitido por el servidor cuando otro usuario
           // se una a la misma sala, lo cual constituiría un "match".
           /*this.socketService.listen(socketEvents.MATCH).subscribe(data => {
@@ -86,7 +86,7 @@ export class YoutubeComponent {
         alert('Sala no es unitaria, match inicial encontrado.');
         // Emitir el evento JOIN_ROOM inmediatamente con el 'roomId' proporcionado en la respuesta del servidor.
         // Esto se hace porque no es necesario esperar a que otro usuario se una; el match ya existe.
-        this.socketService.emitEvent(socketEvents.JOIN_ROOM, { roomId: response.roomId });
+        //this.socketService.emitEvent(socketEvents.JOIN_ROOM, { roomId: response.roomId });
         alert('Evento JOIN_ROOM emitido inmediatamente con roomId');
         }
       },
