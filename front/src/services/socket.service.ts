@@ -37,7 +37,7 @@ export class SocketService {
   }
 
   // Sirver para escuchar el evento MATCH, no se si servira para el resto por el tema de los paramtros
-  public onEvent(eventName: string): Observable<any> {
+  public onMatchEvent(eventName: string): Observable<any> {
     return new Observable(observer => {
       this.socket.on(eventName, (senderId: string, receiverId: string, idSala: string, idVideo: string) => {
         observer.next({ senderId, receiverId, idSala, idVideo });

@@ -9,7 +9,6 @@ import { EditPasswordComponent } from './edit-password/edit-password.component';
 import { SalaComponent } from './sala/sala.component';
 import { UsuariosAdminComponent } from './usuarios-admin/usuarios-admin.component';
 import { ReportsAdminComponent } from './reports-admin/reports-admin.component';
-import { PruebaSocketComponent } from './prueba-socket/prueba-socket.component';
 import { ConCuenta, SinCuenta, Admin } from './auth.guard';
 
 
@@ -24,6 +23,5 @@ export const routes: Routes = [
     { path: 'sala/:id', title: 'Sala', component: SalaComponent, canActivate: [ConCuenta]},
     { path: 'usuarios-admin', title: 'Usuarios admin', component: UsuariosAdminComponent, canActivate: [Admin]},
     { path: 'reports-admin', title: 'Reports admin', component: ReportsAdminComponent, canActivate: [Admin]},
-    { path: 'prueba-socket', title: 'Prueba socket', component: PruebaSocketComponent},
     { path: '**', redirectTo: '', pathMatch: 'full' }
 ];

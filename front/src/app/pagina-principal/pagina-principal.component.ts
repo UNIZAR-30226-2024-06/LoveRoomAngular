@@ -118,7 +118,7 @@ export class PaginaPrincipalComponent implements OnInit{
           //alert('Esperando match...');
           // Escuchar el evento MATCH. Este evento se espera que sea emitido por el servidor cuando otro usuario
           // se una a la misma sala, lo cual constituiría un "match".
-          this.socketService.onEvent(socketEvents.MATCH).subscribe({
+          this.socketService.onMatchEvent(socketEvents.MATCH).subscribe({
             next: (data) => {
               //alert(data.idSala);
               this.router.navigate(['/sala', data.idSala]);
@@ -133,6 +133,7 @@ export class PaginaPrincipalComponent implements OnInit{
           }); 
         } else {
           //alert(response.idsala);
+          localStorage.setItem('videoId', videoId);
           this.router.navigate(['/sala', response.idsala]);
           // En el caso que la sala no sea unitaria desde el inicio (lo que implica que hay al menos otro
           // usuario ya presente en la sala), se emite directamente el evento JOIN_ROOM.

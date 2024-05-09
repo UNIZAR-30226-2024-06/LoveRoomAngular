@@ -56,7 +56,7 @@ export class YoutubeComponent {
       (response: any) => {
         // Manejar la respuesta del backend aquí
         console.log(headers);
-        console.log(response);
+        //console.log(response);
         // Navegar a la sala después de la verificación del backend
 
         // En sala unitaria : redirige /videos/watch/idVideo
@@ -72,7 +72,7 @@ export class YoutubeComponent {
           //alert('Esperando match...');
           // Escuchar el evento MATCH. Este evento se espera que sea emitido por el servidor cuando otro usuario
           // se una a la misma sala, lo cual constituiría un "match".
-          this.socketService.onEvent(socketEvents.MATCH).subscribe({
+          this.socketService.onMatchEvent(socketEvents.MATCH).subscribe({
             next: (data) => {
               //alert(data.idSala);
               const idSalaString = String(data.idSala);
@@ -88,6 +88,7 @@ export class YoutubeComponent {
           }); 
         } else {
           //alert(response.idsala);
+          localStorage.setItem('videoId', videoId);
           const idSalaString = String(response.idSala);
           this.router.navigate(['/sala', response.idsala]);
           // En el caso que la sala no sea unitaria desde el inicio (lo que implica que hay al menos otro

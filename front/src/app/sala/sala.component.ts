@@ -45,7 +45,7 @@ export class SalaComponent implements OnInit {
       this.route.params
         .pipe(first())
         .subscribe(params => {
-          const videoIdAux = params['videoId'];
+          const videoIdAux = params['id'];
           if (videoIdAux) {
             this.videoId = videoIdAux;
           }
