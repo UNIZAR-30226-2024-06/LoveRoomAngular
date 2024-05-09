@@ -30,7 +30,7 @@ export class SalaComponent implements OnInit {
   newMessage: string = '';
   subscriptions: Subscription[] = [];
   player: any;
-  private socketService: SocketService = inject(SocketService);
+  //private socketService: SocketService = inject(SocketService);
 
   constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private router: Router) { } 
 
@@ -51,6 +51,8 @@ export class SalaComponent implements OnInit {
           }
         });
     }
+    alert("Siguiente alerta deberia salir el videoID");
+    alert(this.videoId);
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
      // Configura los listeners de sockets para los eventos de control de video
     //this.setupSocketListeners();
@@ -91,7 +93,7 @@ export class SalaComponent implements OnInit {
   playVideo(): void {
     this.socketService.emitEvent(socketEvents.PLAY, { roomId: this.roomId });
     console.log('Evento PLAY emitido');
-  }
+  }*/
 
   sendMessage(): void {
     if (this.newMessage.trim() !== '') {
@@ -105,5 +107,5 @@ export class SalaComponent implements OnInit {
     if (keyboardEvent.key === 'Enter') {
       this.sendMessage();
     }
-  }*/
+  }
 }

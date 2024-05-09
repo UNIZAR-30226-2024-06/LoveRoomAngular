@@ -21,7 +21,7 @@ export const routes: Routes = [
     { path: 'perfil', title: 'Perfil', component: PerfilComponent, canActivate: [ConCuenta]},
     { path: 'edit-perfil', title: 'Editar perfil', component: EditPerfilComponent, canActivate: [ConCuenta]},
     { path: 'edit-password', title: 'Cambiar contraseña', component: EditPasswordComponent, canActivate: [ConCuenta]},
-    { path: 'sala/:videoId', title: 'Sala', component: SalaComponent, canActivate: [ConCuenta]},
+    { path: 'sala/:id', title: 'Sala', component: SalaComponent, canActivate: [ConCuenta]},
     { path: 'usuarios-admin', title: 'Usuarios admin', component: UsuariosAdminComponent, canActivate: [Admin]},
     { path: 'reports-admin', title: 'Reports admin', component: ReportsAdminComponent, canActivate: [Admin]},
     { path: 'prueba-socket', title: 'Prueba socket', component: PruebaSocketComponent},

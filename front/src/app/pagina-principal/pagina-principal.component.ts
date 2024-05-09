@@ -96,7 +96,7 @@ export class PaginaPrincipalComponent implements OnInit{
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-
+    this.socketService.connect();
     // Hacer la solicitud HTTP POST al backend
     this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
       (response: any) => {
@@ -104,35 +104,43 @@ export class PaginaPrincipalComponent implements OnInit{
         console.log(headers);
         console.log(response);
         // Navegar a la sala después de la verificación del backend
-        this.router.navigate(['/sala', videoId]);
-        alert(response.esSalaUnitaria);
+
+        // En sala unitaria : redirige /videos/watch/idVideo
+        // En sala no unitaria : /rooms/idSala
+
+         // /sala/idSala
+        //alert(response.esSalaUnitaria);
+        // Emitir el evento emitMatch para asegurarnos de iniciar el proceso de matching
+        //this.socketService.emitEvent(socketEvents.MATCH, { videoId: videoId });
         if(response.esSalaUnitaria == true) {
-          alert('Esperando match...');
+          //alert('Sala unitaria, esperando match...');
+          this.router.navigate(['/sala', videoId]);
+          //alert('Esperando match...');
           // Escuchar el evento MATCH. Este evento se espera que sea emitido por el servidor cuando otro usuario
           // se una a la misma sala, lo cual constituiría un "match".
-        /*this.socketService.listen(socketEvents.MATCH).subscribe({
-          next: (data) => {
-            alert('Evento MATCH recibido, data:'); // Aviso cuando llegue algo en la escucha.
-            // En el momento que se recibe el evento MATCH, este bloque se ejecuta. 'data' debería contener
-            // información relevante enviada por el servidor, como el 'roomId' de la sala donde ambos usuarios
-            // están ahora emparejados.
-            
-            // Emitir el evento JOIN_ROOM hacia el servidor, pasando el 'roomId' recibido.
-            // Esto le indica al servidor que el usuario actual se está uniendo formalmente a la sala
-            // donde ha ocurrido el match.
-            this.socketService.emitEvent(socketEvents.JOIN_ROOM, { roomId: data.roomId });
-            alert('Evento JOIN_ROOM emitido hacia el servidor con roomId:'); // Aviso después de hacer el emit.
-            
-          }
-        });*/
-      } else {
-        // En el caso que la sala no sea unitaria desde el inicio (lo que implica que hay al menos otro
-        // usuario ya presente en la sala), se emite directamente el evento JOIN_ROOM.
-        alert('Sala no es unitaria, match inicial encontrado.');
-        // Emitir el evento JOIN_ROOM inmediatamente con el 'roomId' proporcionado en la respuesta del servidor.
-        // Esto se hace porque no es necesario esperar a que otro usuario se una; el match ya existe.
-        //this.socketService.emitEvent(socketEvents.JOIN_ROOM, { roomId: response.roomId });
-        alert('Evento JOIN_ROOM emitido inmediatamente con roomId');
+          this.socketService.onEvent(socketEvents.MATCH).subscribe({
+            next: (data) => {
+              //alert(data.idSala);
+              this.router.navigate(['/sala', data.idSala]);
+              console.log('Match event received:', data);
+              console.log(`Match confirmed between senderId: ${data.senderId} and receiverId: ${data.receiverId} in room: ${data.idSala}`);
+                // Additional logic to handle room joining or video control could be placed here
+              this.socketService.emitEvent(socketEvents.JOIN_ROOM, data.idSala );
+              //alert('Evento JOIN_ROOM emitido hacia el servidor con roomId:'); // Aviso después de hacer el emit.
+            },
+            error: (err) => console.error(err),
+            complete: () => console.log('Finished listening to MATCH events')
+          }); 
+        } else {
+          //alert(response.idsala);
+          this.router.navigate(['/sala', response.idsala]);
+          // En el caso que la sala no sea unitaria desde el inicio (lo que implica que hay al menos otro
+          // usuario ya presente en la sala), se emite directamente el evento JOIN_ROOM.
+          //alert('Sala no es unitaria, match inicial encontrado.');
+          // Emitir el evento JOIN_ROOM inmediatamente con el 'roomId' proporcionado en la respuesta del servidor.
+          // Esto se hace porque no es necesario esperar a que otro usuario se una; el match ya existe.
+          this.socketService.emitEvent(socketEvents.JOIN_ROOM, response.idsala );
+          //alert('Evento JOIN_ROOM emitido inmediatamente con roomId');
         }
       },
       (error: any) => {
