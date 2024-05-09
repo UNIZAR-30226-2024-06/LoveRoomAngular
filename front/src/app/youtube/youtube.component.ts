@@ -75,11 +75,12 @@ export class YoutubeComponent {
           this.socketService.onEvent(socketEvents.MATCH).subscribe({
             next: (data) => {
               //alert(data.idSala);
+              const idSalaString = String(data.idSala);
               this.router.navigate(['/sala', data.idSala]);
               console.log('Match event received:', data);
               console.log(`Match confirmed between senderId: ${data.senderId} and receiverId: ${data.receiverId} in room: ${data.idSala}`);
-                // Additional logic to handle room joining or video control could be placed here
-              this.socketService.emitEvent(socketEvents.JOIN_ROOM, data.idSala );
+              
+              this.socketService.emitEvent(socketEvents.JOIN_ROOM, idSalaString);
               //alert('Evento JOIN_ROOM emitido hacia el servidor con roomId:'); // Aviso después de hacer el emit.
             },
             error: (err) => console.error(err),
@@ -87,13 +88,14 @@ export class YoutubeComponent {
           }); 
         } else {
           //alert(response.idsala);
+          const idSalaString = String(response.idSala);
           this.router.navigate(['/sala', response.idsala]);
           // En el caso que la sala no sea unitaria desde el inicio (lo que implica que hay al menos otro
           // usuario ya presente en la sala), se emite directamente el evento JOIN_ROOM.
           //alert('Sala no es unitaria, match inicial encontrado.');
           // Emitir el evento JOIN_ROOM inmediatamente con el 'roomId' proporcionado en la respuesta del servidor.
           // Esto se hace porque no es necesario esperar a que otro usuario se una; el match ya existe.
-          this.socketService.emitEvent(socketEvents.JOIN_ROOM, response.idsala );
+          this.socketService.emitEvent(socketEvents.JOIN_ROOM, idSalaString);
           //alert('Evento JOIN_ROOM emitido inmediatamente con roomId');
         }
       },
