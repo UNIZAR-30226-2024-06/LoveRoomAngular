@@ -1,0 +1,17 @@
+<div class="verify-code-container">
+    <div>
+        <a [routerLink]="['']">
+            <img src="assets/Logo_titulo.png" alt="Logo" class="logo">
+        </a>
+    </div>
+    <form (ngSubmit)="verifyCode()">
+        <label for="codigo">Codigo</label>
+        <input type="text" id="codigo" [(ngModel)]="codigo" name="codigo" placeholder="Introduzca el codigo: ">
+        
+        <button type="submit">Enviar correo</button>
+        <p class="errorMsg" *ngIf="errorMessage">{{errorMessage}}</p>
+    </form>
+</div>
+
+
+

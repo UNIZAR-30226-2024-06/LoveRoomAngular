@@ -11,36 +11,44 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   standalone: true,
   imports: [RouterOutlet, RouterModule, FormsModule, CommonModule],
   providers: [HttpClient],
-  templateUrl: './send-email.component.html',
-  styleUrl: './send-email.component.css'
+  templateUrl: './verify-code.component.html',
+  styleUrl: './verify-code.component.css'
 })
 
 
-export class SendEmailComponent {
+export class VerifyCodeComponent {
   correo: string = '';
+  codigo: string = '';
   errorMessage: string = '';
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router) { 
+    this.correo = localStorage.getItem('correo') as string;
+  }
 
-  sendEmail(): void {
+  verifyCode(): void {
     const credentials = {
       correo: this.correo,
+      codigo: this.codigo
     };
-
+    
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
-    this.http.post<any>('http://'+environment.host_back+'/user/send/email', credentials, { headers: headers })
+    this.http.post<any>('http://'+environment.host_back+'/user/check/code', credentials, { headers: headers })
       .subscribe(
         response => {
-          console.log('Correo enviado', this.correo);
+          if (response.valido == false) {
+            this.errorMessage = 'error.error.error';
+            return;
+          }
           localStorage.setItem('correo', this.correo);
-          this.router.navigate(['/verify-code']);
+          localStorage.setItem('codigo', this.codigo);
+          this.router.navigate(['/reset-password']);
         },
         error => {
           // Si hubo un error durante la autenticación, muestra una alerta con el mensaje de error.
-          console.error('Error al enviar el correo', error);
+          console.error('Error:', error.error.error);
           this.errorMessage = error.error.error;
         }
       );
