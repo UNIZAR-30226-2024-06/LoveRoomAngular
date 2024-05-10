@@ -13,7 +13,7 @@ import { socketEvents } from '../../environments/socketEvents';
   selector: 'app-youtube',
   standalone: true,
   imports: [RouterOutlet, RouterModule, FormsModule, CommonModule],
-  providers: [SocketService],
+  //providers: [SocketService], Comentado para asegurar patron Singleton del servicio, en caso de que el servicio no funcione descomentar esto primero
   templateUrl: './youtube.component.html',
   styleUrl: './youtube.component.css'
 })
@@ -66,6 +66,7 @@ export class YoutubeComponent {
         //alert(response.esSalaUnitaria);
         // Emitir el evento emitMatch para asegurarnos de iniciar el proceso de matching
         //this.socketService.emitEvent(socketEvents.MATCH, { id: videoId });
+        localStorage.setItem('Sala', response.esSalaUnitaria);
         if(response.esSalaUnitaria == true) {
           //alert('Sala unitaria, esperando match...');
           this.router.navigate(['/sala', videoId]);
@@ -75,6 +76,7 @@ export class YoutubeComponent {
           this.socketService.onMatchEvent(socketEvents.MATCH).subscribe({
             next: (data) => {
               //alert(data.idSala);
+              localStorage.setItem('Sala', response.esSalaUnitaria);
               const idSalaString = String(data.idSala);
               this.router.navigate(['/sala', data.idSala]);
               console.log('Match event received:', data);

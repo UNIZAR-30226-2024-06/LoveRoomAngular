@@ -112,6 +112,7 @@ export class PaginaPrincipalComponent implements OnInit{
         //alert(response.esSalaUnitaria);
         // Emitir el evento emitMatch para asegurarnos de iniciar el proceso de matching
         //this.socketService.emitEvent(socketEvents.MATCH, { videoId: videoId });
+        localStorage.setItem('Sala', response.esSalaUnitaria);
         if(response.esSalaUnitaria == true) {
           //alert('Sala unitaria, esperando match...');
           this.router.navigate(['/sala', videoId]);
@@ -121,6 +122,7 @@ export class PaginaPrincipalComponent implements OnInit{
           this.socketService.onMatchEvent(socketEvents.MATCH).subscribe({
             next: (data) => {
               //alert(data.idSala);
+              localStorage.setItem('Sala', response.esSalaUnitaria);
               this.router.navigate(['/sala', data.idSala]);
               console.log('Match event received:', data);
               console.log(`Match confirmed between senderId: ${data.senderId} and receiverId: ${data.receiverId} in room: ${data.idSala}`);
