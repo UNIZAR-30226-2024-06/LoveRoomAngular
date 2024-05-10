@@ -7,47 +7,34 @@ import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
-  selector: 'app-reset-password',
+  selector: 'app-send-email',
   standalone: true,
   imports: [RouterOutlet, RouterModule, FormsModule, CommonModule],
   providers: [HttpClient],
-  templateUrl: './reset-password.component.html',
-  styleUrl: './reset-password.component.css'
+  templateUrl: './send-email.component.html',
+  styleUrl: './send-email.component.css'
 })
 
 
-export class ResetPasswordComponent {
+export class SendEmailComponent {
   correo: string = '';
-  contrasena: string = '';
   errorMessage: string = '';
-
-  mostrarContrasena = false;
 
   constructor(private http: HttpClient, private router: Router) { }
 
-  login(): void {
+  sendEmail(): void {
     const credentials = {
       correo: this.correo,
-      contrasena: this.contrasena
     };
     
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
 
-    this.http.post<any>('http://'+environment.host_back+'/user/login', credentials, { headers: headers })
+    this.http.post<any>('http://'+environment.host_back+'/user/send/email', credentials, { headers: headers })
       .subscribe(
         response => {
-          // Si la autenticación fue exitosa, muestra una alerta con el token.
-          console.log('Autenticación exitosa', response);
-          if (response.token) {
-            // Guardar el token en localStorage
-            localStorage.setItem('token', response.token);
-            if (response.usuario.tipousuario == "administrador"){
-              localStorage.setItem('admin', 'true');
-            }
-            this.router.navigate(['/']);
-          }
+          console.log('Correo enviado', this.correo);
         },
         error => {
           // Si hubo un error durante la autenticación, muestra una alerta con el mensaje de error.
@@ -55,9 +42,5 @@ export class ResetPasswordComponent {
           this.errorMessage = error.error.error;
         }
       );
-  }
-
-  toggleMostrarContrasena() {
-    this.mostrarContrasena = !this.mostrarContrasena;
   }
 }

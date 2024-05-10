@@ -1,0 +1,17 @@
+<div class="send-email-container">
+    <div>
+        <a [routerLink]="['']">
+            <img src="assets/Logo_titulo.png" alt="Logo" class="logo">
+        </a>
+    </div>
+    <form (ngSubmit)="sendEmail()">
+        <label for="correo">Correo electrónico</label>
+        <input type="text" id="correo" [(ngModel)]="correo" name="correo" placeholder="Introduzca su correo electrónico">
+        
+        <button type="submit">Enviar correo</button>
+        <p class="errorMsg" *ngIf="errorMessage">{{errorMessage}}</p>
+    </form>
+</div>
+
+
+
