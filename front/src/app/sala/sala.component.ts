@@ -10,19 +10,27 @@ import { environment } from '../../environments/environment';
 import { SocketService } from '../../services/socket.service';
 import { socketEvents } from '../../environments/socketEvents';
 import { Subscription, first } from 'rxjs';
-import { YouTubePlayer } from '@angular/youtube-player';
+import { YouTubePlayer, YouTubePlayerModule } from '@angular/youtube-player';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sala',
   standalone: true,
-  imports: [CabeceraYMenuComponent, CommonModule, FormsModule, RouterOutlet, RouterModule],
+  imports: [CabeceraYMenuComponent, CommonModule, FormsModule, RouterOutlet, RouterModule, YouTubePlayerModule],
   //providers: [SocketService], Comentado para asegurar el patron singleton
   templateUrl: './sala.component.html',
   styleUrls: ['./sala.component.css']
 })
 export class SalaComponent implements OnInit {
-  @ViewChild(YouTubePlayer) youtubePlayer!: YouTubePlayer;
+  @ViewChild(YouTubePlayer, { static: false }) youtubePlayer!: YouTubePlayer;
+  playerVars = {
+    autoplay: 1,  // 0 o 1 (1 significa autoplay activado)
+    controls: 1,  // 0 o 1 (1 muestra los controles del reproductor)
+    modestbranding: 1, // 1 para minimizar la marca de YouTube en el reproductor
+    enablejsapi: 1,  // 1 permite la interacción con el API de JavaScript
+    fs: 1,  // 0 o 1 (1 permite el botón de pantalla completa)
+    iv_load_policy: 3, // 1 o 3 (3 para no mostrar anotaciones en el video)
+  };
   roomId: string = '';
   videoUrl!: SafeResourceUrl;
   videoId: string | undefined;
@@ -30,7 +38,8 @@ export class SalaComponent implements OnInit {
   newMessage: string = '';
   subscriptions: Subscription[] = [];
   player: any;
-  sala: any;
+  sala: string = '';
+  salaAux: any;
   //private socketService: SocketService = inject(SocketService);
 
   constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private router: Router, private socketService: SocketService) { } 
@@ -38,7 +47,10 @@ export class SalaComponent implements OnInit {
   ngOnInit(): void {
     
     const videoIdAux = localStorage.getItem('videoId');
-    this.sala = localStorage.getItem('Sala');
+    this.salaAux = localStorage.getItem('salaId');
+    localStorage.removeItem('salaId');
+    this.sala = String(this.salaAux);
+    alert(this.sala);
     localStorage.removeItem('Sala');
 
     if (videoIdAux) {
@@ -61,11 +73,27 @@ export class SalaComponent implements OnInit {
     
   }
 
-  ngAfterViewInit(): void {
+  /*ngAfterViewInit(): void {
     this.setupYouTubePlayerEvents();
+  }*/
+
+  onPlayerReady(event: any): void {
+    console.log('YouTube Player is ready', event);
+    // Aquí puedes también inicializar configuraciones adicionales del reproductor si es necesario.
   }
 
-  setupYouTubePlayerEvents(): void {
+  onStateChange(event: any): void {
+    console.log('YouTube Player state changed', event.data);
+    if (event.data === YT.PlayerState.PLAYING) {
+      alert('PLAY event received and video played');
+      this.playVideo();
+    } else if (event.data === YT.PlayerState.PAUSED) {
+      alert('PAUSE event received and video paused');
+      this.pauseVideo();
+    }
+  }
+
+  /*setupYouTubePlayerEvents(): void {
     alert('Configurando eventos de YouTubePlayer');
     if (!this.youtubePlayer) {
       console.error('YouTubePlayer no está inicializado');
@@ -77,18 +105,19 @@ export class SalaComponent implements OnInit {
     this.youtubePlayer.stateChange.subscribe((event) => {
       // Verificar si el estado cambió a "playing" o "paused"
       alert('Configurando eventos a escuchar')
-      if (event.data === 1) {
+      if (event.data === YT.PlayerState.PLAYING) {
         // 1 significa que el video está reproduciéndose
         alert('PLAY event received and video played');
+        this.playVideo();
         //this.socketService.playVideo(this.roomId);
-      } else if (event.data === 2) {
+      } else if (event.data === YT.PlayerState.PAUSED) {
         // 2 significa que el video está pausado
         alert('PAUSE event received and video paused');
+        this.pauseVideo();
         //this.socketService.pauseVideo(this.roomId);
       }
     });
-    
-  }
+  }*/
   
 
   /*setupSocketListeners(): void {
@@ -116,13 +145,13 @@ export class SalaComponent implements OnInit {
 
   // Emite un evento PAUSE al servidor para informar que el usuario ha pausado el video
   pauseVideo(): void {
-    this.socketService.emitEvent(socketEvents.PAUSE, { roomId: this.roomId });
+    this.socketService.emitEvent(socketEvents.PAUSE, this.sala);
     alert('Evento PAUSE emitido');
   }
 
   // Emite un evento PAUSE al servidor para informar que el usuario ha pausado el video
   playVideo(): void {
-    this.socketService.emitEvent(socketEvents.PLAY, { roomId: this.roomId });
+    this.socketService.emitEvent(socketEvents.PLAY, this.sala);
     console.log('Evento PLAY emitido');
   }
 

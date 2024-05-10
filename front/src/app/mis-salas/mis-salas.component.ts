@@ -6,6 +6,8 @@ import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
 import { map } from 'rxjs';
+import { SocketService } from '../../services/socket.service';
+import { socketEvents } from '../../environments/socketEvents';
 
 @Component({
   selector: 'app-mis-salas',
@@ -19,7 +21,7 @@ import { map } from 'rxjs';
 export class MisSalasComponent implements OnInit {
   salas: any[] = []; // Aquí almacenaremos las salas obtenidas del backend
 
-  constructor(private http: HttpClient, private router: Router, private sanitizer: DomSanitizer) { }
+  constructor(private http: HttpClient, private router: Router, private sanitizer: DomSanitizer, private socketService: SocketService) { }
 
   ngOnInit(): void {
     // Llamada al backend para obtener la lista de salas
@@ -31,7 +33,7 @@ export class MisSalasComponent implements OnInit {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-
+    
     // Llamada HTTP GET al backend para obtener las salas
     this.http.get<any[]>('http://'+environment.host_back+'/rooms', { headers })
       .subscribe(
@@ -94,6 +96,9 @@ export class MisSalasComponent implements OnInit {
 
   watchVideo(salaId: string, videoId: string) {
     localStorage.setItem('videoId', videoId);
+    localStorage.setItem('salaId', salaId);
+    this.socketService.connect();
     this.router.navigate(['/sala', salaId]);
+    this.socketService.emitEvent(socketEvents.JOIN_ROOM, salaId);
   }
 }
