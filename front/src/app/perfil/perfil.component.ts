@@ -18,6 +18,9 @@ export class PerfilComponent {
   usuario: any;
   error: string | undefined;
   showAnswer: boolean[] = [];
+  tarjeta: string = '';
+  monto: number = 4.99;
+  errorMessage: string = '';
 
   constructor(private http: HttpClient, private router: Router) {
     const correo = localStorage.getItem('correo');
@@ -91,7 +94,6 @@ export class PerfilComponent {
           console.log('Se ha borrado la cuenta', response);
           localStorage.removeItem('token');
           localStorage.removeItem('admin');
-          alert('¡Eliminación de cuenta exitosa!');
           this.router.navigate(['/']);
         },
         error => {
@@ -99,6 +101,57 @@ export class PerfilComponent {
           alert('Error al borrar la cuenta' + error.message);
         }
       );
+  } 
+
+  pagar(): void {
+    const credentials = {
+      tarjeta: this.tarjeta,
+      monto: this.monto
+    };
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No se encontró un token en el almacenamiento local.');
+      alert('No se encontró un token en el almacenamiento local.');
+      return;
+    }
+  
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    });
+
+    this.http.post<any>('http://'+environment.host_back+'/payment', credentials, { headers: headers })
+      .subscribe(
+        response => {
+          //Se ha efectuado bien el pago
+          this.http.post<any>('http://'+environment.host_back+'/payment/confirm', response.idTransaccion, { headers: headers })
+          .subscribe(
+            response => {
+              //Se ha efectuado bien el pago
+              alert('Ahora eres premium');
+              this.router.navigate(['/']);
+            },
+            error => {
+              //Ha fallado el pago (no debería poder ocurrir esto)
+            }
+          );
+        },
+        error => {
+          //Ha fallado el pago
+          this.http.post<any>('http://'+environment.host_back+'/payment/cancel', error.idTransaccion, { headers: headers })
+          .subscribe(
+            response => {
+              //Ha fallado el pago
+              alert('Error al pagar');
+            },
+            error => {
+              //Ha fallado el pago (no debería poder ocurrir esto)
+            }
+          );
+        }
+      );
+    
   }
   
 }

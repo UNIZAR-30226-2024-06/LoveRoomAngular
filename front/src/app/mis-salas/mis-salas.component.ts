@@ -5,6 +5,9 @@ import { CommonModule } from '@angular/common';
 import { SafeResourceUrl, DomSanitizer } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
+import { map } from 'rxjs';
+import { SocketService } from '../../services/socket.service';
+import { socketEvents } from '../../environments/socketEvents';
 
 @Component({
   selector: 'app-mis-salas',
@@ -18,7 +21,7 @@ import { Router } from '@angular/router';
 export class MisSalasComponent implements OnInit {
   salas: any[] = []; // Aquí almacenaremos las salas obtenidas del backend
 
-  constructor(private http: HttpClient, private router: Router, private sanitizer: DomSanitizer) { }
+  constructor(private http: HttpClient, private router: Router, private sanitizer: DomSanitizer, private socketService: SocketService) { }
 
   ngOnInit(): void {
     // Llamada al backend para obtener la lista de salas
@@ -30,13 +33,33 @@ export class MisSalasComponent implements OnInit {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-
+    
     // Llamada HTTP GET al backend para obtener las salas
     this.http.get<any[]>('http://'+environment.host_back+'/rooms', { headers })
       .subscribe(
         (response) => {
           // Éxito: asignamos la respuesta (lista de salas) a nuestra variable 'salas'
           this.salas = response;
+          this.salas.forEach(sala => {
+            // Obtenemos el título del video de YouTube
+            this.getVideoTitle(sala.idvideo).subscribe(
+              (title: string) => {
+                sala.videoTitle = title;
+              },
+              (error) => {
+                console.error('Error al obtener el título del video:', error);
+              }
+            );
+
+            this.getAuthor(sala.idvideo).subscribe(
+              (autor: string) => {
+                sala.autor = autor;
+              },
+              (error) => {
+                console.error('Error al obtener el autor del video:', error);
+              }
+            );
+          });
         },
         (error) => {
           // Manejo de errores
@@ -48,7 +71,21 @@ export class MisSalasComponent implements OnInit {
   getVideoTitle(videoId: string) {
     const apiKey = environment.apiKey;
     const url = `https://www.googleapis.com/youtube/v3/videos?key=${apiKey}&part=snippet&id=${videoId}`;
-    return this.http.get(url);
+    return this.http.get(url).pipe(
+      map((data: any) => {
+        return data.items[0].snippet.title;
+      })
+    );
+  }
+
+  getAuthor(videoId: string) {
+    const apiKey = environment.apiKey;
+    const url = `https://www.googleapis.com/youtube/v3/videos?key=${apiKey}&part=snippet&id=${videoId}`;
+    return this.http.get(url).pipe(
+      map((data: any) => {
+        return data.items[0].snippet.channelTitle;
+      })
+    );
   }
   
   getVideoThumbnailUrl(videoId: string): SafeResourceUrl {
@@ -57,25 +94,10 @@ export class MisSalasComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
-  watchVideo(videoId: string) {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-
-    // Hacer la solicitud HTTP GET al backend
-    this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
-      (response: any) => {
-        // Manejar la respuesta del backend aquí
-        console.log(headers);
-        console.log(response);
-        // Navegar a la sala después de la verificación del backend
-        this.router.navigate(['/sala', videoId]);
-      },
-      (error: any) => {
-        // Manejar errores aquí
-        console.error(error);
-      }
-    );
+  watchVideo(salaId: string, videoId: string) {
+    localStorage.setItem('videoId', videoId);
+    this.socketService.connect();
+    this.router.navigate(['/sala', salaId]);
+    this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, salaId);
   }
 }

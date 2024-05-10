@@ -10,9 +10,9 @@
             <button class="salaAvailable" (click)="watchVideo(sala.idvideo)"> <!--Al pinchar aqui te tiene que llevar a esa sala-->
                 <img class="miSala" alt="Miniatura del video" [src]="getVideoThumbnailUrl(sala.idvideo)" alt="Miniatura del video">
                 <div class="infoSala">
-                    <label class="acceptResult">{{ getVideoTitle(sala.idvideo) }}</label> <!--{{ getVideoTitle(sala.idvideo) }}-->
+                    <label class="acceptResult">{{ sala.videoTitle }}</label> <!--{{ getVideoTitle(sala.idvideo) }}-->
                     <br/>
-                    <label>AUTOR</label>
+                    <label>{{ sala.autor }}</label>
                 </div>
             </button>
         </div>

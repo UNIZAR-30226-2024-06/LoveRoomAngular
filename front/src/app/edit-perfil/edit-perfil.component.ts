@@ -91,26 +91,25 @@ export class EditPerfilComponent {
   }
 
   guardarCambios(): void {
-    // Actualizar el objeto usuario con los cambios antes de enviarlos al servidor
-    this.actualizarUsuario();
-
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
+    this.actualizarUsuario();
 
-    const token = localStorage.getItem('token');
-
-    const body = this.usuarioActualizado; // Enviar el objeto usuarioActualizado al backend
-    console.log(body);
-
+    const idUsuario = this.usuario.id;
+    
     console.log(this.file);
     if (this.flag_imagen == true) {
-      this.http.post<any>('http://'+environment.host_back+'/multimedia/upload/foto/${token}', this.file, { headers: headers })
+      const formData = new FormData();
+      formData.append('file',this.file);
+      this.http.post<any>('http://'+environment.host_back+'/multimedia/upload/foto/'+idUsuario, formData, { headers: headers })
       .subscribe(
         response => {
           console.log('Imagen subida', response);
           alert("Imagen subida");
-          this.usuarioActualizado.fotoperfil = response;
+          // Actualizar el objeto usuario con los cambios antes de enviarlos al servidor
+          this.usuarioActualizado.fotoperfil = response.nombreArchivo;
+          alert('Usuario actualizado correctamente');
         },
         error => {
           console.error('Error al subir la imagen', error.message);
@@ -118,7 +117,10 @@ export class EditPerfilComponent {
           alert(error.message);
         }
       );
-    }    
+    }
+
+    const body= this.usuarioActualizado; // Enviar el objeto usuarioActualizado al backend
+    console.log(body);
 
     this.http.put<any>('http://'+environment.host_back+'/user/update', body, { headers: headers })
       .subscribe(

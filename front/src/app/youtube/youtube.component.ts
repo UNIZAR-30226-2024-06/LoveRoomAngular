@@ -5,12 +5,15 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
+import { SocketService } from '../../services/socket.service';
+import { socketEvents } from '../../environments/socketEvents';
 
 
 @Component({
   selector: 'app-youtube',
   standalone: true,
   imports: [RouterOutlet, RouterModule, FormsModule, CommonModule],
+  //providers: [SocketService], Comentado para asegurar patron Singleton del servicio, en caso de que el servicio no funcione descomentar esto primero
   templateUrl: './youtube.component.html',
   styleUrl: './youtube.component.css'
 })
@@ -21,7 +24,7 @@ export class YoutubeComponent {
   videos: any[] = [];
   errorMessage: string = '';
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router, private socketService: SocketService) { }
 
   toggleResults() {
     this.showResults = !this.showResults;
@@ -47,15 +50,31 @@ export class YoutubeComponent {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-
+    this.socketService.connect();
     // Hacer la solicitud HTTP POST al backend
     this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
       (response: any) => {
-        // Manejar la respuesta del backend aquí
         console.log(headers);
-        console.log(response);
-        // Navegar a la sala después de la verificación del backend
-        this.router.navigate(['/sala', videoId]);
+        localStorage.setItem('videoId', videoId);
+        if(response.esSalaUnitaria == true) {
+          this.router.navigate(['/sala', videoId]);
+          this.socketService.onMatchEvent(socketEvents.MATCH).subscribe({
+            next: (data) => {
+              const idSalaString = String(data.idSala);
+              this.router.navigate(['/sala', data.idSala]);
+              console.log('Match event received:', data);
+              console.log(`Match confirmed between senderId: ${data.senderId} and receiverId: ${data.receiverId} in room: ${data.idSala}`);
+              
+              this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, idSalaString);
+            },
+            error: (err) => console.error(err),
+            complete: () => console.log('Finished listening to MATCH events')
+          }); 
+        } else {
+          const idSalaString = String(response.idSala);
+          this.router.navigate(['/sala', response.idsala]);
+          this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, idSalaString);
+        }
       },
       (error: any) => {
         // Manejar errores aquí
