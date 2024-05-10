@@ -66,6 +66,33 @@ export class SocketService {
     });
   }
 
+  public emitTiempo(eventName: string, idSala: string, timesegundos: number): void {
+    this.socket.emit(eventName, idSala, timesegundos, (response: any) => {
+      if (response.success) {
+        console.log('Tiempo actualizado con éxito en el servidor.');
+      } else {
+        console.error('Error al actualizar el tiempo en el servidor:', response.message);
+      }
+    });
+  }
+
+  // Método para emitir un cambio de video en una sala
+  public emitChangeVideo(eventName: string, idSala: string, idVideo: string): void {
+    this.socket.emit(eventName, idSala, idVideo, (success: boolean) => {
+      console.log(success ? 'Video cambiado con éxito' : 'Error al cambiar el video');
+    });
+  }
+
+  // Método para escuchar cambios de video en la sala
+  public listenChangeVideo(eventName: string): Observable<string> {
+    return new Observable(observer => {
+      this.socket.on(eventName, (idVideo: string) => {
+        observer.next(idVideo);
+      });
+      return () => this.socket.off(socketEvents.CHANGE_VIDEO);
+    });
+  }
+
   // Sirver para escuchar el evento MATCH, no se si servira para el resto por el tema de los paramtros
   public onMatchEvent(eventName: string): Observable<any> {
     return new Observable(observer => {
@@ -97,14 +124,6 @@ export class SocketService {
     return new Observable(observer => {
       this.socket.on(socketEvents.GET_SYNC, (idSala: string) => {
         observer.next({idSala});
-      });
-    });
-  }
-
-  public onChangeVideoEvent(): Observable<any> {
-    return new Observable(observer => {
-      this.socket.on(socketEvents.CHANGE_VIDEO, (idVideo: string) => {
-        observer.next({idVideo});
       });
     });
   }

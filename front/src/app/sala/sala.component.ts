@@ -40,9 +40,15 @@ export class SalaComponent implements OnInit {
   player: any;
   sala: string = '';
 
+  //Variables traidas del componente youtube
+  showResults = false;
+  searchQuery: string = '';
+  videos: any[] = [];
+  errorMessage: string = '';
+
   //private socketService: SocketService = inject(SocketService);
 
-  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private router: Router, private socketService: SocketService) { } 
+  constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private router: Router, private socketService: SocketService, private http: HttpClient) { } 
 
   ngOnInit(): void {
     this.socketService.connect();
@@ -63,6 +69,11 @@ export class SalaComponent implements OnInit {
       }),
       this.socketService.listenPausePlay(socketEvents.PLAY).subscribe(() => {
         this.youtubePlayer.playVideo(); // Reproducir el video
+      }),
+      this.socketService.listenChangeVideo(socketEvents.CHANGE_VIDEO).subscribe(idVideo => {
+        this.videoId = idVideo;
+        this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
+        this.youtubePlayer.playVideo();
       })
     );
   }
@@ -86,29 +97,60 @@ export class SalaComponent implements OnInit {
       this.pauseVideo();
     }
   }
-  
-  ngOnDestroy(): void {
-    // Cancela todas las suscripciones cuando el componente se destruye para prevenir fugas de memoria
-    // Asegurarse de desconectar el socket al salir
-    this.socketService.disconnect();
-    localStorage.removeItem('videoId');
-    console.log('Socket desconectado al salir de la sala');
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
 
   // Emite un evento PAUSE al servidor para informar que el usuario ha pausado el video
   pauseVideo(): void {
-    console.log('Evento PAUSE emitido');
     this.socketService.emitPlayPause(socketEvents.PAUSE, this.sala);
     console.log('Evento PAUSE emitido');
+    this.mandarTiempo(this.youtubePlayer.getCurrentTime());
   }
 
   // Emite un evento PAUSE al servidor para informar que el usuario ha pausado el video
   playVideo(): void {
-    console.log('Evento PLAY emitido');
     this.socketService.emitPlayPause(socketEvents.PLAY, this.sala);
     console.log('Evento PLAY emitido');
   }
+
+  mandarTiempo(segundos: number){
+    this.socketService.emitTiempo(socketEvents.STORE_TIME, this.sala, segundos);
+  }
+
+  toggleResults() {
+    this.showResults = !this.showResults;
+  }
+  searchVideos() {
+    if (this.searchQuery.trim() === '') {
+      this.errorMessage = 'No ha escrito nada para su búsqueda';
+      return;
+    }
+    this.errorMessage = '';
+    const apiKey = environment.apiKey;
+    const apiUrl = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&part=snippet&type=video&q=${this.searchQuery}&maxResults=50`;
+
+    this.http.get(apiUrl).subscribe((data: any) => {
+      this.videos = data.items;
+      this.showResults = true;
+    });
+  }
+
+  changeVideo(videoId2: string){
+    // Actualiza localmente el videoId y la URL del video
+    this.videoId = videoId2;
+    this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + videoId2);
+    
+     // Informa a Angular de que debe revisar y actualizar el enlace de datos
+    this.updateVideoPlayer(videoId2);
+
+    this.socketService.emitChangeVideo(socketEvents.CHANGE_VIDEO, this.sala, videoId2);
+  }
+
+  updateVideoPlayer(videoId: string) {
+    if (this.youtubePlayer) {
+        // Forzar la actualización del componente YouTubePlayer
+        this.youtubePlayer.videoId = videoId; // Actualiza el videoId directamente
+        this.youtubePlayer.ngOnChanges({}); // Forzar a Angular a detectar los cambios
+    }
+}
 
   sendMessage(): void {
     if (this.newMessage.trim() !== '') {
@@ -122,5 +164,15 @@ export class SalaComponent implements OnInit {
     if (keyboardEvent.key === 'Enter') {
       this.sendMessage();
     }
+  }
+
+    
+  ngOnDestroy(): void {
+    // Cancela todas las suscripciones cuando el componente se destruye para prevenir fugas de memoria
+    // Asegurarse de desconectar el socket al salir
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.socketService.disconnect();
+    localStorage.removeItem('videoId');
+    console.log('Socket desconectado al salir de la sala');
   }
 }
