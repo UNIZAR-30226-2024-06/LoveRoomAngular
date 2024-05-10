@@ -9,6 +9,7 @@ import { EditPasswordComponent } from './edit-password/edit-password.component';
 import { SalaComponent } from './sala/sala.component';
 import { UsuariosAdminComponent } from './usuarios-admin/usuarios-admin.component';
 import { ConCuenta, SinCuenta, Admin } from './auth.guard';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 
 export const routes: Routes = [
@@ -21,5 +22,6 @@ export const routes: Routes = [
     { path: 'edit-password', title: 'Cambiar contraseña', component: EditPasswordComponent, canActivate: [ConCuenta]},
     { path: 'sala/:videoId', title: 'Sala', component: SalaComponent, canActivate: [ConCuenta]},
     { path: 'usuarios-admin', title: 'Usuarios admin', component: UsuariosAdminComponent, canActivate: [Admin]},
+    { path: 'reset-password', title: 'Recuperar contraseña', component: ResetPasswordComponent, canActivate: [SinCuenta]},
     { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
