@@ -38,11 +38,32 @@ export class SocketService {
     }
   }
 
-  // Método para emitir eventos al servidor
-  public emitEvent(eventName: string, data: any): void {
+  // Método para emitir eventos Join y Leave
+  public emitJoinLeave(eventName: string, idSala: string): void {
     if (this.socket) {
-      this.socket.emit(eventName, data);
+      this.socket.emit(eventName, idSala);
     }
+  }
+
+  // Método para emitir eventos Play y Pause
+  public emitPlayPause(eventName: string, salaId: string): void {
+    this.socket.emit(eventName, salaId, (success: boolean) => {
+      if (success) {
+        console.log(`${eventName} event successful in room ${salaId}`);
+      } else {
+        console.error(`Error emitting ${eventName} event in room ${salaId}`);
+      }
+    });
+  }
+
+  // Método para escuchar eventos de PLAY y PAUSE
+  public listenPausePlay(eventName: string): Observable<void> {
+    return new Observable<void>((observer) => {
+      this.socket.on(eventName, () => {
+        observer.next();
+      });
+      return () => this.socket.off(eventName); // Limpiar al desuscribirse
+    });
   }
 
   // Sirver para escuchar el evento MATCH, no se si servira para el resto por el tema de los paramtros
@@ -88,27 +109,4 @@ export class SocketService {
     });
   }
 
-  public playVideo(idSala: string): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this.socket.emit(socketEvents.PLAY, idSala, (response: boolean) => {
-        if(response){
-          resolve(true);
-        }else{
-          reject(new Error('Error al reproducir el video'));
-        }
-      });
-    });
-  }
-
-  public pauseVideo(idSala: string): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this.socket.emit(socketEvents.PAUSE, idSala, (response: boolean) => {
-        if(response){
-          resolve(true);
-        }else{
-          reject(new Error('Error al pausar el video'));
-        }
-      });
-    });
-  }
 }

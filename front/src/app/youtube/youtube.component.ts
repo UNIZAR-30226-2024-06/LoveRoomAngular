@@ -54,52 +54,26 @@ export class YoutubeComponent {
     // Hacer la solicitud HTTP POST al backend
     this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
       (response: any) => {
-        // Manejar la respuesta del backend aquí
         console.log(headers);
-        //console.log(response);
-        // Navegar a la sala después de la verificación del backend
-
-        // En sala unitaria : redirige /videos/watch/idVideo
-        // En sala no unitaria : /rooms/idSala
-
-         // /sala/idSala
-        //alert(response.esSalaUnitaria);
-        // Emitir el evento emitMatch para asegurarnos de iniciar el proceso de matching
-        //this.socketService.emitEvent(socketEvents.MATCH, { id: videoId });
-        localStorage.setItem('Sala', response.esSalaUnitaria);
+        localStorage.setItem('videoId', videoId);
         if(response.esSalaUnitaria == true) {
-          //alert('Sala unitaria, esperando match...');
           this.router.navigate(['/sala', videoId]);
-          //alert('Esperando match...');
-          // Escuchar el evento MATCH. Este evento se espera que sea emitido por el servidor cuando otro usuario
-          // se una a la misma sala, lo cual constituiría un "match".
           this.socketService.onMatchEvent(socketEvents.MATCH).subscribe({
             next: (data) => {
-              //alert(data.idSala);
-              localStorage.setItem('Sala', response.esSalaUnitaria);
               const idSalaString = String(data.idSala);
               this.router.navigate(['/sala', data.idSala]);
               console.log('Match event received:', data);
               console.log(`Match confirmed between senderId: ${data.senderId} and receiverId: ${data.receiverId} in room: ${data.idSala}`);
               
-              this.socketService.emitEvent(socketEvents.JOIN_ROOM, idSalaString);
-              //alert('Evento JOIN_ROOM emitido hacia el servidor con roomId:'); // Aviso después de hacer el emit.
+              this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, idSalaString);
             },
             error: (err) => console.error(err),
             complete: () => console.log('Finished listening to MATCH events')
           }); 
         } else {
-          //alert(response.idsala);
-          localStorage.setItem('videoId', videoId);
           const idSalaString = String(response.idSala);
           this.router.navigate(['/sala', response.idsala]);
-          // En el caso que la sala no sea unitaria desde el inicio (lo que implica que hay al menos otro
-          // usuario ya presente en la sala), se emite directamente el evento JOIN_ROOM.
-          //alert('Sala no es unitaria, match inicial encontrado.');
-          // Emitir el evento JOIN_ROOM inmediatamente con el 'roomId' proporcionado en la respuesta del servidor.
-          // Esto se hace porque no es necesario esperar a que otro usuario se una; el match ya existe.
-          this.socketService.emitEvent(socketEvents.JOIN_ROOM, idSalaString);
-          //alert('Evento JOIN_ROOM emitido inmediatamente con roomId');
+          this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, idSalaString);
         }
       },
       (error: any) => {

@@ -96,9 +96,8 @@ export class MisSalasComponent implements OnInit {
 
   watchVideo(salaId: string, videoId: string) {
     localStorage.setItem('videoId', videoId);
-    localStorage.setItem('salaId', salaId);
     this.socketService.connect();
     this.router.navigate(['/sala', salaId]);
-    this.socketService.emitEvent(socketEvents.JOIN_ROOM, salaId);
+    this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, salaId);
   }
 }
