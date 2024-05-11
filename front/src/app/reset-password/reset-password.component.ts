@@ -59,6 +59,8 @@ export class ResetPasswordComponent {
             if (response.usuario.tipousuario == "administrador"){
               localStorage.setItem('admin', 'true');
             }
+            localStorage.removeItem('correo');
+            localStorage.removeItem('codigo');
             this.router.navigate(['/']);
           }
         },
