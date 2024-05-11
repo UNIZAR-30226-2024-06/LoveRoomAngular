@@ -19,7 +19,7 @@ export class PerfilComponent {
   error: string | undefined;
   showAnswer: boolean[] = [];
   tarjeta: string = '';
-  monto: number = 4.99;
+  monto: number = 9.99;
   errorMessage: string = '';
 
   constructor(private http: HttpClient, private router: Router) {

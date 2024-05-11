@@ -17,6 +17,7 @@
     <div class="video-container">
         <youtube-player
             [videoId]="videoId"
+            [startSeconds]="segundos"
             [playerVars]="playerVars"
             (ready)="onPlayerReady($event)"
             (stateChange)="onStateChange($event)">

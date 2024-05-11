@@ -103,28 +103,35 @@ export class SocketService {
     });
   }
 
-  public onSyncEvent(eventName: string): Observable<any> {
-    if(eventName === socketEvents.SYNC_ON ){
-      return new Observable(observer => {
-        this.socket.on(socketEvents.SYNC_ON,(idvideo: string, tiemposegundos: number,pausado: boolean, conectado: boolean) => {
-          observer.next({idvideo, tiemposegundos, pausado, conectado });
-        });
-        return () => this.socket.off(socketEvents.SYNC_ON);
-      });
-    }else{
-      return new Observable(observer => {
-        this.socket.on(socketEvents.SYNC_OFF, () => {
-          observer.next(true);
-        });
-      });
+  public emitGetSync(eventName: string, idSala: string): void {
+    if(this.socket) {
+      this.socket.emit(eventName, idSala)
     }
   }
 
-  public onGetSyncEvent(): Observable<any> {
-    return new Observable(observer => {
-      this.socket.on(socketEvents.GET_SYNC, (idSala: string) => {
-        observer.next({idSala});
+  public listenGetSync(eventName: string) : Observable<void> {
+    return new Observable<void>((observer) => {
+      this.socket.on(eventName, () => {
+        observer.next();
       });
+      return () => this.socket.off(eventName); // Limpiar al desuscribirse
+    });
+  }
+
+  // Sirve para emitir el evento de sincronización
+  public emitSyncOn(eventName: string, idSala: string, idVideo: string, timesegundos: number, pausado: boolean, otroUsuarioOnline: boolean): void {
+    this.socket.emit(eventName, idSala, idVideo, timesegundos, pausado, otroUsuarioOnline, (success: any) => {
+      console.log(success ? 'Get Sync emitido con éxito' : 'Error al emitir Get Sync');
+    });
+  }
+
+  // Sirve para escuchar el evento de obtener sincronización
+  public ListenSyncEvent(eventName: string): Observable<any> {
+    return new Observable(observer => {
+      this.socket.on(eventName, (idVideo: string, timesegundos: number, pausado: boolean, otroUsuarioOnline: boolean) => {
+        observer.next({ idVideo, timesegundos, pausado});
+      });
+      return () => this.socket.off(eventName);
     });
   }
 

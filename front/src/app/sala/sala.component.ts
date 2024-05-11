@@ -34,6 +34,7 @@ export class SalaComponent implements OnInit {
   roomId: string = '';
   videoUrl!: SafeResourceUrl;
   videoId: string = '';
+  segundos: number = 0;
   messages: string[] = [];
   newMessage: string = '';
   subscriptions: Subscription[] = [];
@@ -45,6 +46,8 @@ export class SalaComponent implements OnInit {
   searchQuery: string = '';
   videos: any[] = [];
   errorMessage: string = '';
+
+  enPausa: boolean = false;
 
   //private socketService: SocketService = inject(SocketService);
 
@@ -60,6 +63,11 @@ export class SalaComponent implements OnInit {
       console.log('Sala ID actualizado:', this.sala);
     });
     this.joinRoom();
+    
+    
+    if (/^\d+$/.test(this.sala)) {
+      this.socketService.emitGetSync(socketEvents.GET_SYNC, this.sala);
+    }
 
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
      
@@ -74,6 +82,25 @@ export class SalaComponent implements OnInit {
         this.videoId = idVideo;
         this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
         this.youtubePlayer.playVideo();
+      }),
+      this.socketService.listenGetSync(socketEvents.GET_SYNC).subscribe(() => {
+        this.socketService.emitSyncOn(socketEvents.SYNC_ON, this.sala, this.videoId, this.youtubePlayer.getCurrentTime(), this.enPausa, true);
+      }),
+      this.socketService.ListenSyncEvent(socketEvents.SYNC_ON).subscribe(({idVideo, timesegundos, pausado}) => {
+        this.videoId = idVideo;
+        //this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
+        if(this.youtubePlayer){
+        this.youtubePlayer.pauseVideo();
+        alert(timesegundos);
+        this.segundos = timesegundos;
+        this.youtubePlayer.seekTo(this.segundos, false);
+        if(pausado){
+          this.youtubePlayer.pauseVideo();
+        }else{
+          this.youtubePlayer.playVideo();
+        }
+        this.updateVideoPlayer(this.videoId);
+      }
       })
     );
   }
@@ -81,6 +108,7 @@ export class SalaComponent implements OnInit {
   joinRoom(): void {
     this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, this.sala); // Asegúrate de implementar esta funcionalidad en el servidor
   }
+
 
   onPlayerReady(event: any): void {
     console.log('YouTube Player is ready', event);
@@ -92,14 +120,17 @@ export class SalaComponent implements OnInit {
     if (event.data === YT.PlayerState.PLAYING) {
       console.log('PLAY event received and video played');
       this.playVideo();
+      this.enPausa = false;
     } else if (event.data === YT.PlayerState.PAUSED) {
       console.log('PAUSE event received and video paused');
       this.pauseVideo();
+      this.enPausa = true;
     }
   }
 
   // Emite un evento PAUSE al servidor para informar que el usuario ha pausado el video
   pauseVideo(): void {
+    this.enPausa = true;
     this.socketService.emitPlayPause(socketEvents.PAUSE, this.sala);
     console.log('Evento PAUSE emitido');
     this.mandarTiempo(this.youtubePlayer.getCurrentTime());
@@ -107,6 +138,7 @@ export class SalaComponent implements OnInit {
 
   // Emite un evento PAUSE al servidor para informar que el usuario ha pausado el video
   playVideo(): void {
+    this.enPausa = false;
     this.socketService.emitPlayPause(socketEvents.PLAY, this.sala);
     console.log('Evento PLAY emitido');
   }
@@ -142,6 +174,7 @@ export class SalaComponent implements OnInit {
     this.updateVideoPlayer(videoId2);
 
     this.socketService.emitChangeVideo(socketEvents.CHANGE_VIDEO, this.sala, videoId2);
+    localStorage.setItem('videoId', videoId2);
   }
 
   updateVideoPlayer(videoId: string) {
@@ -149,8 +182,11 @@ export class SalaComponent implements OnInit {
         // Forzar la actualización del componente YouTubePlayer
         this.youtubePlayer.videoId = videoId; // Actualiza el videoId directamente
         this.youtubePlayer.ngOnChanges({}); // Forzar a Angular a detectar los cambios
+        localStorage.setItem('videoId', videoId);
     }
-}
+  }
+
+  
 
   sendMessage(): void {
     if (this.newMessage.trim() !== '') {
