@@ -135,4 +135,20 @@ export class SocketService {
     });
   }
 
+  public emitCreateMessage(eventName: string, idSala: string, texto: string, rutaMultimedia: string){
+    this.socket.emit(eventName, idSala, texto, rutaMultimedia, (success: boolean, idMsg: number, timestamp: Date | null) => {
+      console.log(success ? 'Mensaje enviado con éxito' : 'Error al enviar mensaje');
+    });
+  }
+
+  public listenReceiveMessage(eventName: string){
+    return new Observable(observer => {
+      this.socket.on(eventName, (idMsg: number, idSender: string, texto: string, rutaMultimedia: string, fechaHora: Date) => {
+        observer.next({idMsg, idSender, texto, rutaMultimedia, fechaHora});
+      });
+      return () => this.socket.off(eventName);
+    });
+  }
+
+
 }

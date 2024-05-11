@@ -48,6 +48,7 @@ export class SalaComponent implements OnInit {
   errorMessage: string = '';
 
   enPausa: boolean = false;
+  playerReady: boolean = false;
 
   //private socketService: SocketService = inject(SocketService);
 
@@ -64,13 +65,11 @@ export class SalaComponent implements OnInit {
     });
     this.joinRoom();
     
-    
+    this.route.paramMap.subscribe(params => {
     if (/^\d+$/.test(this.sala)) {
       this.socketService.emitGetSync(socketEvents.GET_SYNC, this.sala);
-    }
+    
 
-    this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
-     
      this.subscriptions.push(
       this.socketService.listenPausePlay(socketEvents.PAUSE).subscribe(() => {
         this.youtubePlayer.pauseVideo(); // Pausar el video
@@ -84,36 +83,41 @@ export class SalaComponent implements OnInit {
         this.youtubePlayer.playVideo();
       }),
       this.socketService.listenGetSync(socketEvents.GET_SYNC).subscribe(() => {
+        this.youtubePlayer.pauseVideo(); // Pausar el video
         this.socketService.emitSyncOn(socketEvents.SYNC_ON, this.sala, this.videoId, this.youtubePlayer.getCurrentTime(), this.enPausa, true);
       }),
       this.socketService.ListenSyncEvent(socketEvents.SYNC_ON).subscribe(({idVideo, timesegundos, pausado}) => {
-        this.videoId = idVideo;
-        //this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
-        if(this.youtubePlayer){
-        this.youtubePlayer.pauseVideo();
-        alert(timesegundos);
-        this.segundos = timesegundos;
-        this.youtubePlayer.seekTo(this.segundos, false);
-        if(pausado){
-          this.youtubePlayer.pauseVideo();
-        }else{
-          this.youtubePlayer.playVideo();
-        }
-        this.updateVideoPlayer(this.videoId);
-      }
+        //alert(this.playerReady);
+        this.applyVideoSettings(idVideo, timesegundos, pausado);
       })
     );
+    }
+  });
+}
+
+  onPlayerReady(): void {
+    this.youtubePlayer.playVideo();
+    this.playerReady = true;  // Actualiza el estado cuando el reproductor esté listo
+    console.log('Player ready event received');
+  }
+
+  applyVideoSettings(idVideo: string, timesegundos: number, pausado: boolean): void {
+    this.videoId = idVideo;
+    this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + idVideo);
+    this.updateVideoPlayer(this.videoId);
+    this.youtubePlayer.seekTo(timesegundos, true);
+
+    if (pausado) {
+      this.youtubePlayer.pauseVideo();
+    } else {
+      this.youtubePlayer.playVideo();
+    }
   }
 
   joinRoom(): void {
     this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, this.sala); // Asegúrate de implementar esta funcionalidad en el servidor
   }
 
-
-  onPlayerReady(event: any): void {
-    console.log('YouTube Player is ready', event);
-    // Aquí puedes también inicializar configuraciones adicionales del reproductor si es necesario.
-  }
 
   onStateChange(event: any): void {
     console.log('YouTube Player state changed', event.data);
@@ -133,7 +137,9 @@ export class SalaComponent implements OnInit {
     this.enPausa = true;
     this.socketService.emitPlayPause(socketEvents.PAUSE, this.sala);
     console.log('Evento PAUSE emitido');
-    this.mandarTiempo(this.youtubePlayer.getCurrentTime());
+    if (/^\d+$/.test(this.sala)) {
+      this.mandarTiempo(this.youtubePlayer.getCurrentTime());
+    }
   }
 
   // Emite un evento PAUSE al servidor para informar que el usuario ha pausado el video

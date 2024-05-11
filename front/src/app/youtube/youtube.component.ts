@@ -65,7 +65,7 @@ export class YoutubeComponent {
               console.log('Match event received:', data);
               console.log(`Match confirmed between senderId: ${data.senderId} and receiverId: ${data.receiverId} in room: ${data.idSala}`);
               
-              this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, idSalaString);
+              //this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, idSalaString);
             },
             error: (err) => console.error(err),
             complete: () => console.log('Finished listening to MATCH events')
@@ -73,7 +73,7 @@ export class YoutubeComponent {
         } else {
           const idSalaString = String(response.idSala);
           this.router.navigate(['/sala', response.idsala]);
-          this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, idSalaString);
+          //this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, idSalaString);
         }
       },
       (error: any) => {
