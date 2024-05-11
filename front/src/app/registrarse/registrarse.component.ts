@@ -21,6 +21,8 @@ export class RegistrarseComponent {
   contrasenaConfirm: string = '';
   errorMsg: string = '';
   errorMsg1: string = '';
+  mostrarContrasena = false;
+  mostrarContrasenaRepetida = false;
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -53,7 +55,17 @@ export class RegistrarseComponent {
         },
         error => {
           console.error('Error al crear la cuenta', error);
+          this.errorMsg1 = error.error.error;
         }
       );
   }
+
+  toggleMostrarContrasena() {
+    this.mostrarContrasena = !this.mostrarContrasena;
+  }
+
+  toggleMostrarContrasenaRepetida() {
+    this.mostrarContrasenaRepetida = !this.mostrarContrasenaRepetida;
+  }
+
 }

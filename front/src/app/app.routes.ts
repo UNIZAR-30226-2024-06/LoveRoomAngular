@@ -12,6 +12,7 @@ import { ReportsAdminComponent } from './reports-admin/reports-admin.component';
 import { ConCuenta, SinCuenta, Admin } from './auth.guard';
 import { SendEmailComponent } from './send-email/send-email.component';
 import { VerifyCodeComponent } from './verify-code/verify-code.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 
 export const routes: Routes = [
@@ -27,5 +28,6 @@ export const routes: Routes = [
     { path: 'reports-admin', title: 'Reports admin', component: ReportsAdminComponent, canActivate: [Admin]},
     { path: 'send-email', title: 'Recuperar contraseña', component: SendEmailComponent, canActivate: [SinCuenta]},
     { path: 'verify-code', title: 'Verificar codigo', component: VerifyCodeComponent, canActivate: [SinCuenta]},
+    { path: 'reset-password', title: 'Restablecer contraseña', component: ResetPasswordComponent, canActivate: [SinCuenta]},
     { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
