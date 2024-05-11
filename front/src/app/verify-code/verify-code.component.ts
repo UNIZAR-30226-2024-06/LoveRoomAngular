@@ -42,9 +42,12 @@ export class VerifyCodeComponent {
             this.errorMessage = 'error.error.error';
             return;
           }
-          localStorage.setItem('correo', this.correo);
-          localStorage.setItem('codigo', this.codigo);
-          this.router.navigate(['/reset-password']);
+          else if (response.valido == true){
+            localStorage.setItem('correo', this.correo);
+            localStorage.setItem('codigo', this.codigo);
+            this.router.navigate(['/reset-password']);
+          }
+          
         },
         error => {
           // Si hubo un error durante la autenticación, muestra una alerta con el mensaje de error.
