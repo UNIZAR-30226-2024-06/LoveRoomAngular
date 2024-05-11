@@ -35,7 +35,6 @@ export class UsuariosAdminComponent {
           console.log(response);
           this.usuarios = response;
           this.filteredUsuarios = [...this.usuarios];
-          //alert(response);
         },
         error => {
           console.error('Error al obtener los usuarios', error);
@@ -56,7 +55,6 @@ export class UsuariosAdminComponent {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
-    alert(usuario.id);
     this.http.patch('http://'+environment.host_back+'/user/ban', { id: usuario.id }, { headers: headers })
       .subscribe(
         response => {
@@ -74,7 +72,6 @@ export class UsuariosAdminComponent {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
-    alert(usuario.id);
     this.http.patch('http://'+environment.host_back+'/user/unban', { id: usuario.id }, { headers: headers })
       .subscribe(
         response => {
@@ -92,7 +89,6 @@ export class UsuariosAdminComponent {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
-    alert(usuario.id);
     this.http.patch('http://'+environment.host_back+'/user/update/type/normal', { id: usuario.id }, { headers: headers })
       .subscribe(
         response => {
@@ -110,7 +106,6 @@ export class UsuariosAdminComponent {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
-    alert(usuario.id);
     this.http.patch('http://'+environment.host_back+'/user/update/type/premium', { id: usuario.id }, { headers: headers })
       .subscribe(
         response => {
@@ -129,7 +124,6 @@ export class UsuariosAdminComponent {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
-    alert(usuario.id);
     this.http.patch('http://'+environment.host_back+'/user/update/type/admin', { id: usuario.id }, { headers: headers })
       .subscribe(
         response => {
