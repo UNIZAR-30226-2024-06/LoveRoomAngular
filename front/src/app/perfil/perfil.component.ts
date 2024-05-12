@@ -19,7 +19,9 @@ export class PerfilComponent {
   error: string | undefined;
   showAnswer: boolean[] = [];
   idUser: string = '';
-  tarjeta: number = 0;
+  tarjeta: string = '';
+  CVV: string = '';
+  fecha: string = '';
   cantidad: number = 9.99;
   errorMessage: string = '';
   successMessage: string = '';
@@ -112,6 +114,20 @@ export class PerfilComponent {
       console.error('No se encontró un token en el almacenamiento local.');
       return;
     }
+
+    if (!(/^\d{16}$/.test(this.tarjeta))){
+      this.errorMessage = "Número de tarjeta no válido";
+      return;
+    }
+    else if (!(/^\d{3}$/.test(this.CVV))){
+      this.errorMessage = "Número de CVV no válido";
+      return;
+    }
+    else if (!(/^(0[1-9]|1[0-2])\/\d{2}$/.test(this.fecha))){
+      this.errorMessage = "Fecha no válida";
+      return;
+    }
+
   
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + token,
@@ -132,6 +148,7 @@ export class PerfilComponent {
             .subscribe(
               response => {
                 this.successMessage = "Pago realizado con éxito, disfrute de ser premium";
+                this.errorMessage = '';
                 localStorage.removeItem('admin');
               },
               error => {
