@@ -20,10 +20,19 @@ export class EditPerfilComponent {
   mostrarContrasena = false;
   @ViewChild('fileInput') fileInput!: ElementRef;
   imagenPerfil = 'assets/Logo.png'; //Quiza aqui traer la de la BD
-  usuario: any;
+  usuario: any = { idlocalidad: 1 };
   error: string='';
   flag_imagen = false;
   file: any;
+
+  provincias = [
+    'Álava', 'Albacete', 'Alicante', 'Almería', 'Asturias', 'Ávila', 'Badajoz', 'Baleares', 'Barcelona', 'Burgos',
+    'Cáceres', 'Cádiz', 'Cantabria', 'Castellón', 'Ceuta', 'Ciudad Real', 'Córdoba', 'Cuenca', 'Gerona',
+    'Granada', 'Guadalajara', 'Guipúzcoa', 'Huelva', 'Huesca', 'Jaén', 'La Coruña', 'La Rioja', 'Las Palmas',
+    'León', 'Lérida', 'Lugo', 'Madrid', 'Málaga', 'Melilla', 'Murcia', 'Navarra', 'Orense', 'Palencia',
+    'Pontevedra', 'Salamanca', 'Santa Cruz de Tenerife', 'Segovia', 'Sevilla', 'Soria', 'Tarragona', 'Teruel',
+    'Toledo', 'Valencia', 'Valladolid', 'Vizcaya', 'Zamora', 'Zaragoza'
+  ];
 
   toggleMostrarContrasena() {
     this.mostrarContrasena = !this.mostrarContrasena;
@@ -64,6 +73,12 @@ export class EditPerfilComponent {
     try {
       console.log(response);
       this.usuario = response;
+      if (this.usuario.idlocalidad >= 1 && this.usuario.idlocalidad <= this.provincias.length) {
+        this.usuario.localidad = this.provincias[this.usuario.idlocalidad - 1];
+      } 
+      else {
+        this.usuario.localidad = 'Desconocido';
+      }
       const image = await fetch('http://'+environment.host_back+'/multimedia/' + this.usuario.fotoperfil + '/' + this.usuario.id);
       const blob = await image.blob();
       const objectURL = URL.createObjectURL(blob);

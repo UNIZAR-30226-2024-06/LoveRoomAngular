@@ -51,9 +51,9 @@
 
             <label for="localidad">Localidad</label>
             <select id="localidad" name="localidad" [(ngModel)]="usuario.idlocalidad">
-                <option value="0" [selected]="'0' === usuario.idlocalidad">Zaragoza</option>
-                <option value="1" [selected]="'1' === usuario.idlocalidad">Huesca</option>
-                <option value="2" [selected]="'2' === usuario.idlocalidad">Teruel</option>
+                <option *ngFor="let provincia of provincias; let i = index" [value]="i + 1" [selected]="(i + 1) === usuario.idlocalidad">
+                  {{ provincia }}
+                </option>
             </select>
 
             <label for="descripcion">Descripción</label>

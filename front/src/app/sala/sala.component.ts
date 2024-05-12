@@ -57,6 +57,14 @@ export class SalaComponent implements OnInit {
   usuarioMatch: any;
   idUsuarioMatch: number = 0;
   imagenPerfil = 'assets/Logo.png';
+  provinciasDeEspana: string[] = [
+    'Álava', 'Albacete', 'Alicante', 'Almería', 'Asturias', 'Ávila', 'Badajoz', 'Baleares', 'Barcelona', 'Burgos',
+    'Cáceres', 'Cádiz', 'Cantabria', 'Castellón', 'Ceuta', 'Ciudad Real', 'Córdoba', 'Cuenca', 'Gerona',
+    'Granada', 'Guadalajara', 'Guipúzcoa', 'Huelva', 'Huesca', 'Jaén', 'La Coruña', 'La Rioja', 'Las Palmas',
+    'León', 'Lérida', 'Lugo', 'Madrid', 'Málaga', 'Melilla', 'Murcia', 'Navarra', 'Orense', 'Palencia',
+    'Pontevedra', 'Salamanca', 'Santa Cruz de Tenerife', 'Segovia', 'Sevilla', 'Soria', 'Tarragona', 'Teruel',
+    'Toledo', 'Valencia', 'Valladolid', 'Vizcaya', 'Zamora', 'Zaragoza'
+  ];
   error: string = '';
   
   //private socketService: SocketService = inject(SocketService);
@@ -272,14 +280,10 @@ export class SalaComponent implements OnInit {
   }
 
   getLocalidadDesc(id: number): string {
-    if (id === 0) {
-      return 'Zaragoza';
-    } else if (id === 1) {
-      return 'Huesca';
-    } else if (id === 2) {
-      return 'Teruel';
+    if (id >= 1 && id <= this.provinciasDeEspana.length) {
+      return this.provinciasDeEspana[id - 1];
     } else {
-      return 'No especificado'; // Por si acaso hay algún valor inesperado
+      return 'Desconocido';
     }
   }
     
