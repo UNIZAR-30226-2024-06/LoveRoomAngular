@@ -156,6 +156,18 @@
    height: 50px;
 }
 
+.errorMsg {
+   color: red;
+   margin-top: 0px;
+   font-size: 15px;
+}
+
+.successMsg {
+   color: green;
+   margin-top: 0px;
+   font-size: 15px;
+}
+
 @media (max-height: 1200px) {
       .options {
          margin-top: 100px;

@@ -25,10 +25,12 @@
     </div>
     <div class="chat-container">
         <div class="messages-container">
-            <div *ngFor="let message of messages" class="message">
-                {{message}}
+            <div *ngFor="let message of messages | orderBy: 'timestamp'" [ngClass]="{'message': message.isOwnMessage, 'messageOtro': !message.isOwnMessage}">
+              {{ message.text }}
+              <!--<img *ngIf="message.multimedia" [src]="message.multimedia" alt="Multimedia">-->
             </div>
-        </div>
+          </div>
+          
         <div class="input-container">
             <input [(ngModel)]="newMessage" (keydown.enter)="handleEnterKey($event)" type="text" placeholder="Escribe un mensaje...">
             <img class = "iconosend" src="assets/enviar.png" (click)="sendMessage()">

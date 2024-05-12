@@ -18,9 +18,11 @@ export class PerfilComponent {
   usuario: any;
   error: string | undefined;
   showAnswer: boolean[] = [];
-  tarjeta: string = '';
-  monto: number = 9.99;
+  idUser: string = '';
+  tarjeta: number = 0;
+  cantidad: number = 9.99;
   errorMessage: string = '';
+  successMessage: string = '';
 
   constructor(private http: HttpClient, private router: Router) {
     const correo = localStorage.getItem('correo');
@@ -104,51 +106,41 @@ export class PerfilComponent {
   } 
 
   pagar(): void {
-    const credentials = {
-      tarjeta: this.tarjeta,
-      monto: this.monto
-    };
 
     const token = localStorage.getItem('token');
     if (!token) {
       console.error('No se encontró un token en el almacenamiento local.');
-      alert('No se encontró un token en el almacenamiento local.');
       return;
     }
   
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + token,
-      'Content-Type': 'application/json'
     });
 
-    this.http.post<any>('http://'+environment.host_back+'/payment', credentials, { headers: headers })
+    this.http.get<any>('http://'+environment.host_back+'/payment/client_token', { headers: headers })
       .subscribe(
         response => {
-          //Se ha efectuado bien el pago
-          this.http.post<any>('http://'+environment.host_back+'/payment/confirm', response.idTransaccion, { headers: headers })
-          .subscribe(
-            response => {
-              //Se ha efectuado bien el pago
-              alert('Ahora eres premium');
-              this.router.navigate(['/']);
-            },
-            error => {
-              //Ha fallado el pago (no debería poder ocurrir esto)
-            }
-          );
+          this.idUser = response.clientToken;
+
+          const credentials = {
+            idUser: this.idUser,
+            amount: this.cantidad,
+            paymentMethodNonce: this.tarjeta,
+          };
+
+          this.http.post<any>('http://'+environment.host_back+'/payment/transaction', credentials, {headers: headers})
+            .subscribe(
+              response => {
+                this.successMessage = "Pago realizado con éxito, disfrute de ser premium";
+                localStorage.removeItem('admin');
+              },
+              error => {
+                this.errorMessage = error.error.error;
+              }
+            );
         },
         error => {
-          //Ha fallado el pago
-          this.http.post<any>('http://'+environment.host_back+'/payment/cancel', error.idTransaccion, { headers: headers })
-          .subscribe(
-            response => {
-              //Ha fallado el pago
-              alert('Error al pagar');
-            },
-            error => {
-              //Ha fallado el pago (no debería poder ocurrir esto)
-            }
-          );
+          this.errorMessage = error.error.error;
         }
       );
     

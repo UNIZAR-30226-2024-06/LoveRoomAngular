@@ -9,10 +9,10 @@ import { EditPasswordComponent } from './edit-password/edit-password.component';
 import { SalaComponent } from './sala/sala.component';
 import { UsuariosAdminComponent } from './usuarios-admin/usuarios-admin.component';
 import { ReportsAdminComponent } from './reports-admin/reports-admin.component';
-import { ConCuenta, SinCuenta, Admin } from './auth.guard';
 import { SendEmailComponent } from './send-email/send-email.component';
 import { VerifyCodeComponent } from './verify-code/verify-code.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ConCuenta, SinCuenta, Admin } from './auth.guard';
 
 
 export const routes: Routes = [
