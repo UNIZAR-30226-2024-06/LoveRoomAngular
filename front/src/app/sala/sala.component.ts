@@ -9,6 +9,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
 import { SocketService } from '../../services/socket.service';
 import { socketEvents } from '../../environments/socketEvents';
+import { OrderByPipe } from '../../services/pipe';
 import { Subscription, first } from 'rxjs';
 import { YouTubePlayer, YouTubePlayerModule } from '@angular/youtube-player';
 import { Router } from '@angular/router';
@@ -16,7 +17,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-sala',
   standalone: true,
-  imports: [CabeceraYMenuComponent, CommonModule, FormsModule, RouterOutlet, RouterModule, YouTubePlayerModule],
+  imports: [CabeceraYMenuComponent, CommonModule, FormsModule, RouterOutlet, RouterModule, YouTubePlayerModule, OrderByPipe],
   //providers: [SocketService], Comentado para asegurar el patron singleton
   templateUrl: './sala.component.html',
   styleUrls: ['./sala.component.css']
@@ -35,7 +36,7 @@ export class SalaComponent implements OnInit {
   videoUrl!: SafeResourceUrl;
   videoId: string = '';
   segundos: number = 0;
-  messages: string[] = [];
+  messages: { text: string, multimedia: string, timestamp: number, isOwnMessage: boolean }[] = [];
   newMessage: string = '';
   subscriptions: Subscription[] = [];
   player: any;
@@ -49,6 +50,8 @@ export class SalaComponent implements OnInit {
 
   enPausa: boolean = false;
   playerReady: boolean = false;
+  msgId: any;
+  timeStamp: number = 0;
 
   //private socketService: SocketService = inject(SocketService);
 
@@ -89,6 +92,15 @@ export class SalaComponent implements OnInit {
       this.socketService.ListenSyncEvent(socketEvents.SYNC_ON).subscribe(({idVideo, timesegundos, pausado}) => {
         //alert(this.playerReady);
         this.applyVideoSettings(idVideo, timesegundos, pausado);
+      }),
+      this.socketService.listenReceiveMessage(socketEvents.RECEIVE_MESSAGE).subscribe(({texto, rutaMultimedia}) => {
+        const newMsg = {
+          text: texto,
+          multimedia: rutaMultimedia,
+          timestamp: Date.now(),
+          isOwnMessage: false // Asumimos que sendMessage siempre es llamado por el usuario actual
+        };
+        this.messages.push(newMsg);
       })
     );
     }
@@ -173,6 +185,7 @@ export class SalaComponent implements OnInit {
 
   changeVideo(videoId2: string){
     // Actualiza localmente el videoId y la URL del video
+    if (/^\d+$/.test(this.sala)) {
     this.videoId = videoId2;
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + videoId2);
     
@@ -181,6 +194,40 @@ export class SalaComponent implements OnInit {
 
     this.socketService.emitChangeVideo(socketEvents.CHANGE_VIDEO, this.sala, videoId2);
     localStorage.setItem('videoId', videoId2);
+    }
+    else {
+      this.socketService.disconnect();
+      this.videoId = videoId2;
+      const token = localStorage.getItem('token');
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+      });
+      this.socketService.connect();
+      this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId2}`, {}, { headers: headers }).subscribe(
+        (response: any) => {
+          console.log(headers);
+          localStorage.setItem('videoId', videoId2);
+          if(response.esSalaUnitaria == true) {
+            this.router.navigate(['/sala', videoId2]);
+            this.socketService.onMatchEvent(socketEvents.MATCH).subscribe({
+              next: (data) => {
+                this.router.navigate(['/sala', data.idSala]);
+                console.log('Match event received:', data);
+                console.log(`Match confirmed between senderId: ${data.senderId} and receiverId: ${data.receiverId} in room: ${data.idSala}`);
+              },
+              error: (err) => console.error(err),
+              complete: () => console.log('Finished listening to MATCH events')
+            }); 
+          } else {
+            this.router.navigate(['/sala', response.idsala]);
+          }
+        },
+        (error: any) => {
+          console.error(error);
+          this.errorMessage = error.error.error;
+        }
+      );
+    }
   }
 
   updateVideoPlayer(videoId: string) {
@@ -195,11 +242,20 @@ export class SalaComponent implements OnInit {
   
 
   sendMessage(): void {
+    const rutaMultimedia = '';
     if (this.newMessage.trim() !== '') {
-      this.messages.push(this.newMessage);
+      const newMsg = {
+        text: this.newMessage,
+        multimedia: rutaMultimedia,
+        timestamp: Date.now(),
+        isOwnMessage: true // Asumimos que sendMessage siempre es llamado por el usuario actual
+      };
+      this.messages.push(newMsg);
       this.newMessage = '';
+      this.socketService.emitCreateMessage(socketEvents.CREATE_MESSAGE, this.sala, this.newMessage, rutaMultimedia);
     }
   }
+
 
   handleEnterKey(event: Event): void {
     const keyboardEvent = event as KeyboardEvent;
@@ -213,6 +269,7 @@ export class SalaComponent implements OnInit {
     // Cancela todas las suscripciones cuando el componente se destruye para prevenir fugas de memoria
     // Asegurarse de desconectar el socket al salir
     this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.socketService.emitJoinLeave(socketEvents.LEAVE_ROOM, this.sala);
     this.socketService.disconnect();
     localStorage.removeItem('videoId');
     console.log('Socket desconectado al salir de la sala');

@@ -141,14 +141,15 @@ export class SocketService {
     });
   }
 
-  public listenReceiveMessage(eventName: string){
+  public listenReceiveMessage(eventName: string): Observable<any>{
     return new Observable(observer => {
       this.socket.on(eventName, (idMsg: number, idSender: string, texto: string, rutaMultimedia: string, fechaHora: Date) => {
-        observer.next({idMsg, idSender, texto, rutaMultimedia, fechaHora});
+        observer.next({texto, rutaMultimedia});
+        console.log('Mensaje recibido de: ', idSender);
+        console.log('Texto del mensaje: ', texto);
+        console.log('Ruta multimedia: ', rutaMultimedia);
       });
       return () => this.socket.off(eventName);
     });
   }
-
-
 }

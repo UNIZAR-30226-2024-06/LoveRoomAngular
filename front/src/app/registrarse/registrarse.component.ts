@@ -20,7 +20,6 @@ export class RegistrarseComponent {
   contrasena: string = '';
   contrasenaConfirm: string = '';
   errorMsg: string = '';
-  errorMsg1: string = '';
   mostrarContrasena = false;
   mostrarContrasenaRepetida = false;
 
@@ -55,7 +54,7 @@ export class RegistrarseComponent {
         },
         error => {
           console.error('Error al crear la cuenta', error);
-          this.errorMsg1 = error.error.error;
+          this.errorMsg = error.error.error;
         }
       );
   }

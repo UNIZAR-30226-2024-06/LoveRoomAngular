@@ -57,6 +57,8 @@
         <label class="text"> ¡Es muy sencillo! Solo tienes que introducir su número de tarjeta y pulsar el botón de PAGAR, y se le realizará el cobro de 9,99€.</label>
         <label class="text"> Una vez realizado el pago serás premium para siempre.</label>
         <label class="apartado"> Intrudizca aqui su tarjeta:</label>
+        <p class="errorMsg" *ngIf="errorMessage">{{errorMessage}}</p>
+        <p class="successMsg" *ngIf="successMessage">{{successMessage}}</p>
         <input type="text" id="tarjeta" [(ngModel)]="tarjeta" name="tarjeta" placeholder="XXXX XXXX XXXX XXXX">
         <button class="buttonPagar" (click)="pagar()">Confirmar y pagar</button>
     </div>
