@@ -95,6 +95,13 @@ youtube-player::ng-deep iframe {
 .input-container img {
     cursor: pointer;
 }
+.ImgPerfil {
+    border-radius: 50%; /* Hace que la imagen sea circular */
+    border: 5px solid white; /* Borde blanco alrededor de la imagen */
+    width: 90px; /* Ajusta esto según tus necesidades */
+    height: 90px; /* Ajusta esto según tus necesidades */
+    object-fit: cover; /* Asegura que la imagen se ajuste al tamaño del círculo */
+}
 
 .iconosend {
     cursor: pointer;
@@ -174,3 +181,43 @@ youtube-player::ng-deep iframe {
     width: 100%;
     height: 50px;
 }
+
+.perfilOtroUsuario {
+
+    width: 80%;
+    height: 50%; /* Asumiendo que quieres el 20% del alto de la ventana de visualización */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.datos {
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    position: relative;
+    height: 33%;
+}
+
+.dato {
+    padding-left: 7px;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos hijo salten a la siguiente línea si no caben */
+    width: 100%;
+    flex: 1; /* Distribuye el espacio verticalmente de manera equitativa */
+    align-items: center; /* Centra los elementos verticalmente */
+    margin: 10px 0; /* Margen vertical entre los recuadros */
+    
+}
+
+.dato .nombre {
+    font-size: medium;
+    margin-right: 10px; /* Espacio entre los elementos dentro de .dato */
+    white-space: nowrap; /* Evita que el texto se salte a la siguiente línea */
+}
+

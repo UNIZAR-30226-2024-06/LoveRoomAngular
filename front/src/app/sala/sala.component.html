@@ -1,5 +1,45 @@
 <app-cabecera-y-menu></app-cabecera-y-menu>
 <div class="sala-container">
+    <div class="perfilOtroUsuario">
+        <h1>Perfil del Match</h1>
+        <img [src]="imagenPerfil" alt="Imagen Perfil" class="ImgPerfil">
+        <div class="datos">
+            <div class="dato">
+                <label class="nombre">Nombre:</label>
+                <label class="nombre">{{ usuarioMatch.nombre }}</label>
+            </div>
+            <div class="dato">
+                <label class="nombre">Sexo:</label>
+                <label class="nombre">{{ getSexoDesc(usuarioMatch.sexo) }}</label>    
+            </div>
+            <div class="dato">
+                <label class="nombre">Localidad:</label>
+                <label class="nombre">{{ getLocalidadDesc(usuarioMatch.idlocalidad) }}</label>
+            </div> 
+            
+        </div>
+        <div class="datos">
+            <div class="dato">
+                <label class="nombre">Edad:</label>
+                <label class="nombre">{{ usuarioMatch.edad }}</label>
+            </div>
+            <div class="dato">
+                <label class="nombre">Busca:</label>
+                <label class="nombre">{{ getSexoDesc(usuarioMatch.buscasexo) }}</label> 
+            </div>
+            <div class="dato">
+                <label class="nombre">Busca edad:</label>
+                <label class="nombre">{{ usuarioMatch.buscaedadmin }} - {{ usuarioMatch.buscaedadmax }}</label>
+            </div>
+        </div>
+        <div class="datos">
+            <div class="dato">
+                <label class="nombre">Descripción:</label>
+                <label class="nombre">{{ usuarioMatch.descripcion }}</label>
+            </div>
+        </div>
+
+    </div>
     <div class="youtube-container">
         <div class="name-input-container">
             <input type="text" [(ngModel)]="searchQuery" placeholder="Introduce un nombre de un video para buscarlo" (keydown.enter)="searchVideos()">
