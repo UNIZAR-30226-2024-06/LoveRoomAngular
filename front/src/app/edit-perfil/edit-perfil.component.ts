@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { promises } from 'node:dns';
+import { consumerPollProducersForChange } from '@angular/core/primitives/signals';
+import fs from 'fs';
 
 @Component({
   selector: 'app-edit-perfil',
@@ -53,29 +55,29 @@ export class EditPerfilComponent {
     this.obtenerPerfilUsuario();
   }
 
-  obtenerPerfilUsuario(): void {
+  async obtenerPerfilUsuario(): Promise<void> {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
   
-    this.http.get<any>('http://'+environment.host_back+'/user/profile', { headers: headers })
-      .subscribe(
-        response => {
-          console.log(response);
-          this.usuario = response;
-          this.imagenPerfil = this.usuario.fotoperfil === 'null.jpg' ? this.imagenPerfil : this.usuario.fotoperfil;
-        },
-        error => {
-          console.error('Error al obtener el perfil del usuario', error);
-          this.error = 'Error al obtener el perfil del usuario';
-        }
-      );
+    const response = await this.http.get<any>('http://'+environment.host_back+'/user/profile', { headers: headers }).toPromise();
+    try {
+      console.log(response);
+      this.usuario = response;
+      const image = await fetch('http://'+environment.host_back+'/multimedia/' + this.usuario.fotoperfil + '/' + this.usuario.id);
+      const blob = await image.blob();
+      const objectURL = URL.createObjectURL(blob);
+      this.imagenPerfil = this.usuario.fotoperfil === 'null.jpg' ? this.imagenPerfil : objectURL;
+    }
+    catch (error: any) {
+      console.error('Error al obtener el perfil del usuario', error);
+      this.error = 'Error al obtener el perfil del usuario';
+    }
   }
   
-
   usuarioActualizado: any = {}; // Nuevo objeto para almacenar los cambios antes de enviarlos al servidor
 
-  async actualizarUsuario(): Promise<void> {
+  actualizarUsuario(): void {
     // Actualizar el objeto usuarioActualizado con los valores del formulario
     this.usuarioActualizado = {
     correo: this.usuario.correo,
