@@ -43,7 +43,23 @@ export class ResetPasswordComponent {
       'Content-Type': 'application/json'
     });
 
-    if (this.contrasena != this.repetirContrasena){
+    if (!(/[A-Z]/.test(this.contrasena))){
+      this.errorMessage = 'La contraseña debe contener al menos una letra mayúscula';
+      return;
+    }
+    else if (!(/[a-z]/.test(this.contrasena))){
+      this.errorMessage = 'La contraseña debe contener al menos una letra minúscula';
+      return;
+    }
+    else if (!(/\d/.test(this.contrasena))){
+      this.errorMessage = 'La contraseña debe contener al menos un número';
+      return;
+    }
+    else if (8 > this.contrasena.length || this.contrasena.length > 16){
+      this.errorMessage = 'La contraseña debe tener entre 8 y 16 caracteres';
+      return;
+    }
+    else if (this.contrasena != this.repetirContrasena){
       this.errorMessage = 'Las contraseñas no coinciden';
       return;
     }

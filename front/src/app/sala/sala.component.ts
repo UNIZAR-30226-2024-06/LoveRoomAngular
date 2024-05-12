@@ -55,6 +55,7 @@ export class SalaComponent implements OnInit {
   
   //Datos de la otra persona
   usuarioMatch: any;
+  idUsuarioMatch: number = 0;
   imagenPerfil = 'assets/Logo.png';
   error: string = '';
   
@@ -111,20 +112,30 @@ export class SalaComponent implements OnInit {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
-  
-    this.http.get<any>('http://'+environment.host_back+'/user/profile', { headers: headers })
+
+    this.http.get<any>('http://'+environment.host_back+'/rooms/'+this.sala+'/members', { headers: headers })
       .subscribe(
         response => {
+          this.idUsuarioMatch = response[1].idusuario;
           console.log(response);
-          this.usuarioMatch = response;
-          this.imagenPerfil = this.usuarioMatch.fotoperfil === 'null.jpg' ? this.imagenPerfil : this.usuarioMatch.fotoperfil;
+          this.http.get<any>('http://'+environment.host_back+'/user/'+this.idUsuarioMatch, { headers: headers })
+            .subscribe(
+              response => {
+                console.log(response);
+                this.usuarioMatch = response;
+                this.imagenPerfil = this.usuarioMatch.fotoperfil === 'null.jpg' ? this.imagenPerfil : this.usuarioMatch.fotoperfil;
+              },
+              error => {
+                console.error('Error al obtener el perfil del usuario', error);
+                this.error = 'Error al obtener el perfil del usuario';
+              }
+            );
         },
         error => {
-          console.error('Error al obtener el perfil del usuario', error);
-          this.error = 'Error al obtener el perfil del usuario';
+          console.error('Error al obtener los miembros de la sala', error);
+          this.error = 'Error al obtener los miembros de la sala';
         }
       );
-
 }
 
 

@@ -111,8 +111,6 @@ export class EditPerfilComponent {
         //alert("Imagen subida");
         // Actualizar el objeto usuario con los cambios antes de enviarlos al servidor
         this.usuarioActualizado.fotoperfil = response.nombreArchivo;
-        alert(this.usuarioActualizado.fotoperfil);
-        alert('Usuario actualizado correctamente');
       }
       catch (error: any) {
         console.error('Error al subir la imagen', error.message);

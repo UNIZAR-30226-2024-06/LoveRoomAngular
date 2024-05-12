@@ -27,6 +27,23 @@ export class EditPasswordComponent {
       nuevaContrasena: this.nuevaContrasena,
       antiguaContrasena: this.antiguaContrasena,
     };
+
+    if (!(/[A-Z]/.test(this.nuevaContrasena))){
+      this.error = 'La contraseña debe contener al menos una letra mayúscula';
+      return;
+    }
+    else if (!(/[a-z]/.test(this.nuevaContrasena))){
+      this.error = 'La contraseña debe contener al menos una letra minúscula';
+      return;
+    }
+    else if (!(/\d/.test(this.nuevaContrasena))){
+      this.error = 'La contraseña debe contener al menos un número';
+      return;
+    }
+    else if (8 > this.nuevaContrasena.length || this.nuevaContrasena.length > 16){
+      this.error = 'La contraseña debe tener entre 8 y 16 caracteres';
+      return;
+    }
     
     this.http.patch<any>('http://'+environment.host_back+'/user/update/password', passwords, { headers: headers })
       .subscribe(
