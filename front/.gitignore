@@ -43,3 +43,6 @@ Thumbs.db
 
 # Variables de entorno
 /src/environments/environment.ts
+
+# Package files
+package-lock.json

@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { promises } from 'node:dns';
 
 @Component({
   selector: 'app-edit-perfil',
@@ -74,7 +75,7 @@ export class EditPerfilComponent {
 
   usuarioActualizado: any = {}; // Nuevo objeto para almacenar los cambios antes de enviarlos al servidor
 
-  actualizarUsuario(): void {
+  async actualizarUsuario(): Promise<void> {
     // Actualizar el objeto usuarioActualizado con los valores del formulario
     this.usuarioActualizado = {
     correo: this.usuario.correo,
@@ -90,7 +91,7 @@ export class EditPerfilComponent {
     };
   }
 
-  guardarCambios(): void {
+  async guardarCambios(): Promise<void> {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
@@ -102,21 +103,20 @@ export class EditPerfilComponent {
     if (this.flag_imagen == true) {
       const formData = new FormData();
       formData.append('file',this.file);
-      this.http.post<any>('http://'+environment.host_back+'/multimedia/upload/foto/'+idUsuario, formData, { headers: headers })
-      .subscribe(
-        response => {
-          console.log('Imagen subida', response);
-          alert("Imagen subida");
-          // Actualizar el objeto usuario con los cambios antes de enviarlos al servidor
-          this.usuarioActualizado.fotoperfil = response.nombreArchivo;
-          alert('Usuario actualizado correctamente');
-        },
-        error => {
-          console.error('Error al subir la imagen', error.message);
-          this.error = error.error.error;
-          alert(error.message);
-        }
-      );
+      try {
+        const response = await this.http.post<any>('http://'+environment.host_back+'/multimedia/upload/foto/'+idUsuario, formData, { headers: headers }).toPromise();
+        console.log('Imagen subida', response);
+        //alert("Imagen subida");
+        // Actualizar el objeto usuario con los cambios antes de enviarlos al servidor
+        this.usuarioActualizado.fotoperfil = response.nombreArchivo;
+        alert(this.usuarioActualizado.fotoperfil);
+        alert('Usuario actualizado correctamente');
+      }
+      catch (error: any) {
+        console.error('Error al subir la imagen', error.message);
+        this.error = error.error.error;
+        alert(error.message); 
+      }
     }
 
     const body= this.usuarioActualizado; // Enviar el objeto usuarioActualizado al backend
