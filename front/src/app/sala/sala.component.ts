@@ -52,7 +52,12 @@ export class SalaComponent implements OnInit {
   playerReady: boolean = false;
   msgId: any;
   timeStamp: number = 0;
-
+  
+  //Datos de la otra persona
+  usuarioMatch: any;
+  imagenPerfil = 'assets/Logo.png';
+  error: string = '';
+  
   //private socketService: SocketService = inject(SocketService);
 
   constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private router: Router, private socketService: SocketService, private http: HttpClient) { } 
@@ -99,8 +104,27 @@ export class SalaComponent implements OnInit {
           isOwnMessage: false // Asumimos que sendMessage siempre es llamado por el usuario actual
         };
         this.messages.push(newMsg);
-      })
+      }),
     );
+    
+    //Obtener datos de la otra persona
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+  
+    this.http.get<any>('http://'+environment.host_back+'/user/profile', { headers: headers })
+      .subscribe(
+        response => {
+          console.log(response);
+          this.usuarioMatch = response;
+          this.imagenPerfil = this.usuarioMatch.fotoperfil === 'null.jpg' ? this.imagenPerfil : this.usuarioMatch.fotoperfil;
+        },
+        error => {
+          console.error('Error al obtener el perfil del usuario', error);
+          this.error = 'Error al obtener el perfil del usuario';
+        }
+      );
+
 }
 
 
@@ -224,6 +248,29 @@ export class SalaComponent implements OnInit {
     }
   }
 
+  getSexoDesc(sexo: string): string {
+    if (sexo === 'H') {
+        return 'Hombre';
+    } else if (sexo === 'M') {
+        return 'Mujer';
+    } else if (sexo === 'O') {
+        return 'Otro';
+    } else {
+        return 'No especificado'; // Por si acaso hay algún valor inesperado
+    }
+  }
+
+  getLocalidadDesc(id: number): string {
+    if (id === 0) {
+      return 'Zaragoza';
+    } else if (id === 1) {
+      return 'Huesca';
+    } else if (id === 2) {
+      return 'Teruel';
+    } else {
+      return 'No especificado'; // Por si acaso hay algún valor inesperado
+    }
+  }
     
   ngOnDestroy(): void {
     // Cancela todas las suscripciones cuando el componente se destruye para prevenir fugas de memoria
