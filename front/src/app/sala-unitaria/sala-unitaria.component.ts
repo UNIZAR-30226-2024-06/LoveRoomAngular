@@ -19,10 +19,10 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CabeceraYMenuComponent, CommonModule, FormsModule, RouterOutlet, RouterModule, YouTubePlayerModule, OrderByPipe],
   //providers: [SocketService], Comentado para asegurar el patron singleton
-  templateUrl: './sala.component.html',
-  styleUrls: ['./sala.component.css']
+  templateUrl: './sala-unitaria.component.html',
+  styleUrls: ['./sala-unitaria.component.css']
 })
-export class SalaComponent implements OnInit {
+export class SalaUnitariaComponent implements OnInit {
   @ViewChild(YouTubePlayer, { static: false }) youtubePlayer!: YouTubePlayer;
   playerVars = {
     autoplay: 1,  // 0 o 1 (1 significa autoplay activado)
@@ -57,7 +57,7 @@ export class SalaComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private sanitizer: DomSanitizer, private router: Router, private socketService: SocketService, private http: HttpClient) { } 
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.socketService.connect();
     
     const videoIdAux = localStorage.getItem('videoId');
@@ -67,42 +67,7 @@ export class SalaComponent implements OnInit {
       console.log('Sala ID actualizado:', this.sala);
     });
     this.joinRoom();
-  
-    this.socketService.emitGetSync(socketEvents.GET_SYNC, this.sala);
-    
-
-     this.subscriptions.push(
-      this.socketService.listenPausePlay(socketEvents.PAUSE).subscribe(() => {
-        this.youtubePlayer.pauseVideo(); // Pausar el video
-      }),
-      this.socketService.listenPausePlay(socketEvents.PLAY).subscribe(() => {
-        this.youtubePlayer.playVideo(); // Reproducir el video
-      }),
-      this.socketService.listenChangeVideo(socketEvents.CHANGE_VIDEO).subscribe(idVideo => {
-        this.videoId = idVideo;
-        this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
-        this.youtubePlayer.playVideo();
-      }),
-      this.socketService.listenGetSync(socketEvents.GET_SYNC).subscribe(() => {
-        this.youtubePlayer.pauseVideo(); // Pausar el video
-        this.socketService.emitSyncOn(socketEvents.SYNC_ON, this.sala, this.videoId, this.youtubePlayer.getCurrentTime(), this.enPausa, true);
-      }),
-      this.socketService.ListenSyncEvent(socketEvents.SYNC_ON).subscribe(({idVideo, timesegundos, pausado}) => {
-        //alert(this.playerReady);
-        this.applyVideoSettings(idVideo, timesegundos, pausado);
-      }),
-      this.socketService.listenReceiveMessage(socketEvents.RECEIVE_MESSAGE).subscribe(({texto, rutaMultimedia}) => {
-        const newMsg = {
-          text: texto,
-          multimedia: rutaMultimedia,
-          timestamp: Date.now(),
-          isOwnMessage: false // Asumimos que sendMessage siempre es llamado por el usuario actual
-        };
-        this.messages.push(newMsg);
-      })
-    );
 }
-
 
   onPlayerReady(): void {
     this.youtubePlayer.playVideo();
@@ -146,7 +111,9 @@ export class SalaComponent implements OnInit {
     this.enPausa = true;
     this.socketService.emitPlayPause(socketEvents.PAUSE, this.sala);
     console.log('Evento PAUSE emitido');
+    if (/^\d+$/.test(this.sala)) {
       this.mandarTiempo(this.youtubePlayer.getCurrentTime());
+    }
   }
 
   // Emite un evento PAUSE al servidor para informar que el usuario ha pausado el video
@@ -179,15 +146,42 @@ export class SalaComponent implements OnInit {
   }
 
   changeVideo(videoId2: string){
-    // Actualiza localmente el videoId y la URL del video
-    this.videoId = videoId2;
-    this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + videoId2);
-    
-     // Informa a Angular de que debe revisar y actualizar el enlace de datos
-    this.updateVideoPlayer(videoId2);
+      this.socketService.disconnect();
+      this.videoId = videoId2;
+      const token = localStorage.getItem('token');
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+      });
+      this.socketService.connect();
+      this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId2}`, {}, { headers: headers }).subscribe(
+        async (response: any) => {
+          console.log(headers);
+          localStorage.setItem('videoId', videoId2);
+          if(response.esSalaUnitaria == true) {
+            this.router.navigate(['/salaUnitaria', videoId2]);
+            this.socketService.onMatchEvent(socketEvents.MATCH).subscribe({
+              next: (data) => {
+                this.router.navigate(['/sala', data.idSala]);
+                console.log('Match event received:', data);
+                console.log(`Match confirmed between senderId: ${data.senderId} and receiverId: ${data.receiverId} in room: ${data.idSala}`);
+              },
+              error: (err) => console.error(err),
+              complete: () => console.log('Finished listening to MATCH events')
+            }); 
+          } else {
+            await this.delay(1000); // Espera de 1 segundo
+            this.router.navigate(['/sala', response.idsala]);
+          }
+        },
+        (error: any) => {
+          console.error(error);
+          this.errorMessage = error.error.error;
+        }
+      );
+  }
 
-    this.socketService.emitChangeVideo(socketEvents.CHANGE_VIDEO, this.sala, videoId2);
-    localStorage.setItem('videoId', videoId2);
+  async delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   updateVideoPlayer(videoId: string) {
@@ -200,36 +194,9 @@ export class SalaComponent implements OnInit {
   }
 
   
-
-  sendMessage(): void {
-    const rutaMultimedia = '';
-    if (this.newMessage.trim() !== '') {
-      const newMsg = {
-        text: this.newMessage,
-        multimedia: rutaMultimedia,
-        timestamp: Date.now(),
-        isOwnMessage: true // Asumimos que sendMessage siempre es llamado por el usuario actual
-      };
-      this.messages.push(newMsg);
-      this.socketService.emitCreateMessage(socketEvents.CREATE_MESSAGE, this.sala, this.newMessage, rutaMultimedia);
-      this.newMessage = '';
-    }
-  }
-
-
-  handleEnterKey(event: Event): void {
-    const keyboardEvent = event as KeyboardEvent;
-    if (keyboardEvent.key === 'Enter') {
-      this.sendMessage();
-    }
-  }
-
-    
   ngOnDestroy(): void {
     // Cancela todas las suscripciones cuando el componente se destruye para prevenir fugas de memoria
     // Asegurarse de desconectar el socket al salir
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-    this.socketService.emitJoinLeave(socketEvents.LEAVE_ROOM, this.sala);
     this.socketService.disconnect();
     localStorage.removeItem('videoId');
     console.log('Socket desconectado al salir de la sala');

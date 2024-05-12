@@ -91,7 +91,7 @@ export class PaginaPrincipalComponent implements OnInit{
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
-  watchVideo(videoId: string) {
+ watchVideo(videoId: string) {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
@@ -99,26 +99,27 @@ export class PaginaPrincipalComponent implements OnInit{
     this.socketService.connect();
     // Hacer la solicitud HTTP POST al backend
     this.http.post(`http://`+environment.host_back+`/videos/watch/${videoId}`, {}, { headers: headers }).subscribe(
-      (response: any) => {
+      async (response: any) => {
         console.log(headers);
         console.log(response);
         localStorage.setItem('videoId', videoId);
         if(response.esSalaUnitaria == true) {
-          this.router.navigate(['/sala', videoId]);
+          this.router.navigate(['/salaUnitaria', videoId]);
           this.socketService.onMatchEvent(socketEvents.MATCH).subscribe({
             next: (data) => {
               this.router.navigate(['/sala', data.idSala]);
               console.log('Match event received:', data);
               console.log(`Match confirmed between senderId: ${data.senderId} and receiverId: ${data.receiverId} in room: ${data.idSala}`);
-              this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, data.idSala );
+              //this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, data.idSala );
             },
             error: (err) => console.error(err),
             complete: () => console.log('Finished listening to MATCH events')
           }); 
         } else {
           //alert(response.idsala);
+          await this.delay(1000); // Espera de 1 segundo
           this.router.navigate(['/sala', response.idsala]);
-          this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, response.idsala );
+          //this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, response.idsala );
         }
       },
       (error: any) => {
@@ -127,5 +128,9 @@ export class PaginaPrincipalComponent implements OnInit{
         this.errorMessage = error.error.error;
       }
     );
+  }
+
+  async delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }

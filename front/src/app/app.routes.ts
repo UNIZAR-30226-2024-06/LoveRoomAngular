@@ -7,6 +7,7 @@ import { PerfilComponent } from './perfil/perfil.component';
 import { EditPerfilComponent } from './edit-perfil/edit-perfil.component';
 import { EditPasswordComponent } from './edit-password/edit-password.component';
 import { SalaComponent } from './sala/sala.component';
+import { SalaUnitariaComponent } from './sala-unitaria/sala-unitaria.component';
 import { UsuariosAdminComponent } from './usuarios-admin/usuarios-admin.component';
 import { ReportsAdminComponent } from './reports-admin/reports-admin.component';
 import { SendEmailComponent } from './send-email/send-email.component';
@@ -24,6 +25,7 @@ export const routes: Routes = [
     { path: 'edit-perfil', title: 'Editar perfil', component: EditPerfilComponent, canActivate: [ConCuenta]},
     { path: 'edit-password', title: 'Cambiar contraseña', component: EditPasswordComponent, canActivate: [ConCuenta]},
     { path: 'sala/:id', title: 'Sala', component: SalaComponent, canActivate: [ConCuenta]},
+    { path: 'salaUnitaria/:id', title: 'Sala Unitaria', component: SalaUnitariaComponent, canActivate: [ConCuenta]},
     { path: 'usuarios-admin', title: 'Usuarios admin', component: UsuariosAdminComponent, canActivate: [Admin]},
     { path: 'reports-admin', title: 'Reports admin', component: ReportsAdminComponent, canActivate: [Admin]},
     { path: 'send-email', title: 'Recuperar contraseña', component: SendEmailComponent, canActivate: [SinCuenta]},

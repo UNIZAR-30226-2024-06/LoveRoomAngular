@@ -57,7 +57,7 @@ export class YoutubeComponent {
         console.log(headers);
         localStorage.setItem('videoId', videoId);
         if(response.esSalaUnitaria == true) {
-          this.router.navigate(['/sala', videoId]);
+          this.router.navigate(['/salaUnitaria', videoId]);
           this.socketService.onMatchEvent(socketEvents.MATCH).subscribe({
             next: (data) => {
               this.router.navigate(['/sala', data.idSala]);
