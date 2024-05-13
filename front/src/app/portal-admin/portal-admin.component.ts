@@ -28,7 +28,6 @@ export class PortalAdminComponent {
   async ngOnInit(): Promise<void> {
     await this.graficoSexo();
     await this.graficoEdad();
-    //alert('Usuarios: ' + this.numHombres + ' Hombres, ' + this.numMujeres + ' Mujeres, ' + this.numOtro + ' Otros')
   }
 
 

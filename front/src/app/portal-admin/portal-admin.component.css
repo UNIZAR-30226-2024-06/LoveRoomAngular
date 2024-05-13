@@ -52,18 +52,20 @@
 
   .graficas-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row; /* Cambiado a row para alinear los elementos horizontalmente */
     align-items: center;
     justify-content: center;
     margin-top: 20px;
     margin-bottom: 20px;
     width: 90%;
+    flex-wrap: wrap; /* Envuelve los elementos en múltiples filas */
   }
 
-  .sexo-container{
+  .sexo-container {
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    width: 45%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 33%; /*para que los elementos ocupen todo el ancho disponible */
     margin-top: 20px;
   }
