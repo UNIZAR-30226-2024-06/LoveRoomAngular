@@ -8,20 +8,11 @@
   }
   
   .name-input-container {
-    border: 2px solid #ccc;
-    border-radius: 5px;
     padding: 10px;
     margin-bottom: 20px;
     margin-top: 20px;
-    width: 80%;
     display: flex;
     justify-content: space-between;
-  }
-
-  .name-input-container input {
-    width: 90%;
-    padding: 8px;
-    box-sizing: border-box;
   }
   
   .sala {
@@ -40,7 +31,6 @@
   .estadisticas {
     width: 90%;
     box-sizing: border-box;
-    max-height: 200px;
     margin: 20px auto; /* Centra horizontalmente */
     padding: 3px;
     border: 2px solid #fc0202; /* Borde sólido de 2px */
@@ -48,6 +38,7 @@
     background-color: #f9f9f9; /* Color de fondo */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra */
     margin: 0 auto; /* Centra horizontalmente */
+    text-align: center;
   }
 
   .graficas-container {
@@ -57,8 +48,9 @@
     justify-content: center;
     margin-top: 20px;
     margin-bottom: 20px;
-    width: 90%;
+    width: 100%;
     flex-wrap: wrap; /* Envuelve los elementos en múltiples filas */
+    text-align: center;
   }
 
   .sexo-container {
@@ -67,5 +59,29 @@
     align-items: center;
     justify-content: center;
     width: 33%; /*para que los elementos ocupen todo el ancho disponible */
-    margin-top: 20px;
   }
+
+  .edad-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 33%; /*para que los elementos ocupen todo el ancho disponible */
+  }
+
+  .localidad-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 33%; /*para que los elementos ocupen todo el ancho disponible */
+  }
+
+  .titulo {
+    font-size: 1.5em;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    text-justify: center;
+  }
+

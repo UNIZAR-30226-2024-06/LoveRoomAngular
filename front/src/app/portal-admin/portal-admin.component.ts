@@ -21,13 +21,15 @@ export class PortalAdminComponent {
   public numTotal: number = 0;
   public chartSexo: any;
   public chartEdad: any;
+  public chartLocalidad: any;
 
 
   constructor(private http: HttpClient, private router: Router) { }
 
   async ngOnInit(): Promise<void> {
-    await this.graficoSexo();
-    await this.graficoEdad();
+    this.graficoSexo();
+    this.graficoEdad();
+    this.graficoLocalidad();
   }
 
 
@@ -38,11 +40,15 @@ export class PortalAdminComponent {
     let numHombres: number = 0;
     let numMujeres: number = 0;
     let numOtro: number = 0;
+    let numPremium: number = 0;
+    let numNormal: number = 0;
+    let numBaned: number = 0;
+    let numAdmin: number = 0;
     
     try {
-      const response = await this.http.get<any[]>('http://'+environment.host_back+'/users', { headers: headers }).toPromise();
-      if (response) {
-        response.forEach(usuario => {
+      let responseSExo = await this.http.get<any[]>('http://'+environment.host_back+'/users', { headers: headers }).toPromise();
+      if (responseSExo) {
+        responseSExo.forEach(usuario => {
           //alert('Usuario: ' + usuario.nombre + ' ' + usuario.apellido + ' ' + usuario.sexo)
           if (usuario.sexo == "H") {
             numHombres++;
@@ -51,9 +57,31 @@ export class PortalAdminComponent {
           } else if (usuario.sexo == "O"){
             numOtro++;
           }
+          
+          if (usuario.tipousuario == "premium") {
+            numPremium++;
+          }
+          else if (usuario.tipousuario == "normal") {
+            numNormal++;
+          }
+          else if (usuario.tipousuario == "administrador") {
+            numAdmin++;
+          }
+
+          if (usuario.baneado == 1) {
+            numBaned++;
+          }
         });
         this.numTotal = numHombres + numMujeres + numOtro;
       }
+      /*
+      let responseType = await this.http.get<any>('http://'+environment.host_back+'/admin/stats/users', { headers: headers }).toPromise();
+      if (responseType) {
+        numBaned = responseType.BannedUsers;
+        numNormal = responseType.NormalUsers;
+        numPremium = responseType.PremiumUsers;
+      }
+      */
     }
     catch (error : any) {
       console.error('Error al obtener los usuarios', error);
@@ -62,24 +90,26 @@ export class PortalAdminComponent {
     }
     
     this.chartSexo = new Chart("sexo", {
-      type: 'pie', //this denotes the type of chart
-
-      data: {// values on X-Axis
-        labels: ['Hombres', 'Mujeres', 'Otro'], 
-	       datasets: [{
-          label: "Sexo",
-          data: [numHombres, numMujeres, numOtro],
-          backgroundColor: ['blue', 'red', 'limegreen']
-         }]
+      type: 'pie',
+      data: {
+        labels: ['Hombres', 'Mujeres', 'Otro'], // Etiquetas para el conjunto de datos de sexo
+        datasets: [
+          {
+            label: "Sexo",
+            data: [numHombres, numMujeres, numOtro],
+            backgroundColor: ['blue', 'red', 'limegreen']
+          },
+        ]
       },
       options: {
-        aspectRatio:2.5
+        aspectRatio: 2.5
       }
     });
   }
 
   async graficoEdad(): Promise<void> {
-
+    let vectorComponente1: any[] = [];
+    let vectorComponente2: any[] = [];
     let numAge18_25 = 0;  // 18 - 25
     let numAge26_35 = 0;  // 26 - 35
     let numAge36_45 = 0;  // 36 - 45
@@ -91,6 +121,15 @@ export class PortalAdminComponent {
     });
 
     try {
+      /*
+      const response = await this.http.get<any[]>('http://'+environment.host_back+'/admin/stats/users/age', { headers: headers }).toPromise();
+      if (response) {
+        alert('Response: ' + response[0].Age + ' ' + response[0].Count);
+        response.forEach(usuario => {
+          vectorComponente1.push(usuario.Age);
+          vectorComponente2.push(usuario.Count);
+        });
+      */
       const response = await this.http.get<any[]>('http://'+environment.host_back+'/users', { headers: headers }).toPromise();
       if (response) {
         response.forEach(usuario => {
@@ -131,6 +170,49 @@ export class PortalAdminComponent {
         aspectRatio:2.5
       }
     });
+  }
 
+  async graficoLocalidad(): Promise<void> {
+    let vectorLabel: any[] = [];
+    let vectorValues: any[] = [];
+    let headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+
+    try {
+      const response = await this.http.get<any[]>('http://'+environment.host_back+'/admin/stats/users/localidad', { headers: headers }).toPromise();
+      if (response) {
+        response.forEach(usuario => {
+          if (usuario.Localidad == "undefined"){
+            vectorLabel.push("Indefinido");
+          }
+          else {
+            vectorLabel.push(usuario.Localidad);
+          }
+          vectorValues.push(usuario.Count);
+        });
+      }
+    }
+    catch (error : any) {
+      console.error('Error al obtener la localidad de los usuarios', error);
+      this.error = 'Error al obtener los usuarios';
+      return;
+    }
+
+    this.chartLocalidad = new Chart("localidad", {
+      type: 'pie',
+
+      data: {
+        labels: vectorLabel.slice(0, 7),
+        datasets: [{
+          label: "Localidad",
+          data: vectorValues.slice(0, 7),
+          backgroundColor: ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink']
+         }]
+      },
+      options: {
+        aspectRatio:2.5,
+      }
+    });
   }
 }
