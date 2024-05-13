@@ -34,7 +34,6 @@ youtube-player::ng-deep iframe {
   }
 
 .chat-container {
-    margin-top: 20px;
     width: 80%;
     height: 400px;
     border: 5px solid #F89F9F;
@@ -118,11 +117,11 @@ youtube-player::ng-deep iframe {
 }
 
 .name-input-container {
+    margin-top: 20px;
     border: 2px solid #ccc;
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 20px;
-    margin-top: 20px;
     width: 80%;
     display: flex;
     justify-content: space-between;
@@ -219,5 +218,16 @@ youtube-player::ng-deep iframe {
     font-size: medium;
     margin-right: 10px; /* Espacio entre los elementos dentro de .dato */
     white-space: nowrap; /* Evita que el texto se salte a la siguiente línea */
+}
+
+.toggle-image {
+    align-self:flex-end;
+    margin-top: 30px;
+    margin-right: 10%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 80px; /* Ajusta esto según tus necesidades */
+    height: 40px; /* Ajusta esto según tus necesidades */
+    cursor: pointer;
 }
 

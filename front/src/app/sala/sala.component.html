@@ -63,6 +63,7 @@
             (stateChange)="onStateChange($event)">
         </youtube-player>    
     </div>
+    <img src="{{ currentImage }}" (click)="toggleImage()" alt="Toggle Image" class="toggle-image">
     <div class="chat-container">
         <div class="messages-container">
             <div *ngFor="let message of messages | orderBy: 'timestamp'" [ngClass]="{'message': message.isOwnMessage, 'messageOtro': !message.isOwnMessage}">

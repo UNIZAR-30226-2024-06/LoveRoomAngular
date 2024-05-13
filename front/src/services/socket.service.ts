@@ -119,9 +119,15 @@ export class SocketService {
   }
 
   // Sirve para emitir el evento de sincronización
-  public emitSyncOn(eventName: string, idSala: string, idVideo: string, timesegundos: number, pausado: boolean, otroUsuarioOnline: boolean): void {
-    this.socket.emit(eventName, idSala, idVideo, timesegundos, pausado, otroUsuarioOnline, (success: any) => {
+  public emitSyncOn(eventName: string, idSala: string, idVideo: string, timesegundos: number, pausado: boolean): void {
+    this.socket.emit(eventName, idSala, idVideo, timesegundos, pausado, (success: any) => {
       console.log(success ? 'Get Sync emitido con éxito' : 'Error al emitir Get Sync');
+    });
+  }
+
+  public emitSyncOff(eventName: string, idSala: string){
+    this.socket.emit(eventName, idSala, (success: boolean) => {
+      console.log(success ? 'Enviado SyncOff' : 'Error al enviar SyncOff');
     });
   }
 
@@ -132,6 +138,15 @@ export class SocketService {
         observer.next({ idVideo, timesegundos, pausado});
       });
       return () => this.socket.off(eventName);
+    });
+  }
+
+  public ListenSyncOff(eventName: string): Observable<void> {
+    return new Observable<void>((observer) => {
+      this.socket.on(eventName, () => {
+        observer.next();
+      });
+      return () => this.socket.off(eventName); // Limpiar al desuscribirse
     });
   }
 

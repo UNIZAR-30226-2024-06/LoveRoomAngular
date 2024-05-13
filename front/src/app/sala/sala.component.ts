@@ -38,7 +38,7 @@ export class SalaComponent implements OnInit {
   segundos: number = 0;
   messages: { text: string, multimedia: string, timestamp: number, isOwnMessage: boolean }[] = [];
   newMessage: string = '';
-  subscriptions: Subscription[] = [];
+  subscriptions1: Subscription[] = [];
   player: any;
   sala: string = '';
 
@@ -52,6 +52,9 @@ export class SalaComponent implements OnInit {
   playerReady: boolean = false;
   msgId: any;
   timeStamp: number = 0;
+
+  currentImage: string = 'assets/OFF.jpg';  // Inicia con la primera imagen
+  isFirstImage: boolean = true;  // Controlar qué imagen mostrar
   
   //Datos de la otra persona
   usuarioMatch: any;
@@ -66,6 +69,13 @@ export class SalaComponent implements OnInit {
     'Toledo', 'Valencia', 'Valladolid', 'Vizcaya', 'Zamora', 'Zaragoza'
   ];
   error: string = '';
+
+  // Estados de sincronización
+  isSynchronized: boolean = false;  // Estado global de sincronización
+
+  // Variables para controlar la lógica de negocio
+  syncSubscription!: Subscription;
+  videoControlSubscriptions: Subscription[] = [];
   
   //private socketService: SocketService = inject(SocketService);
 
@@ -83,27 +93,14 @@ export class SalaComponent implements OnInit {
     this.joinRoom();
   
     this.socketService.emitGetSync(socketEvents.GET_SYNC, this.sala);
-    
 
-     this.subscriptions.push(
-      this.socketService.listenPausePlay(socketEvents.PAUSE).subscribe(() => {
-        this.youtubePlayer.pauseVideo(); // Pausar el video
-      }),
-      this.socketService.listenPausePlay(socketEvents.PLAY).subscribe(() => {
-        this.youtubePlayer.playVideo(); // Reproducir el video
-      }),
-      this.socketService.listenChangeVideo(socketEvents.CHANGE_VIDEO).subscribe(idVideo => {
-        this.videoId = idVideo;
-        this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/' + this.videoId);
-        this.youtubePlayer.playVideo();
-      }),
+    this.manageSyncEvents();
+    
+     this.subscriptions1.push(
       this.socketService.listenGetSync(socketEvents.GET_SYNC).subscribe(() => {
-        this.youtubePlayer.pauseVideo(); // Pausar el video
-        this.socketService.emitSyncOn(socketEvents.SYNC_ON, this.sala, this.videoId, this.youtubePlayer.getCurrentTime(), this.enPausa, true);
-      }),
-      this.socketService.ListenSyncEvent(socketEvents.SYNC_ON).subscribe(({idVideo, timesegundos, pausado}) => {
-        //alert(this.playerReady);
-        this.applyVideoSettings(idVideo, timesegundos, pausado);
+        //this.youtubePlayer.pauseVideo(); // Pausar el video
+        
+        //this.socketService.emitSyncOn(socketEvents.SYNC_ON, this.sala, this.videoId, this.youtubePlayer.getCurrentTime(), this.enPausa);
       }),
       this.socketService.listenReceiveMessage(socketEvents.RECEIVE_MESSAGE).subscribe(({texto, rutaMultimedia}) => {
         const newMsg = {
@@ -113,8 +110,11 @@ export class SalaComponent implements OnInit {
           isOwnMessage: false // Asumimos que sendMessage siempre es llamado por el usuario actual
         };
         this.messages.push(newMsg);
-      }),
+      })
     );
+
+    //this.desincronizar();
+    //this.sincronizar();
     
     //Obtener datos de la otra persona
     const headers = new HttpHeaders({
@@ -146,6 +146,44 @@ export class SalaComponent implements OnInit {
       );
 }
 
+async delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Manejar eventos de sincronización
+manageSyncEvents(): void {
+  // Escucha para iniciar la sincronización
+  this.syncSubscription = this.socketService.ListenSyncEvent(socketEvents.SYNC_ON)
+    .subscribe(({ idVideo, timesegundos, pausado }) => {
+      this.applyVideoSettings(idVideo, timesegundos, pausado);
+      this.setupVideoControlListeners();
+      this.isSynchronized = true;
+      this.currentImage = 'assets/ON.jpg';
+    });
+
+  // Escuchar para desincronizar
+  this.socketService.ListenSyncOff(socketEvents.SYNC_OFF).subscribe(() => {
+    this.clearVideoControlListeners();
+    this.isSynchronized = false;
+    this.currentImage = 'assets/OFF.jpg';
+  });
+}
+
+// Establecer oyentes para controles de video
+setupVideoControlListeners(): void {
+  this.clearVideoControlListeners(); // Limpiar suscripciones previas
+  this.videoControlSubscriptions = [
+    this.socketService.listenPausePlay(socketEvents.PAUSE).subscribe(() => this.youtubePlayer.pauseVideo()),
+    this.socketService.listenPausePlay(socketEvents.PLAY).subscribe(() => this.youtubePlayer.playVideo()),
+    this.socketService.listenChangeVideo(socketEvents.CHANGE_VIDEO).subscribe(idVideo => this.changeVideo(idVideo))
+  ];
+}
+
+// Limpiar oyentes de control de video
+clearVideoControlListeners(): void {
+  this.videoControlSubscriptions.forEach(sub => sub.unsubscribe());
+  this.videoControlSubscriptions = [];
+}
 
   onPlayerReady(): void {
     this.youtubePlayer.playVideo();
@@ -286,11 +324,38 @@ export class SalaComponent implements OnInit {
       return 'Desconocido';
     }
   }
+
+  sincronizar(): void {
+    if (!this.isSynchronized) {
+      this.socketService.emitSyncOn(socketEvents.SYNC_ON, this.sala, this.videoId, this.youtubePlayer.getCurrentTime(), this.enPausa);
+      this.setupVideoControlListeners();
+    }
+  }
+
+  desincronizar(): void {
+    if (this.isSynchronized) {
+      this.socketService.emitSyncOff(socketEvents.SYNC_OFF, this.sala);
+      this.clearVideoControlListeners();
+    }
+  }
+
+  // Método para cambiar la imagen y ejecutar funciones
+  toggleImage(): void {
+    if (this.isSynchronized) {
+      this.currentImage = 'assets/OFF.jpg';
+      this.desincronizar();  // Ejecutar la primera función
+    } else {
+      this.currentImage = 'assets/ON.jpg';
+      this.sincronizar();  // Ejecutar la segunda función
+    }
+    this.isSynchronized = !this.isSynchronized;  // Cambiar el estado de la imagen
+  }
     
   ngOnDestroy(): void {
     // Cancela todas las suscripciones cuando el componente se destruye para prevenir fugas de memoria
-    // Asegurarse de desconectar el socket al salir
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    // Asegurarse de desconectar el socket al salirthis.syncSubscription.unsubscribe();
+    this.clearVideoControlListeners();
+    this.subscriptions1.forEach(sub => sub.unsubscribe());
     this.socketService.emitJoinLeave(socketEvents.LEAVE_ROOM, this.sala);
     this.socketService.disconnect();
     localStorage.removeItem('videoId');
