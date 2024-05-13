@@ -167,4 +167,19 @@ export class SocketService {
       return () => this.socket.off(eventName);
     });
   }
+
+  public emitUnmatch(eventName: string, idUsuario: string, idSala: string){
+    this.socket.emit(eventName, idUsuario, idSala, (success: boolean) => {
+      console.log(success ? 'Unmatch enviado con éxito' : 'Error al enviar unmatch');
+    });
+  }
+
+  public listenUnmatch(eventName: string): Observable<any>{
+    return new Observable(observer => {
+      this.socket.on(eventName, (idUsuario: string, idSala: string) => {
+        observer.next({idUsuario, idSala});
+      });
+      return () => this.socket.off(eventName);
+    });
+  }
 }

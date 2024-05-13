@@ -198,7 +198,6 @@ export class SalaUnitariaComponent implements OnInit {
     // Cancela todas las suscripciones cuando el componente se destruye para prevenir fugas de memoria
     // Asegurarse de desconectar el socket al salir
     this.socketService.disconnect();
-    localStorage.removeItem('videoId');
     console.log('Socket desconectado al salir de la sala');
   }
 }

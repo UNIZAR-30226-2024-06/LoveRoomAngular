@@ -53,12 +53,17 @@ export class SalaComponent implements OnInit {
   msgId: any;
   timeStamp: number = 0;
 
+  intervalo: any; 
+  tiempoPrevio: number = 0;
+  flagAvance: boolean = false;
+
   currentImage: string = 'assets/OFF.jpg';  // Inicia con la primera imagen
   isFirstImage: boolean = true;  // Controlar qué imagen mostrar
   
   //Datos de la otra persona
   usuarioMatch: any;
   idUsuarioMatch: number = 0;
+  idUsuario: number = 0;
   imagenPerfil = 'assets/Logo.png';
   provinciasDeEspana: string[] = [
     'Álava', 'Albacete', 'Alicante', 'Almería', 'Asturias', 'Ávila', 'Badajoz', 'Baleares', 'Barcelona', 'Burgos',
@@ -76,6 +81,7 @@ export class SalaComponent implements OnInit {
   // Variables para controlar la lógica de negocio
   syncSubscription!: Subscription;
   videoControlSubscriptions: Subscription[] = [];
+  lastPlayedSeconds: any;
   
   //private socketService: SocketService = inject(SocketService);
 
@@ -121,27 +127,43 @@ export class SalaComponent implements OnInit {
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
 
-    this.http.get<any>('http://'+environment.host_back+'/rooms/'+this.sala+'/members', { headers: headers })
+    this.http.get<any>('http://'+environment.host_back+'/user/profile', { headers: headers })
       .subscribe(
         response => {
-          this.idUsuarioMatch = response[1].idusuario;
-          console.log(response);
-          this.http.get<any>('http://'+environment.host_back+'/user/'+this.idUsuarioMatch, { headers: headers })
+          this.idUsuario = response.id;
+          this.http.get<any>('http://'+environment.host_back+'/rooms/'+this.sala+'/members', { headers: headers })
             .subscribe(
               response => {
+                if(this.idUsuario == response[0].idusuario){
+                  this.idUsuarioMatch = response[1].idusuario;
+                }
+                else{
+                  this.idUsuarioMatch = response[0].idusuario;
+                  this.idUsuario = response[1].idusuario;
+                }
                 console.log(response);
-                this.usuarioMatch = response;
-                this.imagenPerfil = this.usuarioMatch.fotoperfil === 'null.jpg' ? this.imagenPerfil : this.usuarioMatch.fotoperfil;
+                this.http.get<any>('http://'+environment.host_back+'/user/'+this.idUsuarioMatch, { headers: headers })
+                  .subscribe(
+                    response => {
+                      console.log(response);
+                      this.usuarioMatch = response;
+                      this.imagenPerfil = this.usuarioMatch.fotoperfil === 'null.jpg' ? this.imagenPerfil : this.usuarioMatch.fotoperfil;
+                    },
+                    error => {
+                      console.error('Error al obtener el perfil del usuario', error);
+                      this.error = 'Error al obtener el perfil del usuario';
+                    }
+                  );
               },
               error => {
-                console.error('Error al obtener el perfil del usuario', error);
-                this.error = 'Error al obtener el perfil del usuario';
+                console.error('Error al obtener los miembros de la sala', error);
+                this.error = 'Error al obtener los miembros de la sala';
               }
             );
         },
         error => {
-          console.error('Error al obtener los miembros de la sala', error);
-          this.error = 'Error al obtener los miembros de la sala';
+          console.error('Error al obtener el perfil del usuario', error);
+          this.error = 'Error al obtener el perfil del usuario';
         }
       );
 }
@@ -175,7 +197,8 @@ setupVideoControlListeners(): void {
   this.videoControlSubscriptions = [
     this.socketService.listenPausePlay(socketEvents.PAUSE).subscribe(() => this.youtubePlayer.pauseVideo()),
     this.socketService.listenPausePlay(socketEvents.PLAY).subscribe(() => this.youtubePlayer.playVideo()),
-    this.socketService.listenChangeVideo(socketEvents.CHANGE_VIDEO).subscribe(idVideo => this.changeVideo(idVideo))
+    this.socketService.listenChangeVideo(socketEvents.CHANGE_VIDEO).subscribe(idVideo => this.changeVideo(idVideo)),
+    this.socketService.listenUnmatch(socketEvents.UNMATCH).subscribe(() => this.listenUnmatch())
   ];
 }
 
@@ -213,14 +236,24 @@ clearVideoControlListeners(): void {
     console.log('YouTube Player state changed', event.data);
     if (event.data === YT.PlayerState.PLAYING) {
       console.log('PLAY event received and video played');
-      this.playVideo();
+      if (this.lastPlayedSeconds) {
+        const currentSeconds = this.youtubePlayer.getCurrentTime();
+        const diff = currentSeconds - this.lastPlayedSeconds;
+        if ((Math.abs(diff) >= 1) && this.isSynchronized){
+          this.socketService.emitSyncOn(socketEvents.SYNC_ON, this.sala, this.videoId, currentSeconds, this.enPausa);
+        }
+      }
+      this.lastPlayedSeconds = this.youtubePlayer.getCurrentTime();
+      this.playVideo(); // Si se está reproduciendo, continua la reproducción
       this.enPausa = false;
     } else if (event.data === YT.PlayerState.PAUSED) {
       console.log('PAUSE event received and video paused');
-      this.pauseVideo();
+      this.pauseVideo(); // Pausa el video y emite un evento PAUSE
       this.enPausa = true;
     }
   }
+  
+
 
   // Emite un evento PAUSE al servidor para informar que el usuario ha pausado el video
   pauseVideo(): void {
@@ -349,6 +382,29 @@ clearVideoControlListeners(): void {
       this.sincronizar();  // Ejecutar la segunda función
     }
     this.isSynchronized = !this.isSynchronized;  // Cambiar el estado de la imagen
+  }
+
+  emitUnmatch(): void {
+    const iduser = this.idUsuario.toString();
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+    this.socketService.emitUnmatch(socketEvents.UNMATCH, iduser, this.sala);
+    this.http.delete<any>('http://'+environment.host_back+'/rooms/'+this.sala, { headers: headers })
+      .subscribe(
+        response => {
+          alert("Sala borrada con éxito, volviendo a mis salas");
+          this.router.navigate(['/mis-salas']);
+        },
+        error => {
+          alert('Error al borrar sala');
+        }
+      );
+  }
+
+  listenUnmatch(): void {
+    alert("El otro usuario ha borrado la sala, volviendo a mis salas");
+    this.router.navigate(['/mis-salas']);
   }
     
   ngOnDestroy(): void {
