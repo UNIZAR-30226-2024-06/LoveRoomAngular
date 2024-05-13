@@ -3,16 +3,18 @@
 <div class="mis-salas-container">
     <div class="name-input-container">
     </div>
-    <div class="estadisticas">
-        <div class="sexo-container">
-            <canvas  id="sexo" >{{ chart }}</canvas>
-        </div>
-      
-        <div class="edad" >
+        <div class="estadisticas">
+            <div class="graficas-container"> 
+                <div class="sexo-container">
+                    <label>Numero de usuarios: {{ numTotal }}</label>
+                    <canvas  id="sexo" >{{ chartSexo }}</canvas>
+                </div>
+                <div class="edad-container" >
+                    <canvas  id="edad" >{{ chartEdad }}</canvas>
+                </div>
+                <div class="comunidad-autonoma" >
             
+                </div>
+            </div>
         </div>
-        <div class="comunidad-autonoma" >
-            
-        </div>
-    </div>
 </div>
