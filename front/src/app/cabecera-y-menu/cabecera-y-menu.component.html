@@ -28,6 +28,11 @@
       <button class="menu-button h1-like">Mis salas</button>
     </a>
     <ng-container *ngIf="admin">
+      <a [routerLink]="['/admin']">
+        <button class="menu-button h1-like">Admin</button>
+      </a>
+    </ng-container>
+    <ng-container *ngIf="admin">
       <a [routerLink]="['/usuarios-admin']">
         <button class="menu-button h1-like">Usuarios</button>
       </a>
