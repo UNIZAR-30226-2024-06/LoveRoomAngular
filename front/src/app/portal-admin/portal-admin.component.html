@@ -4,7 +4,7 @@
     <div class="name-input-container">
     </div>
         <div class="estadisticas">
-            <h1 class="titulo">Estadísticas</h1>
+            <h1 class="titulo">Estadísticas Generales</h1>
             <div class="graficas-container"> 
                 <div class="sexo-container">
                     <label>Numero de usuarios: {{ numTotal }}</label>
@@ -18,4 +18,30 @@
                 </div>
             </div>
         </div>
+        <div>
+        <div class="listas">
+            <a [routerLink]="['/usuarios-admin']">
+                <button class="boton_users">
+                    <div class="lista_usuarios">
+                        <h1 class="titulo">Tipos de usuarios</h1>
+                        <div class="container_listas_usuarios">
+                            <canvas  id="tipo" >{{ chartTipo }}</canvas>
+                        </div>
+                        <label>Ver más sobre los usuarios</label>
+                    </div>
+                </button>
+            </a>
+            <a [routerLink]="['/reports-admin']">
+                <button class="boton_users">
+                    <div class="lista_reportes">
+                        <h1 class="titulo">Reportes</h1>
+                        <div class="container_reportes">
+                            <canvas  id="reportes" >{{ chartReports }}</canvas>
+                        </div>
+                        <label>Ver más sobre los reportes</label>
+                    </div>
+                </button>
+            </a>
+        </div>
+    </div>
 </div>
