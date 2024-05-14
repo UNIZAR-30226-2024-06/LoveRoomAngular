@@ -1,0 +1,87 @@
+.mis-salas-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-left: 110px;
+    margin-top: 84px;
+  }
+  
+  .name-input-container {
+    padding: 10px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .sala {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100px;
+    margin: 20px auto; /* Centra horizontalmente */
+    padding: 3px;
+    border: 2px solid #fc0202; /* Borde sólido de 2px */
+    border-radius: 10px; /* Borde redondeado */
+    background-color: #f9f9f9; /* Color de fondo */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra */
+    }
+
+  .estadisticas {
+    width: 90%;
+    box-sizing: border-box;
+    margin: 20px auto; /* Centra horizontalmente */
+    padding: 3px;
+    border: 2px solid #fc0202; /* Borde sólido de 2px */
+    border-radius: 10px; /* Borde redondeado */
+    background-color: #f9f9f9; /* Color de fondo */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra */
+    margin: 0 auto; /* Centra horizontalmente */
+    text-align: center;
+  }
+
+  .graficas-container {
+    display: flex;
+    flex-direction: row; /* Cambiado a row para alinear los elementos horizontalmente */
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    flex-wrap: wrap; /* Envuelve los elementos en múltiples filas */
+    text-align: center;
+  }
+
+  .sexo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 33%; /*para que los elementos ocupen todo el ancho disponible */
+  }
+
+  .edad-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 33%; /*para que los elementos ocupen todo el ancho disponible */
+  }
+
+  .localidad-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 33%; /*para que los elementos ocupen todo el ancho disponible */
+  }
+
+  .titulo {
+    font-size: 1.5em;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    text-justify: center;
+  }
+
