@@ -25,7 +25,9 @@ import { Router } from '@angular/router';
 export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @ViewChild(YouTubePlayer, { static: false }) youtubePlayer!: YouTubePlayer;
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('fileInputImage') fileInputImage!: ElementRef<HTMLInputElement>;
+  @ViewChild('fileInputVideo') fileInputVideo!: ElementRef<HTMLInputElement>;
+
 
   playerVars = {
     autoplay: 1,  // 0 o 1 (1 significa autoplay activado)
@@ -42,7 +44,7 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
   videoUrl!: SafeResourceUrl;
   videoId: string = '';
   segundos: number = 0;
-  messages: { id: number, text: string, multimedia: string, timestamp: number, isOwnMessage: boolean, showReportBox?: boolean, reportText?: string }[] = [];
+  messages: { id: number, text: string, multimedia: string | null, timestamp: number, isOwnMessage: boolean, showReportBox?: boolean, reportText?: string, imgCargada:any}[] = [];
   newMessage: string = '';
   idMsg: number = 0;
   subscriptions1: Subscription[] = [];
@@ -59,10 +61,6 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
   playerReady: boolean = false;
   msgId: any;
   timeStamp: number = 0;
-
-  intervalo: any; 
-  tiempoPrevio: number = 0;
-  flagAvance: boolean = false;
 
   currentImage: string = 'assets/OFF.jpg';  // Inicia con la primera imagen
   isFirstImage: boolean = true;  // Controlar qué imagen mostrar
@@ -90,6 +88,9 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
   videoControlSubscriptions: Subscription[] = [];
   lastPlayedSeconds: any;
   multimediaUrl: string | null = null;
+  flag_imagen = false;
+  flag_video = false;
+  file: any;
   
   //private socketService: SocketService = inject(SocketService);
 
@@ -116,14 +117,22 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
         
         //this.socketService.emitSyncOn(socketEvents.SYNC_ON, this.sala, this.videoId, this.youtubePlayer.getCurrentTime(), this.enPausa);
       }),
-      this.socketService.listenReceiveMessage(socketEvents.RECEIVE_MESSAGE).subscribe(({idMsg, texto, rutaMultimedia}) => {
-        const newMsg = {
+      this.socketService.listenReceiveMessage(socketEvents.RECEIVE_MESSAGE).subscribe(async ({idMsg, texto, rutaMultimedia}) => {
+        let newMsg = {
           id: idMsg,
           text: texto,
           multimedia: rutaMultimedia,
           timestamp: Date.now(),
-          isOwnMessage: false // Asumimos que sendMessage siempre es llamado por el usuario actual
+          isOwnMessage: false, // Asumimos que sendMessage siempre es llamado por el usuario actual
+          imgCargada: 'assets/Logo.png'
         };
+        
+        if(newMsg.multimedia !== null){
+          const image = await fetch('http://'+environment.host_back+'/multimedia/' + newMsg.multimedia);
+          const blob = await image.blob();
+          const objectURL = URL.createObjectURL(blob);
+          newMsg.imgCargada = objectURL;
+        }
         this.messages.push(newMsg);
         this.scrollToBottom();
       }), 
@@ -160,15 +169,35 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
                   this.http.get<any>(`http://${environment.host_back}/${this.sala}/chat`, { headers })
                   .subscribe(
                     response => {
-                      response.forEach((msg: any) => {
+                      response.forEach(async (msg: any) => {
                         const isOwnMessage = msg.idusuario === this.idUsuario;
                         const newMsg = {
                           id: msg.id,
                           text: msg.texto,
                           multimedia: msg.rutamultimedia,
                           timestamp: new Date(msg.fechahora).getTime(),
-                          isOwnMessage: isOwnMessage
+                          isOwnMessage: isOwnMessage,
+                          imgCargada: 'assets/Logo.png'
                         };
+                        if (newMsg.multimedia !== null) {
+                          const response = await fetch('http://' + environment.host_back + '/multimedia/' + newMsg.multimedia, {
+                            headers: {
+                              'Authorization': 'Bearer ' + localStorage.getItem('token')
+                            }
+                          });
+                          const blob = await response.blob();
+                        
+                          // Ver todas las cabeceras de la respuesta
+                          response.headers.forEach((value, key) => {
+                            console.log(`${key}: ${value}`);
+                          });
+                        
+                          const tipoArchivo = response.headers.get('Tipo-Multimedia');
+                          //alert(tipoArchivo);
+                        
+                          const objectURL = URL.createObjectURL(blob);
+                          newMsg.imgCargada = objectURL;
+                        }
                         this.messages.push(newMsg);
                         this.scrollToBottom();
                       });
@@ -387,26 +416,65 @@ clearVideoControlListeners(): void {
 
   
 
-  sendMessage(): void {
-    const rutaMultimedia = '';
-    if (this.newMessage.trim() !== '') {
+  async sendMessage(): Promise<void> {
+    if (this.newMessage.trim() !== '' || this.multimediaUrl) {
       const newMsg = {
         id: this.idMsg,
         text: this.newMessage,
-        multimedia: rutaMultimedia,
+        multimedia: this.multimediaUrl,
         timestamp: Date.now(),
-        isOwnMessage: true // Asumimos que sendMessage siempre es llamado por el usuario actual
+        isOwnMessage: true,// Asumimos que sendMessage siempre es llamado por el usuario actual
+        imgCargada: this.multimediaUrl
       };
+      
       this.messages.push(newMsg);
-      this.socketService.emitCreateMessage(socketEvents.CREATE_MESSAGE, this.sala, this.newMessage, rutaMultimedia);
+      this.clearMultimedia();
+      
+      const headers = new HttpHeaders({
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      });
+
+      if (this.flag_imagen == true) {
+        const formData = new FormData();
+        formData.append('file',this.file);
+        try {
+          const response = await this.http.post<any>('http://'+environment.host_back+'/multimedia/upload/foto/'+this.idUsuario, formData, { headers: headers }).toPromise();
+          console.log('Imagen subida', response);
+          this.multimediaUrl = response.nombreArchivo;
+        }
+        catch (error: any) {
+          console.error('Error al subir la imagen', error.message);
+          this.error = error.error.error;
+          alert(error.message); 
+        }
+      }
+      else if (this.flag_video == true) {
+        const formData = new FormData();
+        formData.append('file',this.file);
+        try {
+          const response = await this.http.post<any>('http://'+environment.host_back+'/multimedia/upload/video/'+this.idUsuario, formData, { headers: headers }).toPromise();
+          console.log('Video subido', response);
+          this.multimediaUrl = response.nombreArchivo;
+        }
+        catch (error: any) {
+          console.error('Error al subir el video', error.message);
+          this.error = error.error.error;
+          alert(error.message); 
+        }
+      }
+      this.socketService.emitCreateMessage(socketEvents.CREATE_MESSAGE, this.sala, this.newMessage, this.multimediaUrl);
       this.newMessage = '';
       this.scrollToBottom();
+      this.flag_imagen = false;
+      this.flag_video = false;
     }
   }
 
-  triggerFileInput(): void {
-    if (this.fileInput && this.fileInput.nativeElement) {
-      this.fileInput.nativeElement.click();
+  triggerFileInput(type: string): void {
+    if (type === 'image' && this.fileInputImage && this.fileInputImage.nativeElement) {
+      this.fileInputImage.nativeElement.click();
+    } else if (type === 'video' && this.fileInputVideo && this.fileInputVideo.nativeElement) {
+      this.fileInputVideo.nativeElement.click();
     }
   }
   
@@ -415,23 +483,59 @@ clearVideoControlListeners(): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.multimediaUrl = e.target.result; // Almacena la URL del archivo multimedia
-      };
-      reader.readAsDataURL(file);
+      const fileName = file.name.toLowerCase();
+      const validExtensions = ['jpg', 'jpeg', 'png'];
+      const fileExtension = fileName.split('.').pop();
+  
+      if (fileExtension && validExtensions.includes(fileExtension)) {
+        this.file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.multimediaUrl = reader.result as string; // Almacena la URL del archivo multimedia
+        };
+        reader.readAsDataURL(file);
+        this.flag_imagen = true;
+      } else {
+        alert('Solo se permiten archivos de tipo JPG o PNG.');
+        this.clearMultimedia();
+      }
     }
   }
+
+  handleVideoInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const fileName = file.name.toLowerCase();
+      const validExtensions = ['mp4', 'amv'];
+      const fileExtension = fileName.split('.').pop();
+  
+      if (fileExtension && validExtensions.includes(fileExtension)) {
+        this.file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.multimediaUrl = reader.result as string; // Almacena la URL del archivo multimedia
+        };
+        reader.readAsDataURL(file);
+        this.flag_video = true;
+      } else {
+        alert('Solo se permiten archivos de tipo mp4 o amv.');
+        this.clearMultimedia();
+      }
+    }
+  }
+  
 
   clearMultimedia(): void {
     this.multimediaUrl = null;
-    if (this.fileInput && this.fileInput.nativeElement) {
-      this.fileInput.nativeElement.value = '';
+    if (this.fileInputImage && this.fileInputImage.nativeElement) {
+      this.fileInputImage.nativeElement.value = '';
+    }
+    if (this.fileInputVideo && this.fileInputVideo.nativeElement) {
+      this.fileInputVideo.nativeElement.value = '';
     }
   }
   
-  
-
 
   handleEnterKey(event: Event): void {
     const keyboardEvent = event as KeyboardEvent;

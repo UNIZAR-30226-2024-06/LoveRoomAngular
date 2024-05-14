@@ -68,7 +68,7 @@
         <div #messagesContainer class="messages-container">
           <div *ngFor="let message of messages | orderBy: 'timestamp'" [ngClass]="{'message': message.isOwnMessage, 'messageOtro': !message.isOwnMessage}">
             {{ message.text }}
-            <img *ngIf="message.multimedia" [src]="message.multimedia" alt="Multimedia" class="multimedia-preview">
+            <img *ngIf="message.multimedia" [src]="message.imgCargada" alt="Multimedia" class="multimedia-preview">
             <div class="report-container" *ngIf="!message.isOwnMessage">
               <img src="assets/report.png" alt="Report Icon" class="report-icon" (click)="toggleReportBox(message.id)">
               <div *ngIf="message.showReportBox" class="report-box">
@@ -81,8 +81,10 @@
     
         <div class="input-container">
             <input [(ngModel)]="newMessage" class="msg" (keydown.enter)="handleEnterKey($event)" type="text" placeholder="Escribe un mensaje...">
-            <img src="assets/clip.png" alt="Seleccionar archivo" class="upload-icon" (click)="triggerFileInput()">
-            <input type="file" class="selImg" (change)="handleFileInput($event)" #fileInput style="display: none;">
+            <img src="assets/foto.png" alt="Seleccionar imagen" class="upload-icon" (click)="triggerFileInput('image')">
+            <input type="file" class="selImg" (change)="handleFileInput($event)" #fileInputImage style="display: none;">
+            <img src="assets/video.png" alt="Seleccionar video" class="upload-icon" (click)="triggerFileInput('video')">
+            <input type="file" class="selImg" (change)="handleVideoInput($event)" #fileInputVideo style="display: none;">
             <img class="iconosend" src="assets/enviar.png" (click)="sendMessage()">
         </div>
         
