@@ -17,9 +17,8 @@ jobs:
         run: |
           docker build -t loveroom \
           --build-arg APIKEY="${{ secrets.APIKEY }}" \
-          --build-arg HOST_BACK="${{ secrets.HOST_BACK }}" front/ loveroom
-          
-          .
+          --build-arg HOST_BACK="${{ secrets.HOST_BACK }}" front/
+        
       - name: Save Docker image to file
         run: docker save loveroom > image.tar
 
