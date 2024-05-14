@@ -50,13 +50,23 @@ export class EditPerfilComponent {
   cambiarImagen(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      this.file = input.files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.imagenPerfil = reader.result as string;
-      };
-      reader.readAsDataURL(this.file);
-      this.flag_imagen = true;
+      const file = input.files[0];
+      const fileName = file.name.toLowerCase();
+      const validExtensions = ['jpg', 'jpeg', 'png'];
+      const fileExtension = fileName.split('.').pop();
+  
+      if (fileExtension && validExtensions.includes(fileExtension)) {
+        this.file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.imagenPerfil = reader.result as string; // Almacena la URL del archivo multimedia
+        };
+        reader.readAsDataURL(file);
+        this.flag_imagen = true;
+      } else {
+        alert('Solo se permiten archivos de tipo JPG o PNG.');
+  
+      }
     }
   }
 
