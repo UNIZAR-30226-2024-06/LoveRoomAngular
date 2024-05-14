@@ -25,33 +25,28 @@ export class PerfilComponent {
   cantidad: number = 9.99;
   errorMessage: string = '';
   successMessage: string = '';
+  imagenPerfil = 'assets/Logo.png';
 
-  constructor(private http: HttpClient, private router: Router) {
-    const correo = localStorage.getItem('correo');
-    if (correo !== null && correo !== undefined) {
-    this.obtenerPerfilUsuario(correo);
-    }
-  }
+  constructor(private http: HttpClient, private router: Router) { this.obtenerPerfilUsuario(); }
 
-  obtenerPerfilUsuario(correo: string): void {
+  async obtenerPerfilUsuario(): Promise<void> {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
-
-    this.http.get<any>('http://'+environment.host_back+'/user/' + correo, { headers: headers })
-      .subscribe(
-        response => {
-          if (response.error) {
-            this.error = response.error;
-          } else {
-            this.usuario = response;
-          }
-        },
-        error => {
-          console.error('Error al obtener el perfil del usuario', error);
-          this.error = 'Error al obtener el perfil del usuario';
-        }
-      );
+  
+    const response = await this.http.get<any>('http://'+environment.host_back+'/user/profile', { headers: headers }).toPromise();
+    try {
+      console.log(response);
+      this.usuario = response;
+      const image = await fetch('http://'+environment.host_back+'/multimedia/' + this.usuario.fotoperfil);
+      const blob = await image.blob();
+      const objectURL = URL.createObjectURL(blob);
+      this.imagenPerfil = this.usuario.fotoperfil === 'null.jpg' ? this.imagenPerfil : objectURL;
+    }
+    catch (error: any) {
+      console.error('Error al obtener el perfil del usuario', error);
+      this.error = 'Error al obtener el perfil del usuario';
+    }
   }
 
   toggleAnswer(index: number): void {

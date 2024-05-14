@@ -87,7 +87,7 @@ youtube-player::ng-deep iframe {
     padding: 10px;
 }
 
-.input-container input {
+.msg {
     width: 90%;
     border-radius: 5px;
     padding: 5px;
@@ -278,3 +278,324 @@ youtube-player::ng-deep iframe {
     cursor: pointer;
     height: 30px;
 }
+
+.sala-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-left: 110px;
+    margin-top: 84px;
+}
+
+.video-container {
+    border: 7px solid #ccc;
+    border-radius: 5px;
+    position: relative;
+    width: 80%;
+    height: 0;
+    padding-bottom: 45%;
+}
+
+youtube-player {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+youtube-player::ng-deep iframe {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  :host ::ng-deep youtube-player div {
+    height: 100% !important;
+  }
+
+.chat-container {
+    width: 80%;
+    height: 400px;
+    border: 5px solid #F89F9F;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden; /* Asegura que el contenido no se desborde */
+}
+
+.messages-container {
+    overflow-y: auto;
+    flex-grow: 1; /* Asegura que el contenedor de mensajes ocupe todo el espacio disponible */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding-bottom: 10px; /* Espacio inferior para que el último mensaje no quede oculto */
+}
+
+.messages-container .message {
+    border: 4px solid #F89F9F;
+    border-radius: 20px;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+    max-width: 40%;
+    word-wrap: break-word;
+    background-color: rgb(126, 251, 126);
+    align-self: flex-end;
+}
+
+.messages-container .messageOtro {
+    border: 4px solid #F89F9F;
+    border-radius: 20px;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+    max-width: 40%;
+    word-wrap: break-word;
+    background-color: rgb(126, 205, 251);
+    align-self: flex-start;
+}
+
+.input-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 10%;
+    border-top: 3px solid #F89F9F;
+    padding: 10px;
+}
+
+.msg {
+    width: 70%;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.input-container img {
+    cursor: pointer;
+}
+.ImgPerfil {
+    border-radius: 50%; /* Hace que la imagen sea circular */
+    border: 5px solid white; /* Borde blanco alrededor de la imagen */
+    width: 90px; /* Ajusta esto según tus necesidades */
+    height: 90px; /* Ajusta esto según tus necesidades */
+    object-fit: cover; /* Asegura que la imagen se ajuste al tamaño del círculo */
+}
+
+.iconosend {
+    cursor: pointer;
+    height: 30px;
+}
+
+.report-icon {
+    cursor: pointer;
+    height: 30px;
+    margin-left: 2px;
+
+}
+
+.youtube-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 100%;
+    height: 100%;
+}
+
+.name-input-container {
+    margin-top: 20px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 20px;
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+}
+    
+.name-input-container input {
+    width: 90%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.search-icon {
+    cursor: pointer;
+    height: 30px;
+}
+
+.error-message {
+    color: red;
+    margin-top: 0px;
+    font-size: 14px;
+}
+
+.results {
+    flex-direction: column;
+    margin-bottom: 20px;
+    width: 80%;
+    height: 300px;
+    max-height: 30%;
+    overflow-y: auto;
+    border: 2px solid red;
+    border-radius: 5px;
+}
+
+.result {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 3px;
+    margin-bottom: 10px;
+}
+
+.miniature {
+    width: 100px;
+    height: 50px;
+    margin-right: 5px;
+}
+
+.acceptResult {
+    background-color: rgb(230, 229, 229); 
+    color:black; 
+    border:none; 
+    cursor: pointer;
+    width: 100%;
+    height: 50px;
+}
+
+.perfilOtroUsuario {
+
+    width: 80%;
+    height: 50%; /* Asumiendo que quieres el 20% del alto de la ventana de visualización */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.datos {
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    position: relative;
+    height: 33%;
+}
+
+.dato {
+    padding-left: 7px;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos hijo salten a la siguiente línea si no caben */
+    width: 100%;
+    flex: 1; /* Distribuye el espacio verticalmente de manera equitativa */
+    align-items: center; /* Centra los elementos verticalmente */
+    margin: 10px 0; /* Margen vertical entre los recuadros */
+    
+}
+
+.dato .nombre {
+    font-size: medium;
+    margin-right: 10px; /* Espacio entre los elementos dentro de .dato */
+    white-space: nowrap; /* Evita que el texto se salte a la siguiente línea */
+}
+
+.toggle-image {
+    align-self:flex-end;
+    margin-top: 30px;
+    margin-right: 10%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 80px; /* Ajusta esto según tus necesidades */
+    height: 40px; /* Ajusta esto según tus necesidades */
+    cursor: pointer;
+}
+
+.report-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 10px; /* Ajusta el espacio entre el mensaje y el icono de reportar */
+}
+
+.report-icon {
+    cursor: pointer;
+    height: 20px;
+    margin-left: 10px;
+}
+
+.report-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.report-box textarea {
+    width: 100px;
+    height: 30px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    resize: none;
+}
+
+.send-report-icon {
+    cursor: pointer;
+    height: 30px;
+}
+
+.multimedia-preview {
+    max-width: 100px;
+    max-height: 100px;
+    margin: 10px 0;
+  }
+
+.multimedia-preview-container {
+    max-width: 100%;
+    max-height: 100px;
+    margin: 10px 0;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .multimedia-preview-container button {
+    position: absolute;
+    width: 20%;
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 12px;
+    margin-left: 10%;
+  }
+
+  .upload-icon {
+    cursor: pointer;
+    width: 30px; /* Ajusta el tamaño según sea necesario */
+    height: 30px; /* Ajusta el tamaño según sea necesario */
+    margin-right: 10px; /* Espacio entre la imagen y el botón de enviar */
+  }
+  
+  .selImg {
+    display: none; /* Asegura que el input de archivo esté oculto */
+  }
+  
+
+  

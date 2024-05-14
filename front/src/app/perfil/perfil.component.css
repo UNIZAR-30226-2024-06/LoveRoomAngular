@@ -80,7 +80,7 @@
    border-radius: 50%; /* Hace que la imagen sea circular */
    border: 5px solid white; /* Borde blanco alrededor de la imagen */
    width: 90px; /* Ajusta esto según tus necesidades */
-   height: 90px; /* Ajusta esto según tus necesidades */
+   height: 150px; /* Ajusta esto según tus necesidades */
    object-fit: cover; /* Asegura que la imagen se ajuste al tamaño del círculo */
 }
 
