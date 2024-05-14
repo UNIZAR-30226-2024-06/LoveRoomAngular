@@ -53,7 +53,7 @@ jobs:
           ssh -i ssh_key  -o StrictHostKeyChecking=no ${{ secrets.AZURE_USERNAME }}@${{ secrets.AZURE_HOST_ANGULAR }} "docker load -i /home/${{ secrets.AZURE_USERNAME }}/loveroom_images/image_${{ env.TIMESTAMP }}.tar"
           
       - name: Run Docker container on Azure VM
-        run: ssh -i ssh_key  -o StrictHostKeyChecking=no ${{ secrets.AZURE_USERNAME }}@${{ secrets.AZURE_HOST_ANGULAR }} 'docker run -d --name loveroom_container -p 5000:5000 -e HOST_BACK="${{ secrets.HOST_BACK }}" -e HOST_BACK="${{ secrets.HOST_BACK }}" loveroom'
+        run: ssh -i ssh_key  -o StrictHostKeyChecking=no ${{ secrets.AZURE_USERNAME }}@${{ secrets.AZURE_HOST_ANGULAR }} 'docker run -d --name loveroom_container -p 4200:4200 -e HOST_BACK="${{ secrets.HOST_BACK }}" -e HOST_BACK="${{ secrets.HOST_BACK }}" loveroom'
 
       #- name: Change Nginx Configuration on Azure VM
       #  run: ssh -o StrictHostKeyChecking=no ${{ secrets.AZURE_USERNAME }}@${{ secrets.AZURE_HOST }} "sudo sed '13 a client_max_body_size 100M;' -i /etc/nginx/nginx.conf"
