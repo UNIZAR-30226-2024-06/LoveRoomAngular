@@ -66,21 +66,29 @@
     <img src="{{ currentImage }}" (click)="toggleImage()" alt="Toggle Image" class="toggle-image">
     <div class="chat-container">
         <div #messagesContainer class="messages-container">
-            <div *ngFor="let message of messages | orderBy: 'timestamp'" [ngClass]="{'message': message.isOwnMessage, 'messageOtro': !message.isOwnMessage}">
-                {{ message.text }}
-                <div class="report-container" *ngIf="!message.isOwnMessage">
-                  <img src="assets/report.png" alt="Report Icon" class="report-icon" (click)="toggleReportBox(message.id)">
-                  <div *ngIf="message.showReportBox" class="report-box">
-                    <textarea [(ngModel)]="message.reportText" placeholder="Escribe el motivo del reporte"></textarea>
-                    <img src="assets/enviar.png" alt="Send Report Icon" class="send-report-icon" (click)="reportMessage(message.id, message.reportText)">
-                  </div>
-                </div>
+          <div *ngFor="let message of messages | orderBy: 'timestamp'" [ngClass]="{'message': message.isOwnMessage, 'messageOtro': !message.isOwnMessage}">
+            {{ message.text }}
+            <img *ngIf="message.multimedia" [src]="message.multimedia" alt="Multimedia" class="multimedia-preview">
+            <div class="report-container" *ngIf="!message.isOwnMessage">
+              <img src="assets/report.png" alt="Report Icon" class="report-icon" (click)="toggleReportBox(message.id)">
+              <div *ngIf="message.showReportBox" class="report-box">
+                <textarea [(ngModel)]="message.reportText" placeholder="Escribe el motivo del reporte"></textarea>
+                <img src="assets/enviar.png" alt="Send Report Icon" class="send-report-icon" (click)="reportMessage(message.id, message.reportText)">
               </div>
+            </div>
+          </div>
         </div>
-          
+    
         <div class="input-container">
-            <input [(ngModel)]="newMessage" (keydown.enter)="handleEnterKey($event)" type="text" placeholder="Escribe un mensaje...">
-            <img class = "iconosend" src="assets/enviar.png" (click)="sendMessage()">
+            <input [(ngModel)]="newMessage" class="msg" (keydown.enter)="handleEnterKey($event)" type="text" placeholder="Escribe un mensaje...">
+            <img src="assets/clip.png" alt="Seleccionar archivo" class="upload-icon" (click)="triggerFileInput()">
+            <input type="file" class="selImg" (change)="handleFileInput($event)" #fileInput style="display: none;">
+            <img class="iconosend" src="assets/enviar.png" (click)="sendMessage()">
+        </div>
+        
+        <div *ngIf="multimediaUrl" class="multimedia-preview-container">
+            <img [src]="multimediaUrl" alt="Vista previa de imagen" class="multimedia-preview">
+            <button (click)="clearMultimedia()">Eliminar</button>
         </div>
     </div>
 </div>

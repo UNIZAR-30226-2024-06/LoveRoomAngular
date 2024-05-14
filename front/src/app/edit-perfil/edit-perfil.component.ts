@@ -79,7 +79,7 @@ export class EditPerfilComponent {
       else {
         this.usuario.localidad = 'Desconocido';
       }
-      const image = await fetch('http://'+environment.host_back+'/multimedia/' + this.usuario.fotoperfil + '/' + this.usuario.id);
+      const image = await fetch('http://'+environment.host_back+'/multimedia/' + this.usuario.fotoperfil);
       const blob = await image.blob();
       const objectURL = URL.createObjectURL(blob);
       this.imagenPerfil = this.usuario.fotoperfil === 'null.jpg' ? this.imagenPerfil : objectURL;

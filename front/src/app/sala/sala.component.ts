@@ -25,6 +25,8 @@ import { Router } from '@angular/router';
 export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @ViewChild(YouTubePlayer, { static: false }) youtubePlayer!: YouTubePlayer;
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   playerVars = {
     autoplay: 1,  // 0 o 1 (1 significa autoplay activado)
     controls: 1,  // 0 o 1 (1 muestra los controles del reproductor)
@@ -32,7 +34,10 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
     enablejsapi: 1,  // 1 permite la interacción con el API de JavaScript
     fs: 1,  // 0 o 1 (1 permite el botón de pantalla completa)
     iv_load_policy: 3, // 1 o 3 (3 para no mostrar anotaciones en el video)
+    rel: 0,  // 0 para no mostrar videos relacionados al final
+    showinfo: 0, // 0 para no mostrar información del video
   };
+  
   roomId: string = '';
   videoUrl!: SafeResourceUrl;
   videoId: string = '';
@@ -84,6 +89,7 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
   syncSubscription!: Subscription;
   videoControlSubscriptions: Subscription[] = [];
   lastPlayedSeconds: any;
+  multimediaUrl: string | null = null;
   
   //private socketService: SocketService = inject(SocketService);
 
@@ -149,18 +155,7 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
                   this.idUsuario = response[1].idusuario;
                 }
                 console.log(response);
-                this.http.get<any>('http://'+environment.host_back+'/user/'+this.idUsuarioMatch, { headers: headers })
-                  .subscribe(
-                    response => {
-                      console.log(response);
-                      this.usuarioMatch = response;
-                      this.imagenPerfil = this.usuarioMatch.fotoperfil === 'null.jpg' ? this.imagenPerfil : this.usuarioMatch.fotoperfil;
-                    },
-                    error => {
-                      console.error('Error al obtener el perfil del usuario', error);
-                      this.error = 'Error al obtener el perfil del usuario';
-                    }
-                  );
+                this.obtenerPerfillUsuario();
                   //AÑADIR AQUI
                   this.http.get<any>(`http://${environment.host_back}/${this.sala}/chat`, { headers })
                   .subscribe(
@@ -199,6 +194,25 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
           this.error = 'Error al obtener el perfil del usuario';
         }
       );
+}
+
+async obtenerPerfillUsuario(): Promise<void> {
+  const headers = new HttpHeaders({
+    'Authorization': 'Bearer ' + localStorage.getItem('token')
+  });
+  const response = await this.http.get<any>('http://'+environment.host_back+'/user/'+this.idUsuarioMatch, { headers: headers }).toPromise();
+  try {
+    console.log(response);
+    this.usuarioMatch = response;
+    const image = await fetch('http://'+environment.host_back+'/multimedia/' + this.usuarioMatch.fotoperfil);
+    const blob = await image.blob();
+    const objectURL = URL.createObjectURL(blob);
+    this.imagenPerfil = this.usuarioMatch.fotoperfil === 'null.jpg' ? this.imagenPerfil : objectURL;
+  }
+  catch (error: any) {
+    console.error('Error al obtener el perfil del usuario', error);
+    this.error = 'Error al obtener el perfil del usuario';
+  }
 }
 
 ngAfterViewInit(): void {
@@ -389,6 +403,34 @@ clearVideoControlListeners(): void {
       this.scrollToBottom();
     }
   }
+
+  triggerFileInput(): void {
+    if (this.fileInput && this.fileInput.nativeElement) {
+      this.fileInput.nativeElement.click();
+    }
+  }
+  
+
+  handleFileInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.multimediaUrl = e.target.result; // Almacena la URL del archivo multimedia
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  clearMultimedia(): void {
+    this.multimediaUrl = null;
+    if (this.fileInput && this.fileInput.nativeElement) {
+      this.fileInput.nativeElement.value = '';
+    }
+  }
+  
+  
 
 
   handleEnterKey(event: Event): void {
