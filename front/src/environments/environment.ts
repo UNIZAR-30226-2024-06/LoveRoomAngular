@@ -1,4 +1,4 @@
 export const environment = {
-    apiKey: process.env['apiKey'] ,
-    host_back: process.env['host_back']
+    apiKey: 'AIzaSyBOsDlrJWusYYGbZ7xXcyoRK2_KkGBVvfY',
+    host_back: '48.216.156.246'
 };
