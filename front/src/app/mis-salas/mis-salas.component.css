@@ -18,7 +18,7 @@
 }
 .id {
     margin: 20px;
-    width: 10%;
+    width: 20%;
     text-align: center;
 }
 
@@ -53,16 +53,63 @@
     background-color: white; 
     color:black; 
     border:none; 
-    width: 50%;
-    height: 100%;
+    width: 20%;
+    text-align: center;
+    margin: 10px;
+    font-weight: bold;
 }
 
 .goToSala{
-  width: 20%;
+  width: 15%;
   height: 100%;
   background-color: rgb(4, 207, 4);
   color: white;
   cursor: pointer;
   border: none;
   border-radius: 10px;
+}
+
+.erraseSala{
+  margin-left: 5px;
+  width: 15%;
+  height: 100%;
+  background-color: rgb(231, 3, 3);
+  color: white;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+}
+
+.nameSala {
+  width: 30%;
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Para que el input esté pegado abajo */
+  box-sizing: border-box;
+}
+
+.name {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px; /* Espacio entre el label y el input */
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+.update-icon {
+  cursor: pointer;
+  height: 24px; /* Ajusta el tamaño de la imagen según sea necesario */
+  width: 24px;
+  margin-left: 10px; /* Espacio entre el input y la imagen */
 }

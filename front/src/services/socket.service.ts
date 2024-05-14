@@ -159,7 +159,7 @@ export class SocketService {
   public listenReceiveMessage(eventName: string): Observable<any>{
     return new Observable(observer => {
       this.socket.on(eventName, (idMsg: number, idSender: string, texto: string, rutaMultimedia: string, fechaHora: Date) => {
-        observer.next({texto, rutaMultimedia});
+        observer.next({idMsg, texto, rutaMultimedia});
         console.log('Mensaje recibido de: ', idSender);
         console.log('Texto del mensaje: ', texto);
         console.log('Ruta multimedia: ', rutaMultimedia);
@@ -168,16 +168,11 @@ export class SocketService {
     });
   }
 
-  public emitUnmatch(eventName: string, idUsuario: string, idSala: string){
-    this.socket.emit(eventName, idUsuario, idSala, (success: boolean) => {
-      console.log(success ? 'Unmatch enviado con éxito' : 'Error al enviar unmatch');
-    });
-  }
 
   public listenUnmatch(eventName: string): Observable<any>{
     return new Observable(observer => {
-      this.socket.on(eventName, (idUsuario: string, idSala: string) => {
-        observer.next({idUsuario, idSala});
+      this.socket.on(eventName, (idSala: string) => {
+        observer.next({idSala});
       });
       return () => this.socket.off(eventName);
     });

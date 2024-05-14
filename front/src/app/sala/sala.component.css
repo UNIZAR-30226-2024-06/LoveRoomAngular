@@ -41,15 +41,17 @@ youtube-player::ng-deep iframe {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow: hidden; /* Asegura que el contenido no se desborde */
 }
 
 .messages-container {
     overflow-y: auto;
-    height: 90%;
+    flex-grow: 1; /* Asegura que el contenedor de mensajes ocupe todo el espacio disponible */
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     justify-content: flex-start;
+    padding-bottom: 10px; /* Espacio inferior para que el último mensaje no quede oculto */
 }
 
 .messages-container .message {
@@ -105,6 +107,13 @@ youtube-player::ng-deep iframe {
 .iconosend {
     cursor: pointer;
     height: 30px;
+}
+
+.report-icon {
+    cursor: pointer;
+    height: 30px;
+    margin-left: 2px;
+
 }
 
 .youtube-container {
@@ -231,3 +240,41 @@ youtube-player::ng-deep iframe {
     cursor: pointer;
 }
 
+.report-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 10px; /* Ajusta el espacio entre el mensaje y el icono de reportar */
+}
+
+.report-icon {
+    cursor: pointer;
+    height: 20px;
+    margin-left: 10px;
+}
+
+.report-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.report-box textarea {
+    width: 100px;
+    height: 30px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    resize: none;
+}
+
+.send-report-icon {
+    cursor: pointer;
+    height: 30px;
+}

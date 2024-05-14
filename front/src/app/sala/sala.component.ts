@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnDestroy, OnInit, inject,AfterViewInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnDestroy, OnInit, inject,AfterViewInit, AfterRenderOptions, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CabeceraYMenuComponent } from '../cabecera-y-menu/cabecera-y-menu.component';
 import { YoutubeComponent } from '../youtube/youtube.component';
@@ -22,8 +22,9 @@ import { Router } from '@angular/router';
   templateUrl: './sala.component.html',
   styleUrls: ['./sala.component.css']
 })
-export class SalaComponent implements OnInit {
+export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @ViewChild(YouTubePlayer, { static: false }) youtubePlayer!: YouTubePlayer;
+  @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
   playerVars = {
     autoplay: 1,  // 0 o 1 (1 significa autoplay activado)
     controls: 1,  // 0 o 1 (1 muestra los controles del reproductor)
@@ -36,8 +37,9 @@ export class SalaComponent implements OnInit {
   videoUrl!: SafeResourceUrl;
   videoId: string = '';
   segundos: number = 0;
-  messages: { text: string, multimedia: string, timestamp: number, isOwnMessage: boolean }[] = [];
+  messages: { id: number, text: string, multimedia: string, timestamp: number, isOwnMessage: boolean, showReportBox?: boolean, reportText?: string }[] = [];
   newMessage: string = '';
+  idMsg: number = 0;
   subscriptions1: Subscription[] = [];
   player: any;
   sala: string = '';
@@ -108,14 +110,19 @@ export class SalaComponent implements OnInit {
         
         //this.socketService.emitSyncOn(socketEvents.SYNC_ON, this.sala, this.videoId, this.youtubePlayer.getCurrentTime(), this.enPausa);
       }),
-      this.socketService.listenReceiveMessage(socketEvents.RECEIVE_MESSAGE).subscribe(({texto, rutaMultimedia}) => {
+      this.socketService.listenReceiveMessage(socketEvents.RECEIVE_MESSAGE).subscribe(({idMsg, texto, rutaMultimedia}) => {
         const newMsg = {
+          id: idMsg,
           text: texto,
           multimedia: rutaMultimedia,
           timestamp: Date.now(),
           isOwnMessage: false // Asumimos que sendMessage siempre es llamado por el usuario actual
         };
         this.messages.push(newMsg);
+        this.scrollToBottom();
+      }), 
+      this.socketService.listenUnmatch(socketEvents.UNMATCH).subscribe((idSala) => {
+        this.listenUnmatch();
       })
     );
 
@@ -154,6 +161,32 @@ export class SalaComponent implements OnInit {
                       this.error = 'Error al obtener el perfil del usuario';
                     }
                   );
+                  //AÑADIR AQUI
+                  this.http.get<any>(`http://${environment.host_back}/${this.sala}/chat`, { headers })
+                  .subscribe(
+                    response => {
+                      response.forEach((msg: any) => {
+                        const isOwnMessage = msg.idusuario === this.idUsuario;
+                        const newMsg = {
+                          id: msg.id,
+                          text: msg.texto,
+                          multimedia: msg.rutamultimedia,
+                          timestamp: new Date(msg.fechahora).getTime(),
+                          isOwnMessage: isOwnMessage
+                        };
+                        this.messages.push(newMsg);
+                        this.scrollToBottom();
+                      });
+                    },
+                    error => {
+                      if (error.status === 403) {
+                        console.error('Error: El usuario no pertenece a la sala indicada');
+                      } else {
+                        console.error('Error al obtener mensajes de sala', error);
+                      }
+                    }
+                  );
+
               },
               error => {
                 console.error('Error al obtener los miembros de la sala', error);
@@ -168,9 +201,23 @@ export class SalaComponent implements OnInit {
       );
 }
 
-async delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+ngAfterViewInit(): void {
+  this.scrollToBottom();
 }
+
+ngAfterViewChecked(): void {
+  this.scrollToBottom();
+}
+
+
+scrollToBottom(): void {
+  try {
+    this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
+  } catch(err) {
+    console.error('Error al desplazar el contenedor de mensajes', err);
+  }
+}
+
 
 // Manejar eventos de sincronización
 manageSyncEvents(): void {
@@ -195,10 +242,17 @@ manageSyncEvents(): void {
 setupVideoControlListeners(): void {
   this.clearVideoControlListeners(); // Limpiar suscripciones previas
   this.videoControlSubscriptions = [
-    this.socketService.listenPausePlay(socketEvents.PAUSE).subscribe(() => this.youtubePlayer.pauseVideo()),
-    this.socketService.listenPausePlay(socketEvents.PLAY).subscribe(() => this.youtubePlayer.playVideo()),
-    this.socketService.listenChangeVideo(socketEvents.CHANGE_VIDEO).subscribe(idVideo => this.changeVideo(idVideo)),
-    this.socketService.listenUnmatch(socketEvents.UNMATCH).subscribe(() => this.listenUnmatch())
+    this.socketService.listenPausePlay(socketEvents.PAUSE).subscribe(() => {
+      this.youtubePlayer.pauseVideo();
+      this.enPausa=true;
+    }
+  ),
+    this.socketService.listenPausePlay(socketEvents.PLAY).subscribe(() => {
+      this.youtubePlayer.playVideo();
+      this.enPausa=false;
+    }
+  ),
+    this.socketService.listenChangeVideo(socketEvents.CHANGE_VIDEO).subscribe(idVideo => this.changeVideo(idVideo))
   ];
 }
 
@@ -244,12 +298,16 @@ clearVideoControlListeners(): void {
         }
       }
       this.lastPlayedSeconds = this.youtubePlayer.getCurrentTime();
-      this.playVideo(); // Si se está reproduciendo, continua la reproducción
-      this.enPausa = false;
+      if (this.enPausa){
+        this.playVideo(); // Reproduce el video y emite un evento PLAY
+        this.enPausa = false;
+      }
     } else if (event.data === YT.PlayerState.PAUSED) {
       console.log('PAUSE event received and video paused');
-      this.pauseVideo(); // Pausa el video y emite un evento PAUSE
-      this.enPausa = true;
+      if (this.enPausa==false){
+        this.pauseVideo(); // Pausa el video y emite un evento PAUSE
+        this.enPausa = true;
+      }
     }
   }
   
@@ -319,6 +377,7 @@ clearVideoControlListeners(): void {
     const rutaMultimedia = '';
     if (this.newMessage.trim() !== '') {
       const newMsg = {
+        id: this.idMsg,
         text: this.newMessage,
         multimedia: rutaMultimedia,
         timestamp: Date.now(),
@@ -327,6 +386,7 @@ clearVideoControlListeners(): void {
       this.messages.push(newMsg);
       this.socketService.emitCreateMessage(socketEvents.CREATE_MESSAGE, this.sala, this.newMessage, rutaMultimedia);
       this.newMessage = '';
+      this.scrollToBottom();
     }
   }
 
@@ -384,27 +444,9 @@ clearVideoControlListeners(): void {
     this.isSynchronized = !this.isSynchronized;  // Cambiar el estado de la imagen
   }
 
-  emitUnmatch(): void {
-    const iduser = this.idUsuario.toString();
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + localStorage.getItem('token')
-    });
-    this.socketService.emitUnmatch(socketEvents.UNMATCH, iduser, this.sala);
-    this.http.delete<any>('http://'+environment.host_back+'/rooms/'+this.sala, { headers: headers })
-      .subscribe(
-        response => {
-          alert("Sala borrada con éxito, volviendo a mis salas");
-          this.router.navigate(['/mis-salas']);
-        },
-        error => {
-          alert('Error al borrar sala');
-        }
-      );
-  }
-
   listenUnmatch(): void {
-    alert("El otro usuario ha borrado la sala, volviendo a mis salas");
     this.router.navigate(['/mis-salas']);
+    alert("El otro usuario ha borrado la sala, volviendo a mis salas");
   }
     
   ngOnDestroy(): void {
@@ -416,5 +458,33 @@ clearVideoControlListeners(): void {
     this.socketService.disconnect();
     localStorage.removeItem('videoId');
     console.log('Socket desconectado al salir de la sala');
+  }
+
+  toggleReportBox(messageId: number): void {
+    const message = this.messages.find(msg => msg.id === messageId);
+    if (message) {
+      message.showReportBox = !message.showReportBox;
+    }
+  }
+
+  reportMessage(idMsg: number, motivo: string): void {
+    const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    const body = { motivo }; // Cuerpo de la petición con el motivo del reporte
+  
+    this.http.post(`http://${environment.host_back}/reports/${idMsg}`, body, { headers })
+      .subscribe(
+        response => {
+          console.log('Reporte creado exitosamente:', response);
+          alert('Reporte enviado exitosamente');
+          // Puedes añadir cualquier otra lógica que desees ejecutar después de crear el reporte
+        },
+        error => {
+          console.error('Error al crear el reporte:', error);
+          alert('Error al enviar el reporte');
+        }
+      );
   }
 }

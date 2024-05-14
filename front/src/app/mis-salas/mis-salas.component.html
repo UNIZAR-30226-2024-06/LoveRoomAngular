@@ -3,12 +3,17 @@
 <div class="mis-salas-container">
     <div class="salas">
         <div class="sala" *ngFor="let sala of salas">
-            <h3 class="id">Sala: {{ sala.id }}</h3> <!-- Puedes mostrar otros detalles de la sala si es necesario -->
+            <div class="nameSala">
+                <label class="name">Sala: {{ sala.nombre }}</label> <!-- Puedes mostrar otros detalles de la sala si es necesario -->
+                <div class="input-container">
+                    <input [(ngModel)]="sala.newName" (keydown.enter)="updateRoom(sala.idsala, sala.newName)" type="text" placeholder="Escribe un nuevo nombre para la sala">
+                    <img src="assets/enviar.png" alt="Actualizar" class="update-icon" (click)="updateRoom(sala.idsala, sala.newName)">
+                </div>          
+            </div>
             <img class="miniature" [src]="getVideoThumbnailUrl(sala.idvideo)" alt="Miniatura del video">
             <label class="acceptResult">{{ sala.videoTitle }}</label>
-            <h3 class="namePerson"> {{ sala.id }}</h3>
-            <h3 class="namePerson"> {{ sala.autor }}</h3>
             <button class="goToSala" (click)="watchVideo(sala.idsala, sala.idvideo)">IR A LA SALA</button>
+            <button class="erraseSala" (click)="deleteRoom(sala.idsala)">BORRAR SALA</button>
         </div>
     </div>
 </div>

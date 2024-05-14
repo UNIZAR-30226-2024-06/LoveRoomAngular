@@ -65,19 +65,22 @@
     </div>
     <img src="{{ currentImage }}" (click)="toggleImage()" alt="Toggle Image" class="toggle-image">
     <div class="chat-container">
-        <div class="messages-container">
+        <div #messagesContainer class="messages-container">
             <div *ngFor="let message of messages | orderBy: 'timestamp'" [ngClass]="{'message': message.isOwnMessage, 'messageOtro': !message.isOwnMessage}">
-              {{ message.text }}
-              <!--<img *ngIf="message.multimedia" [src]="message.multimedia" alt="Multimedia">-->
-            </div>
-          </div>
+                {{ message.text }}
+                <div class="report-container" *ngIf="!message.isOwnMessage">
+                  <img src="assets/report.png" alt="Report Icon" class="report-icon" (click)="toggleReportBox(message.id)">
+                  <div *ngIf="message.showReportBox" class="report-box">
+                    <textarea [(ngModel)]="message.reportText" placeholder="Escribe el motivo del reporte"></textarea>
+                    <img src="assets/enviar.png" alt="Send Report Icon" class="send-report-icon" (click)="reportMessage(message.id, message.reportText)">
+                  </div>
+                </div>
+              </div>
+        </div>
           
         <div class="input-container">
             <input [(ngModel)]="newMessage" (keydown.enter)="handleEnterKey($event)" type="text" placeholder="Escribe un mensaje...">
             <img class = "iconosend" src="assets/enviar.png" (click)="sendMessage()">
         </div>
     </div>
-    <button class="unmatch" (click)="emitUnmatch()">Abandonar la sala</button>
 </div>
-
-<!---->

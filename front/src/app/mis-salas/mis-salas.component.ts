@@ -8,11 +8,12 @@ import { Router } from '@angular/router';
 import { map } from 'rxjs';
 import { SocketService } from '../../services/socket.service';
 import { socketEvents } from '../../environments/socketEvents';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-mis-salas',
   standalone: true,
-  imports: [CabeceraYMenuComponent, CommonModule],
+  imports: [CabeceraYMenuComponent, CommonModule, FormsModule],
   templateUrl: './mis-salas.component.html',
   styleUrl: './mis-salas.component.css'
 })
@@ -99,5 +100,39 @@ export class MisSalasComponent implements OnInit {
     this.socketService.connect();
     this.router.navigate(['/sala', salaId]);
     this.socketService.emitJoinLeave(socketEvents.JOIN_ROOM, salaId);
+  }
+
+  deleteRoom(salaId: string) {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    this.http.delete(`http://${environment.host_back}/rooms/${salaId}`, { headers })
+      .subscribe(
+        (response) => {
+          console.log('Sala eliminada:', response);
+          this.getSalas();
+        },
+        (error) => {
+          console.error('Error al eliminar la sala:', error);
+        }
+      );
+  }
+
+  updateRoom(salaId: string, nombreSala: string) {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    this.http.put(`http://${environment.host_back}/rooms/${salaId}/rename`, { nombreSala }, { headers })
+      .subscribe(
+        (response) => {
+          console.log('Nombre de sala actualizado:', response);
+          this.getSalas();
+        },
+        (error) => {
+          console.error('Error al actualizar el nombre de la sala:', error);
+        }
+      );
   }
 }
