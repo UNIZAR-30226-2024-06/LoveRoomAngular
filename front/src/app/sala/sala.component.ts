@@ -44,7 +44,7 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
   videoUrl!: SafeResourceUrl;
   videoId: string = '';
   segundos: number = 0;
-  messages: { id: number, text: string, multimedia: string | null, timestamp: number, isOwnMessage: boolean, showReportBox?: boolean, reportText?: string, imgCargada:any}[] = [];
+  messages: { id: number, text: string, multimedia: string | null, timestamp: number, isOwnMessage: boolean, showReportBox?: boolean, reportText?: string, imgCargada:any, videoCargado: any}[] = [];
   newMessage: string = '';
   idMsg: number = 0;
   subscriptions1: Subscription[] = [];
@@ -124,14 +124,30 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
           multimedia: rutaMultimedia,
           timestamp: Date.now(),
           isOwnMessage: false, // Asumimos que sendMessage siempre es llamado por el usuario actual
-          imgCargada: 'assets/Logo.png'
+          imgCargada: '',
+          videoCargado: ''
         };
         
-        if(newMsg.multimedia !== null){
-          const image = await fetch('http://'+environment.host_back+'/multimedia/' + newMsg.multimedia);
-          const blob = await image.blob();
-          const objectURL = URL.createObjectURL(blob);
-          newMsg.imgCargada = objectURL;
+        if (newMsg.multimedia !== null) {
+          const response = await fetch('http://' + environment.host_back + '/multimedia/' + newMsg.multimedia);
+          const response_aux = await fetch('http://' + environment.host_back + '/multimedia/' + newMsg.multimedia + '/tipo');
+          const blob = await response.blob();
+          
+          // Verificar la estructura de la respuesta JSON
+          const tipoMultimediaJson = await response_aux.json();
+          console.log('Respuesta JSON:', tipoMultimediaJson);
+          
+          // Extraer el tipo de archivo, si existe
+          const tipoArchivo = tipoMultimediaJson?.tipo || 'Tipo no encontrado';
+          
+          if(tipoArchivo == "F"){
+            const objectURL = URL.createObjectURL(blob);
+            newMsg.imgCargada = objectURL;
+          }
+          else if(tipoArchivo == "V"){
+            const objectURL = URL.createObjectURL(blob);
+            newMsg.videoCargado = objectURL;
+          }
         }
         this.messages.push(newMsg);
         this.scrollToBottom();
@@ -177,26 +193,29 @@ export class SalaComponent implements OnInit, AfterViewInit, AfterViewChecked {
                           multimedia: msg.rutamultimedia,
                           timestamp: new Date(msg.fechahora).getTime(),
                           isOwnMessage: isOwnMessage,
-                          imgCargada: 'assets/Logo.png'
+                          imgCargada: '',
+                          videoCargado: ''
                         };
                         if (newMsg.multimedia !== null) {
-                          const response = await fetch('http://' + environment.host_back + '/multimedia/' + newMsg.multimedia, {
-                            headers: {
-                              'Authorization': 'Bearer ' + localStorage.getItem('token')
-                            }
-                          });
+                          const response = await fetch('http://' + environment.host_back + '/multimedia/' + newMsg.multimedia);
+                          const response_aux = await fetch('http://' + environment.host_back + '/multimedia/' + newMsg.multimedia + '/tipo');
                           const blob = await response.blob();
-                        
-                          // Ver todas las cabeceras de la respuesta
-                          response.headers.forEach((value, key) => {
-                            console.log(`${key}: ${value}`);
-                          });
-                        
-                          const tipoArchivo = response.headers.get('Tipo-Multimedia');
-                          //alert(tipoArchivo);
-                        
-                          const objectURL = URL.createObjectURL(blob);
-                          newMsg.imgCargada = objectURL;
+                          
+                          // Verificar la estructura de la respuesta JSON
+                          const tipoMultimediaJson = await response_aux.json();
+                          console.log('Respuesta JSON:', tipoMultimediaJson);
+                          
+                          // Extraer el tipo de archivo, si existe
+                          const tipoArchivo = tipoMultimediaJson?.tipo || 'Tipo no encontrado';
+                          
+                          if(tipoArchivo == "F"){
+                            const objectURL = URL.createObjectURL(blob);
+                            newMsg.imgCargada = objectURL;
+                          }
+                          else if(tipoArchivo == "V"){
+                            const objectURL = URL.createObjectURL(blob);
+                            newMsg.videoCargado = objectURL;
+                          }
                         }
                         this.messages.push(newMsg);
                         this.scrollToBottom();
@@ -424,12 +443,23 @@ clearVideoControlListeners(): void {
         multimedia: this.multimediaUrl,
         timestamp: Date.now(),
         isOwnMessage: true,// Asumimos que sendMessage siempre es llamado por el usuario actual
-        imgCargada: this.multimediaUrl
+        imgCargada: '',
+        videoCargado: ''
       };
+      if(this.flag_imagen == true){
+        if(this.multimediaUrl){
+          newMsg.imgCargada = this.multimediaUrl;
+        }
+      }
+      else if(this.flag_video == true){
+        if(this.multimediaUrl){
+          newMsg.videoCargado = this.multimediaUrl;
+        }
+      }
       
       this.messages.push(newMsg);
       this.clearMultimedia();
-      
+
       const headers = new HttpHeaders({
         'Authorization': 'Bearer ' + localStorage.getItem('token')
       });
@@ -438,6 +468,10 @@ clearVideoControlListeners(): void {
         const formData = new FormData();
         formData.append('file',this.file);
         try {
+          if(this.multimediaUrl){
+            //newMsg.imgCargada = this.multimediaUrl;
+          }
+          
           const response = await this.http.post<any>('http://'+environment.host_back+'/multimedia/upload/foto/'+this.idUsuario, formData, { headers: headers }).toPromise();
           console.log('Imagen subida', response);
           this.multimediaUrl = response.nombreArchivo;
@@ -452,6 +486,9 @@ clearVideoControlListeners(): void {
         const formData = new FormData();
         formData.append('file',this.file);
         try {
+          if(this.multimediaUrl){
+            //newMsg.videoCargado = this.multimediaUrl;
+          }
           const response = await this.http.post<any>('http://'+environment.host_back+'/multimedia/upload/video/'+this.idUsuario, formData, { headers: headers }).toPromise();
           console.log('Video subido', response);
           this.multimediaUrl = response.nombreArchivo;
@@ -462,6 +499,7 @@ clearVideoControlListeners(): void {
           alert(error.message); 
         }
       }
+      
       this.socketService.emitCreateMessage(socketEvents.CREATE_MESSAGE, this.sala, this.newMessage, this.multimediaUrl);
       this.newMessage = '';
       this.scrollToBottom();
