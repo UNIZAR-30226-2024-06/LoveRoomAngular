@@ -114,13 +114,6 @@
     height: 350px;
 }
 
-boton_users {
-  background: none; /* Elimina el color de fondo */
-    border: none; /* Elimina el borde */
-    padding: 0; /* Elimina el padding */
-    margin: 0; /* Elimina el margen */
-    color: inherit; /* Hereda el color del texto circundante */
-    font: inherit; /* Hereda la fuente del texto circundante */
-    cursor: pointer; /* Muestra el cursor de puntero */
-    outline: none; /* Elimina el contorno al hacer clic */
+.usuarios{
+  font-size: 45 px;
 }
