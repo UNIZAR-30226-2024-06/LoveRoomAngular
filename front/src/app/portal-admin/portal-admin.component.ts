@@ -21,6 +21,7 @@ export class PortalAdminComponent {
   public chartSexo: any;
   public chartEdad: any;
   public chartLocalidad: any;
+  users: any[] = [];
 
 
   constructor(private http: HttpClient, private router: Router) { }
@@ -29,6 +30,7 @@ export class PortalAdminComponent {
     this.graficoSexo();
     this.graficoEdad();
     this.graficoLocalidad();
+    this.mostrarUsers();
   }
 
 
@@ -213,5 +215,25 @@ export class PortalAdminComponent {
         aspectRatio:2.5,
       }
     });
+  }
+
+  async mostrarUsers(): Promise<void> {
+    let vectorLabel: any[] = [];
+    let vectorValues: any[] = [];
+    let headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+
+    try {
+      const responseUsuarios = await this.http.get<any[]>('http://'+environment.host_back+'/users', { headers: headers }).toPromise();
+      if (responseUsuarios) {
+        this.users = responseUsuarios;
+      }
+    }
+    catch (error : any) {
+      console.error('Error al obtener la localidad de los usuarios', error);
+      this.error = 'Error al obtener los usuarios';
+      return;
+    }
   }
 }

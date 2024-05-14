@@ -10,9 +10,10 @@
             <label for="correo" class="correo">{{ reporte.correo }}</label> <!-- Puedes mostrar otros detalles de la sala si es necesario -->
             <label class="texto" for="correo">{{ reporte.texto }}</label>
             <label class="motivo" for="correo">{{ reporte.motivo }}</label>
-            <button class="unban" *ngIf="!reporte.resuelto" (click)="resolverReporte(reporte.id)">Resolver Reporte</button>
+            <button class="no_ban" (click)="resolverReporte(reporte.id, false)">Desestimar reporte</button>
+            <button class="delete" (click)="eliminarReporte(reporte.id)">Eliminar reporte</button>
+            <button class="ban_user" *ngIf="!reporte.resuelto" (click)="resolverReporte(reporte.id, true)">Banear Usuario</button>
             <label class="resuelto" *ngIf="reporte.resuelto">Reporte Resuelto </label>
-            <button class="ban" (click)="eliminarReporte(reporte.id)">Eliminar Reporte</button>
         </div>
     </div>
 </div>

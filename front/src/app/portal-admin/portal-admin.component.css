@@ -85,3 +85,42 @@
     text-justify: center;
   }
 
+  .listas {
+    box-sizing: border-box;
+    padding: 3px;
+    display: flex;
+    flex-direction: row; /* Alinear elementos en una fila */
+    align-items: flex-start; /* Alinear al inicio del eje cruzado */
+    justify-content: flex-start; /* Alinear al inicio del eje principal */
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 90%;
+    text-align: center;
+}
+
+.lista_usuarios,
+.lista_reportes {
+    width: 500px; /* Ancho automático basado en el contenido */
+    box-sizing: border-box;
+    margin: 10px; /* Espaciado entre los contenedores */
+    padding: 3px;
+    border: 2px solid #fc0202; /* Borde sólido de 2px */
+    border-radius: 10px; /* Borde redondeado */
+    background-color: #f9f9f9; /* Color de fondo */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra */
+    text-align: center;
+    max-height: 350px; /* Altura máxima para el contenedor con scroll */
+    overflow-y: auto; /* Habilitar scroll vertical */
+    height: 350px;
+}
+
+boton_users {
+  background: none; /* Elimina el color de fondo */
+    border: none; /* Elimina el borde */
+    padding: 0; /* Elimina el padding */
+    margin: 0; /* Elimina el margen */
+    color: inherit; /* Hereda el color del texto circundante */
+    font: inherit; /* Hereda la fuente del texto circundante */
+    cursor: pointer; /* Muestra el cursor de puntero */
+    outline: none; /* Elimina el contorno al hacer clic */
+}

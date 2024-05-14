@@ -75,12 +75,16 @@ export class ReportsAdminComponent {
     }
   }
 
-  resolverReporte(idReporte: number): void {
+  resolverReporte(idReporte: number, ban: boolean): void {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + localStorage.getItem('token')
     });
 
-    this.http.patch('http://' + environment.host_back + '/reports/' + idReporte + '/resolve', null, { headers: headers })
+    const credentials = {
+      banUser: ban
+    };
+
+    this.http.patch('http://' + environment.host_back + '/reports/' + idReporte + '/resolve', credentials, { headers: headers })
       .subscribe({
         next: response => {
           console.log(response);

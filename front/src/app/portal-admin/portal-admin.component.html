@@ -18,4 +18,22 @@
                 </div>
             </div>
         </div>
+        <div>
+            <div class="listas">
+                <a [routerLink]="['/usuarios-admin']">
+                    <button class="menu-button h1-like">
+                        <div class="lista_usuarios">
+                            <h1 class="titulo">Usuarios</h1>
+                            <div class="usuarios" *ngFor="let user of users">
+                                <label for="nombre" class="nombre">{{ user.nombre }}</label>
+                                <label for="tipo" class="tipo">{{ "     " + user.tipousuario }}</label>
+                            </div>
+                        </div>
+                    </button>
+                </a>
+                <div class="lista_reportes">
+                    <h1 class="titulo">Reportes</h1>
+                </div>
+            </div>
+        </div>
 </div>
