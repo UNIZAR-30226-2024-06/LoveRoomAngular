@@ -5,13 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterOutlet, RouterModule, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { CabeceraYMenuComponent } from '../cabecera-y-menu/cabecera-y-menu.component';
-import { BarChartComponent } from '../bar-chart/bar-chart.component';
 import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'app-usuarios-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterOutlet, RouterModule, CabeceraYMenuComponent, BarChartComponent],
+  imports: [CommonModule, FormsModule, RouterOutlet, RouterModule, CabeceraYMenuComponent],
   templateUrl: './portal-admin.component.html',
   styleUrl: './portal-admin.component.css'
 })
