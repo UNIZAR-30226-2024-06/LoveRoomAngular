@@ -20,7 +20,10 @@ export class PortalAdminComponent {
   public numTotal: number = 0;
   public chartSexo: any;
   public chartEdad: any;
+  public chartTipo: any;
   public chartLocalidad: any;
+  public chartReports: any;
+  users: any[] = [];
 
 
   constructor(private http: HttpClient, private router: Router) { }
@@ -29,6 +32,8 @@ export class PortalAdminComponent {
     this.graficoSexo();
     this.graficoEdad();
     this.graficoLocalidad();
+    this.graficoTipos();
+    this.graficoReportes();
   }
 
 
@@ -56,20 +61,7 @@ export class PortalAdminComponent {
           } else if (usuario.sexo == "O"){
             numOtro++;
           }
-          
-          if (usuario.tipousuario == "premium") {
-            numPremium++;
-          }
-          else if (usuario.tipousuario == "normal") {
-            numNormal++;
-          }
-          else if (usuario.tipousuario == "administrador") {
-            numAdmin++;
-          }
 
-          if (usuario.baneado == 1) {
-            numBaned++;
-          }
         });
         this.numTotal = numHombres + numMujeres + numOtro;
       }
@@ -211,6 +203,115 @@ export class PortalAdminComponent {
       },
       options: {
         aspectRatio:2.5,
+      }
+    });
+  }
+
+  async mostrarUsers(): Promise<void> {
+    let vectorLabel: any[] = [];
+    let vectorValues: any[] = [];
+    let headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+
+    try {
+      const responseUsuarios = await this.http.get<any[]>('http://'+environment.host_back+'/users', { headers: headers }).toPromise();
+      if (responseUsuarios) {
+        this.users = responseUsuarios;
+      }
+    }
+    catch (error : any) {
+      console.error('Error al obtener la localidad de los usuarios', error);
+      this.error = 'Error al obtener los usuarios';
+      return;
+    }
+  }
+
+  async graficoReportes(): Promise<void> {
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+
+    let numResolved: number = 0;
+    let numUnresolved: number = 0;
+    
+    try {
+      const responseReports = await this.http.get<any>('http://'+environment.host_back+'/admin/stats/reports', { headers: headers }).toPromise();
+      if (responseReports) {
+        numResolved = responseReports.ResolvedReports;
+        numUnresolved = responseReports.UnresolvedReports;
+      }
+    }
+    catch (error : any) {
+      console.error('Error al obtener los usuarios', error);
+      this.error = 'Error al obtener los usuarios';
+      return;
+    }
+    this.chartReports = new Chart("reportes", {
+      type: 'pie',
+      data: {
+        labels: ['Resueltas', 'No resueltas'], // Etiquetas para el conjunto de datos de sexo
+        datasets: [
+          {
+            label: "Estado",
+            data: [numResolved, numUnresolved],
+            backgroundColor: ['green', 'red']
+          },
+        ]
+      },
+      options: {
+        aspectRatio: 2.5
+      }
+    });
+  }
+
+  async graficoTipos(): Promise<void> {
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + localStorage.getItem('token')
+    });
+    let numNormal: number = 0;
+    let numPremium: number = 0;
+    let numAdmin: number = 0;
+    
+    try {
+      let responseSExo = await this.http.get<any[]>('http://'+environment.host_back+'/users', { headers: headers }).toPromise();
+      if (responseSExo) {
+        responseSExo.forEach(usuario => {
+          
+          if (usuario.tipousuario == "premium") {
+            numPremium++;
+          }
+          else if (usuario.tipousuario == "normal") {
+            numNormal++;
+          }
+          else if (usuario.tipousuario == "administrador") {
+            numAdmin++;
+          }
+
+        });
+        this.numTotal = numPremium + numNormal + numAdmin;
+      }
+    }
+    catch (error : any) {
+      console.error('Error al obtener los usuarios', error);
+      this.error = 'Error al obtener los usuarios';
+      return;
+    }
+    
+    this.chartTipo = new Chart("tipo", {
+      type: 'pie',
+      data: {
+        labels: ['Normal', 'Premium', 'Admin'], // Etiquetas para el conjunto de datos de sexo
+        datasets: [
+          {
+            label: "Tipo",
+            data: [numNormal, numPremium, numAdmin],
+            backgroundColor: ['blue', 'red', 'yellow']
+          },
+        ]
+      },
+      options: {
+        aspectRatio: 2.5
       }
     });
   }

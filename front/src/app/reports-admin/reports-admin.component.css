@@ -89,7 +89,17 @@
       height: 100%;
   }
   
-  .ban{
+  .no_ban{
+    width: 15%;
+    height: 100%;
+    background-color: green;
+    color: white;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    margin-left: 5px;
+  }
+  .ban_user{
     width: 15%;
     height: 100%;
     background-color: red;
@@ -99,10 +109,11 @@
     border-radius: 10px;
     margin-left: 5px;
   }
-  .unban{
+
+  .delete{
     width: 15%;
     height: 100%;
-    background-color: green;
+    background-color: orange;
     color: white;
     cursor: pointer;
     border: none;
